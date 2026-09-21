@@ -2,7 +2,7 @@ Here is a comprehensive description of **endoflife.tech**:
 
 ---
 
-#Enterprise Software Lifecycle & EOL Intelligence Portal
+# Enterprise Software Lifecycle & EOL Intelligence Portal
 
 **endoflife.tech** is an open enterprise software lifecycle reference portal and risk management platform. It provides centralized, decision-ready visibility into End-of-Life (EOL), End-of-Active-Support (EOAS), and Long-Term Support (LTS) schedules across thousands of enterprise software products, operating systems, frameworks, databases, and vendor suites.
 
