@@ -3,15 +3,20 @@ import { useQuery } from "@tanstack/react-query";
 import { 
   AlertTriangle, 
   CheckCircle2, 
+  ChevronDown,
+  ChevronUp,
   Clock3, 
   Download, 
   FileSpreadsheet, 
+  Info,
   Layers, 
   RefreshCw, 
   RotateCcw, 
   Search, 
   Server, 
   ShieldAlert, 
+  ShieldCheck,
+  Sparkles,
   Upload 
 } from "lucide-react";
 import { useMemo, useRef, useState } from "react";
@@ -164,6 +169,8 @@ function RiskDashboardPage() {
   const { data: catalog = [] } = useQuery({ queryKey: ["catalog"], queryFn: getCatalog });
   const [activeTab, setActiveTab] = useState<"fleet" | "catalog">("fleet");
   const [environments, setEnvironments] = useState<RuntimeEnvironment[]>(INITIAL_SAMPLE_ENVIRONMENTS);
+  const [isSampleData, setIsSampleData] = useState(true);
+  const [showHowItWorks, setShowHowItWorks] = useState(true);
   const [query, setQuery] = useState("");
   const [riskFilter, setRiskFilter] = useState("all");
   const [statusFilter, setStatusFilter] = useState("all");
@@ -258,6 +265,7 @@ function RiskDashboardPage() {
       }
 
       setEnvironments(parsed);
+      setIsSampleData(false);
       toast.success(`Successfully imported ${parsed.length} runtime environments.`);
       setActiveTab("fleet");
     } catch (err) {
@@ -292,17 +300,37 @@ function RiskDashboardPage() {
     toast.success("Inventory risk report exported as CSV.");
   };
 
+  const handleDownloadTemplate = () => {
+    const templateRows = [
+      "deployment_env,platform,version,eol_date,target_upgrade_path,migration_status,business_owner",
+      '"Production API Gateway Node-1","Node.js","18","2025-04-30","Node.js 22 LTS","In Progress","Edge Web Core"',
+      '"Enterprise Data Lake Engine","Python","3.10","2026-10-04","Python 3.12 LTS","Migration Planned","Data Platform Eng"',
+      '"Identity & Single Sign-On Cluster",".NET","8.0","2026-11-10","Stay on .NET 8.0","No Action Needed","Security Systems"',
+      '"Legacy Customer Billing Portal","PHP","8.1","2025-12-31","PHP 8.3","In Progress","Finance Tech"'
+    ];
+    const csvContent = "data:text/csv;charset=utf-8," + templateRows.join("\n");
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", "runtime_fleet_inventory_template.csv");
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    toast.success("Downloaded runtime fleet CSV template.");
+  };
+
   const handleResetSampleFleet = () => {
     setEnvironments(INITIAL_SAMPLE_ENVIRONMENTS);
+    setIsSampleData(true);
     toast.info("Reset to default enterprise sample fleet.");
   };
 
   return (
     <div>
       <PageHeader
-        eyebrow="Risk Governance"
+        eyebrow="Governance & Remediation"
         title="Runtime Environment Risk Dashboard"
-        description="Monitor active deployment environments, platforms, and installed versions against verified end-of-life schedules."
+        description="Audit enterprise deployment environments, host fleets, and software versions against verified end-of-life timelines to proactively eliminate security vulnerabilities and technical debt."
         action={
           <div className="flex flex-wrap items-center gap-2">
             <input
@@ -312,18 +340,112 @@ function RiskDashboardPage() {
               className="hidden"
               onChange={handleFileUpload}
             />
+            <Button variant="outline" size="sm" onClick={handleDownloadTemplate} title="Download starter CSV template">
+              <FileSpreadsheet className="mr-1.5 size-4" /> CSV Template
+            </Button>
             <Button variant="outline" size="sm" onClick={() => fileInputRef.current?.click()}>
-              <Upload className="mr-1.5 size-4" /> Import CSV Fleet
+              <Upload className="mr-1.5 size-4" /> Import Fleet CSV
             </Button>
             <Button variant="outline" size="sm" onClick={handleExportCSV}>
               <Download className="mr-1.5 size-4" /> Export Report
             </Button>
-            <Button variant="ghost" size="sm" onClick={handleResetSampleFleet} title="Reset to sample environments">
-              <RotateCcw className="mr-1.5 size-4" /> Reset Sample
-            </Button>
+            {!isSampleData && (
+              <Button variant="ghost" size="sm" onClick={handleResetSampleFleet} title="Reset to sample environments">
+                <RotateCcw className="mr-1.5 size-4" /> Restore Demo Fleet
+              </Button>
+            )}
           </div>
         }
       />
+
+      {/* Interactive Sandbox & Demo Notice Banner */}
+      <div className="mb-6 overflow-hidden rounded-xl border border-primary/25 bg-gradient-to-r from-primary/5 via-card to-primary/5 p-5 shadow-sm">
+        <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+          <div className="flex items-start gap-3.5">
+            <div className="rounded-lg bg-primary/10 p-2.5 text-primary shrink-0 mt-0.5">
+              <Sparkles className="size-5" />
+            </div>
+            <div>
+              <div className="flex flex-wrap items-center gap-2">
+                <h3 className="text-base font-semibold text-foreground">
+                  Interactive Demo Fleet Sandbox
+                </h3>
+                {isSampleData ? (
+                  <Badge variant="outline" className="border-amber-300 bg-amber-50 text-[11px] font-semibold text-amber-800 dark:border-amber-700 dark:bg-amber-950 dark:text-amber-300">
+                    Sample Data (7 Environments)
+                  </Badge>
+                ) : (
+                  <Badge variant="outline" className="border-emerald-300 bg-emerald-50 text-[11px] font-semibold text-emerald-800 dark:border-emerald-700 dark:bg-emerald-950 dark:text-emerald-300">
+                    Custom Imported Fleet ({environments.length} Environments)
+                  </Badge>
+                )}
+              </div>
+              <p className="mt-1.5 text-sm text-muted-foreground leading-relaxed">
+                This dashboard demonstrates how infrastructure and security teams audit software obsolescence across active production workloads. The 7 environments below simulate enterprise applications mapped against our verified EOL knowledge base. You can test filters, simulate risk calculations, or upload your own infrastructure inventory to audit your organization's real risk.
+              </p>
+            </div>
+          </div>
+          <div className="flex shrink-0 flex-wrap items-center gap-2 md:self-center">
+            <Button variant="outline" size="sm" onClick={handleDownloadTemplate} className="h-9">
+              <FileSpreadsheet className="mr-1.5 size-4" /> Download Template
+            </Button>
+            <Button size="sm" onClick={() => fileInputRef.current?.click()} className="h-9">
+              <Upload className="mr-1.5 size-4" /> Import Your Fleet
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setShowHowItWorks((prev) => !prev)}
+              className="h-9 text-xs font-medium"
+            >
+              {showHowItWorks ? (
+                <>Hide Guide <ChevronUp className="ml-1 size-3.5" /></>
+              ) : (
+                <>How It Works <ChevronDown className="ml-1 size-3.5" /></>
+              )}
+            </Button>
+          </div>
+        </div>
+
+        {/* Expandable 3-Step "How It Works" Guide */}
+        {showHowItWorks && (
+          <div className="mt-4 pt-4 border-t border-border/60 grid gap-3 sm:grid-cols-3 text-xs">
+            <div className="flex items-start gap-2.5 rounded-lg border border-border/60 bg-card/60 p-3">
+              <div className="rounded-full bg-primary/10 p-1.5 text-primary shrink-0">
+                <Server className="size-4" />
+              </div>
+              <div>
+                <span className="font-semibold text-foreground">1. Map Fleet Inventory</span>
+                <p className="mt-0.5 text-muted-foreground leading-relaxed">
+                  Catalog your servers, cloud runtimes, containers, or microservices with their installed software platforms and version numbers.
+                </p>
+              </div>
+            </div>
+            <div className="flex items-start gap-2.5 rounded-lg border border-border/60 bg-card/60 p-3">
+              <div className="rounded-full bg-amber-500/10 p-1.5 text-amber-600 dark:text-amber-400 shrink-0">
+                <ShieldAlert className="size-4" />
+              </div>
+              <div>
+                <span className="font-semibold text-foreground">2. Automated EOL Correlation</span>
+                <p className="mt-0.5 text-muted-foreground leading-relaxed">
+                  Every version is correlated in real-time with 39,613 verified lifecycle records and 8,843 release cycles to detect support deadlines.
+                </p>
+              </div>
+            </div>
+            <div className="flex items-start gap-2.5 rounded-lg border border-border/60 bg-card/60 p-3">
+              <div className="rounded-full bg-emerald-500/10 p-1.5 text-emerald-600 dark:text-emerald-400 shrink-0">
+                <ShieldCheck className="size-4" />
+              </div>
+              <div>
+                <span className="font-semibold text-foreground">3. Triage &amp; Assign Remediation</span>
+                <p className="mt-0.5 text-muted-foreground leading-relaxed">
+                  Identify overdue unpatched runtimes, calculate days to compliance cutoffs, define recommended LTS upgrade paths, and assign engineering owners.
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
 
       {/* View Switcher Tabs */}
       <div className="mb-6 flex border-b border-border">
@@ -336,7 +458,10 @@ function RiskDashboardPage() {
           }`}
         >
           <Server className="size-4" />
-          Runtime Fleet Inventory ({environments.length})
+          Runtime Fleet Inventory
+          <span className="rounded-full bg-muted px-2 py-0.5 text-[11px] font-mono text-muted-foreground">
+            {isSampleData ? `Demo (${environments.length})` : `Custom (${environments.length})`}
+          </span>
         </button>
         <button
           onClick={() => setActiveTab("catalog")}
@@ -347,7 +472,10 @@ function RiskDashboardPage() {
           }`}
         >
           <Layers className="size-4" />
-          Catalog Risk Watchlist ({catalogEol.length + catalogSoon.length})
+          Global Catalog Watchlist
+          <span className="rounded-full bg-muted px-2 py-0.5 text-[11px] font-mono text-muted-foreground">
+            {catalogEol.length + catalogSoon.length} Expiring Cycles
+          </span>
         </button>
       </div>
 
@@ -437,9 +565,22 @@ function RiskDashboardPage() {
           </section>
 
           {/* Results Summary */}
-          <div className="mt-5 flex items-center justify-between">
-            <p className="text-sm font-semibold">{filteredEnvironments.length} environments displayed</p>
-            <p className="text-xs text-muted-foreground">Computed dynamically from server schedule timestamps</p>
+          <div className="mt-5 flex flex-wrap items-center justify-between gap-2">
+            <div className="flex items-center gap-2">
+              <p className="text-sm font-semibold">{filteredEnvironments.length} environments displayed</p>
+              {isSampleData ? (
+                <Badge variant="outline" className="border-amber-300 bg-amber-50 text-[10px] font-semibold text-amber-800 dark:border-amber-700 dark:bg-amber-950 dark:text-amber-300">
+                  Simulated Demo Fleet
+                </Badge>
+              ) : (
+                <Badge variant="outline" className="border-emerald-300 bg-emerald-50 text-[10px] font-semibold text-emerald-800 dark:border-emerald-700 dark:bg-emerald-950 dark:text-emerald-300">
+                  Custom Fleet
+                </Badge>
+              )}
+            </div>
+            <p className="text-xs text-muted-foreground">
+              Risk scores &amp; days-to-EOL computed live against verified upstream schedules
+            </p>
           </div>
 
           {/* Runtime Fleet Table */}
@@ -447,10 +588,10 @@ function RiskDashboardPage() {
             <table className="w-full min-w-[900px] text-left text-sm">
               <thead className="bg-muted/70 text-xs text-muted-foreground">
                 <tr>
-                  <th className="px-4 py-3 font-semibold">Environment</th>
+                  <th className="px-4 py-3 font-semibold">Environment (Host &amp; Owner)</th>
                   <th className="px-4 py-3 font-semibold">Platform &amp; Version</th>
                   <th className="px-4 py-3 font-semibold">Lifecycle Phase</th>
-                  <th className="px-4 py-3 font-semibold">EOL Date / Days</th>
+                  <th className="px-4 py-3 font-semibold">EOL Cutoff / Timeline</th>
                   <th className="px-4 py-3 font-semibold">Target Upgrade Path</th>
                   <th className="px-4 py-3 font-semibold">Risk Level</th>
                   <th className="px-4 py-3 font-semibold">Migration Status</th>
