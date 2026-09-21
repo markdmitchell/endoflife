@@ -17,7 +17,9 @@ export const syncProduct = createServerFn({ method: "POST" })
     if (!allowed) throw new Error("Administrator access is required.");
     const response = await fetch(`https://endoflife.date/api/v1/products/${data.slug}`);
     if (!response.ok) throw new Error(`Source request failed [${response.status}]: ${await response.text()}`);
-    const raw = await response.json() as { name?: string; label?: string; category?: string; releases?: unknown[] };
+    const payload = await response.json() as { result?: { name?: string; label?: string; category?: string; releases?: unknown[] } };
+    const raw = payload.result;
+    if (!raw) throw new Error("The lifecycle source returned an unexpected response.");
     const releases = z.array(cycleSchema).parse(raw.releases ?? []);
     const { data: source } = await context.supabase.from("data_sources").select("id").eq("name", "endoflife.date API v1").single();
     const { data: product, error } = await context.supabase.from("products").upsert({ slug: data.slug, name: raw.label ?? raw.name ?? data.slug, category: raw.category ?? "software", vendor: "Community", source_id: source?.id ?? null, updated_at: new Date().toISOString() }, { onConflict: "slug" }).select("id").single();
