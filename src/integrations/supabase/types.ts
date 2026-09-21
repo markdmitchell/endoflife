@@ -14,16 +14,245 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      data_sources: {
+        Row: {
+          category: string
+          created_at: string
+          description: string
+          id: number
+          last_synced_at: string | null
+          license: string | null
+          name: string
+          source_url: string | null
+        }
+        Insert: {
+          category: string
+          created_at?: string
+          description?: string
+          id?: number
+          last_synced_at?: string | null
+          license?: string | null
+          name: string
+          source_url?: string | null
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          description?: string
+          id?: number
+          last_synced_at?: string | null
+          license?: string | null
+          name?: string
+          source_url?: string | null
+        }
+        Relationships: []
+      }
+      environment_inventories: {
+        Row: {
+          business_owner: string | null
+          created_at: string
+          environment: string
+          eol_date: string | null
+          id: number
+          installed_version: string
+          migration_status: string
+          owner_id: string
+          product_name: string
+          risk_status: Database["public"]["Enums"]["lifecycle_status"]
+          updated_at: string
+        }
+        Insert: {
+          business_owner?: string | null
+          created_at?: string
+          environment: string
+          eol_date?: string | null
+          id?: number
+          installed_version: string
+          migration_status?: string
+          owner_id: string
+          product_name: string
+          risk_status?: Database["public"]["Enums"]["lifecycle_status"]
+          updated_at?: string
+        }
+        Update: {
+          business_owner?: string | null
+          created_at?: string
+          environment?: string
+          eol_date?: string | null
+          id?: number
+          installed_version?: string
+          migration_status?: string
+          owner_id?: string
+          product_name?: string
+          risk_status?: Database["public"]["Enums"]["lifecycle_status"]
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      products: {
+        Row: {
+          category: string
+          created_at: string
+          description: string
+          homepage_url: string | null
+          id: number
+          name: string
+          slug: string
+          source_id: number | null
+          updated_at: string
+          vendor: string
+        }
+        Insert: {
+          category?: string
+          created_at?: string
+          description?: string
+          homepage_url?: string | null
+          id?: number
+          name: string
+          slug: string
+          source_id?: number | null
+          updated_at?: string
+          vendor?: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          description?: string
+          homepage_url?: string | null
+          id?: number
+          name?: string
+          slug?: string
+          source_id?: number | null
+          updated_at?: string
+          vendor?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "products_source_id_fkey"
+            columns: ["source_id"]
+            isOneToOne: false
+            referencedRelation: "data_sources"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      provenance_records: {
+        Row: {
+          confidence_score: number
+          entity_id: number
+          entity_type: string
+          fetched_at: string
+          id: number
+          license: string | null
+          notes: string
+          source_name: string
+          source_url: string | null
+        }
+        Insert: {
+          confidence_score?: number
+          entity_id: number
+          entity_type: string
+          fetched_at?: string
+          id?: number
+          license?: string | null
+          notes?: string
+          source_name: string
+          source_url?: string | null
+        }
+        Update: {
+          confidence_score?: number
+          entity_id?: number
+          entity_type?: string
+          fetched_at?: string
+          id?: number
+          license?: string | null
+          notes?: string
+          source_name?: string
+          source_url?: string | null
+        }
+        Relationships: []
+      }
+      release_cycles: {
+        Row: {
+          created_at: string
+          cycle: string
+          eol_date: string | null
+          id: number
+          latest_release_date: string | null
+          latest_version: string | null
+          product_id: number
+          release_date: string | null
+          status: Database["public"]["Enums"]["lifecycle_status"]
+          support_end: string | null
+        }
+        Insert: {
+          created_at?: string
+          cycle: string
+          eol_date?: string | null
+          id?: number
+          latest_release_date?: string | null
+          latest_version?: string | null
+          product_id: number
+          release_date?: string | null
+          status?: Database["public"]["Enums"]["lifecycle_status"]
+          support_end?: string | null
+        }
+        Update: {
+          created_at?: string
+          cycle?: string
+          eol_date?: string | null
+          id?: number
+          latest_release_date?: string | null
+          latest_version?: string | null
+          product_id?: number
+          release_date?: string | null
+          status?: Database["public"]["Enums"]["lifecycle_status"]
+          support_end?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "release_cycles_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_roles: {
+        Row: {
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "user"
+      lifecycle_status: "supported" | "approaching_eol" | "end_of_life"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +379,9 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "user"],
+      lifecycle_status: ["supported", "approaching_eol", "end_of_life"],
+    },
   },
 } as const
