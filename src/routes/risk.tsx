@@ -212,7 +212,7 @@ function RiskDashboardPage() {
         return;
       }
 
-      const headers = lines[0].split(",").map((h) => h.trim().toLowerCase().replace(/['"]/g, ""));
+      const headers = (lines[0] ?? "").split(",").map((h) => h.trim().toLowerCase().replace(/['"]/g, ""));
       const getIndex = (keys: string[]) => headers.findIndex((h) => keys.includes(h));
 
       const envIdx = getIndex(["deployment_env", "environment", "env", "server", "app", "workload"]);
@@ -226,10 +226,10 @@ function RiskDashboardPage() {
       const parsed: RuntimeEnvironment[] = [];
 
       for (let i = 1; i < lines.length; i++) {
-        const cells = lines[i].split(",").map((c) => c.trim().replace(/^["']|["']$/g, ""));
-        const platform = platformIdx >= 0 ? cells[platformIdx] : "Application";
-        const version = versionIdx >= 0 ? cells[versionIdx] : "1.0";
-        const deployment_env = envIdx >= 0 ? cells[envIdx] : `Environment ${i}`;
+        const cells = (lines[i] ?? "").split(",").map((c) => c.trim().replace(/^["']|["']$/g, ""));
+        const platform = (platformIdx >= 0 ? cells[platformIdx] : "Application") || "Application";
+        const version = (versionIdx >= 0 ? cells[versionIdx] : "1.0") || "1.0";
+        const deployment_env = (envIdx >= 0 ? cells[envIdx] : `Environment ${i}`) || `Environment ${i}`;
         let eolDate = eolIdx >= 0 && cells[eolIdx] ? cells[eolIdx] : null;
 
         // Auto-match against catalog if EOL date missing
@@ -244,7 +244,7 @@ function RiskDashboardPage() {
         }
 
         const risk = calculateRiskFromDate(eolDate);
-        const rawStatus = statusIdx >= 0 ? cells[statusIdx] : "";
+        const rawStatus = (statusIdx >= 0 ? cells[statusIdx] : "") ?? "";
         let migration_status: "In Progress" | "Migration Planned" | "No Action Needed" = "Migration Planned";
         if (rawStatus.toLowerCase().includes("progress")) migration_status = "In Progress";
         else if (rawStatus.toLowerCase().includes("no") || rawStatus.toLowerCase().includes("healthy")) migration_status = "No Action Needed";
