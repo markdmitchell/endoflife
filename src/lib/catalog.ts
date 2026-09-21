@@ -2,11 +2,31 @@ import { supabase } from "@/integrations/supabase/client";
 
 export type LifecycleStatus = "supported" | "approaching_eol" | "end_of_life";
 
+export interface CatalogStats {
+  products: number;
+  cycles: number;
+  provenance: number;
+}
+
+export async function getCatalogStats(): Promise<CatalogStats> {
+  const [prodRes, cycRes, provRes] = await Promise.all([
+    supabase.from("products").select("*", { count: "exact", head: true }),
+    supabase.from("release_cycles").select("*", { count: "exact", head: true }),
+    supabase.from("provenance_records").select("*", { count: "exact", head: true }),
+  ]);
+  return {
+    products: prodRes.count ?? 0,
+    cycles: cycRes.count ?? 0,
+    provenance: provRes.count ?? 0,
+  };
+}
+
 export async function getCatalog() {
   const { data, error } = await supabase
     .from("products")
     .select("*, release_cycles(*)")
-    .order("name");
+    .order("name")
+    .range(0, 4999);
   if (error) throw error;
   return data ?? [];
 }
@@ -31,7 +51,8 @@ export async function getProvenance() {
   const { data, error } = await supabase
     .from("provenance_records")
     .select("*")
-    .order("fetched_at", { ascending: false });
+    .order("fetched_at", { ascending: false })
+    .limit(500);
   if (error) throw error;
   return data ?? [];
 }

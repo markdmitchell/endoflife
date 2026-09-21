@@ -27,6 +27,15 @@ dist-ssr
 .DS_Store
 *.suo
 *.ntvs*
-*.njsproj
-*.sln
 *.sw?
+
+# Local workspace scratch & python files
+original_eol.db
+scratch/
+db/
+endoflife/
+services/
+tests/
+__pycache__/
+*.pyc
+

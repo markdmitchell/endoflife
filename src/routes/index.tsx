@@ -1,8 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { ArrowRight, Boxes, CalendarClock, Search, ShieldAlert } from "lucide-react";
+import { ArrowRight, Boxes, CalendarClock, Search, ShieldCheck } from "lucide-react";
 import { useMemo, useState } from "react";
-import { getCatalog, type LifecycleStatus } from "@/lib/catalog";
+import { getCatalog, getCatalogStats, type LifecycleStatus } from "@/lib/catalog";
 import { PageHeader, StatusBadge } from "@/components/app-shell";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -15,6 +15,7 @@ export const Route = createFileRoute("/")({
 
 function CatalogPage() {
   const { data = [], isLoading, error } = useQuery({ queryKey: ["catalog"], queryFn: getCatalog });
+  const { data: stats } = useQuery({ queryKey: ["catalog-stats"], queryFn: getCatalogStats });
   const [query, setQuery] = useState(""); const [category, setCategory] = useState("all"); const [status, setStatus] = useState("all");
   const categories = useMemo(() => [...new Set(data.map((p) => p.category))].sort(), [data]);
   const filtered = data.filter((p) => {
@@ -22,12 +23,17 @@ function CatalogPage() {
     const statuses = p.release_cycles.map((r) => r.status);
     return text.includes(query.toLowerCase()) && (category === "all" || p.category === category) && (status === "all" || statuses.includes(status as LifecycleStatus));
   });
-  const cycleCount = data.reduce((n, p) => n + p.release_cycles.length, 0);
-  const eolCount = data.filter((p) => p.release_cycles.some((r) => r.status === "end_of_life")).length;
+  const productCount = stats?.products ?? data.length;
+  const cycleCount = stats?.cycles ?? data.reduce((n, p) => n + p.release_cycles.length, 0);
+  const provenanceCount = stats?.provenance ?? 0;
   return <div>
     <PageHeader eyebrow="Lifecycle catalog" title="Know what reaches end of life next." description="A decision-ready view of software support windows, maintained from public and vendor sources." action={<Button asChild><Link to="/risk">Review risk <ArrowRight /></Link></Button>} />
     <section className="grid gap-px overflow-hidden rounded-lg border border-border bg-border sm:grid-cols-3">
-      {[{ icon: Boxes, value: data.length, label: "Products tracked" }, { icon: CalendarClock, value: cycleCount, label: "Release cycles" }, { icon: ShieldAlert, value: eolCount, label: "Products with EOL cycles" }].map(({icon: Icon,value,label}) => <div key={label} className="bg-card p-5"><Icon className="mb-5 size-4 text-muted-foreground"/><div className="font-display text-3xl font-semibold">{value}</div><p className="mt-1 text-xs font-medium text-muted-foreground">{label}</p></div>)}
+      {[
+        { icon: Boxes, value: productCount ? productCount.toLocaleString() : "...", label: "Enterprise Products" },
+        { icon: CalendarClock, value: cycleCount ? cycleCount.toLocaleString() : "...", label: "Release Cycles Tracked" },
+        { icon: ShieldCheck, value: provenanceCount ? provenanceCount.toLocaleString() : "...", label: "Verified Provenance Records" },
+      ].map(({icon: Icon,value,label}) => <div key={label} className="bg-card p-5"><Icon className="mb-5 size-4 text-muted-foreground"/><div className="font-display text-3xl font-semibold">{value}</div><p className="mt-1 text-xs font-medium text-muted-foreground">{label}</p></div>)}
     </section>
     <section className="mt-7 border-y border-border bg-card py-5"><div className="grid gap-3 md:grid-cols-[1fr_220px_190px_auto]"><div className="relative"><Search className="absolute left-3 top-3 size-4 text-muted-foreground"/><Input className="h-10 pl-9" value={query} onChange={(e)=>setQuery(e.target.value)} placeholder="Search products, vendors, or categories" /></div><Select value={category} onValueChange={setCategory}><SelectTrigger className="h-10"><SelectValue placeholder="Category"/></SelectTrigger><SelectContent><SelectItem value="all">All categories</SelectItem>{categories.map((x)=><SelectItem key={x} value={x}>{x}</SelectItem>)}</SelectContent></Select><Select value={status} onValueChange={setStatus}><SelectTrigger className="h-10"><SelectValue placeholder="Status"/></SelectTrigger><SelectContent><SelectItem value="all">All statuses</SelectItem><SelectItem value="supported">Supported</SelectItem><SelectItem value="approaching_eol">Action needed</SelectItem><SelectItem value="end_of_life">End of life</SelectItem></SelectContent></Select><Button variant="outline" onClick={()=>{setQuery("");setCategory("all");setStatus("all")}}>Clear</Button></div></section>
     <div className="mt-5 flex items-center justify-between"><p className="text-sm font-semibold">{filtered.length} products</p><p className="text-xs text-muted-foreground">Updated from verified sources</p></div>
