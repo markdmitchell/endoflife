@@ -13,7 +13,7 @@ export const syncProduct = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input) => z.object({ slug: z.string().regex(/^[a-z0-9.-]+$/).max(80) }).parse(input))
   .handler(async ({ data, context }) => {
-    const { data: allowed } = await context.supabase.rpc("has_role", { _user_id: context.userId, _role: "admin" });
+    const { data: allowed } = await context.supabase.from("user_roles").select("role").eq("user_id", context.userId).eq("role", "admin").maybeSingle();
     if (!allowed) throw new Error("Administrator access is required.");
     const response = await fetch(`https://endoflife.date/api/v1/products/${data.slug}`);
     if (!response.ok) throw new Error(`Source request failed [${response.status}]: ${await response.text()}`);
@@ -41,7 +41,7 @@ export const importInventory = createServerFn({ method: "POST" }).middleware([re
 });
 
 export const addCustomProduct = createServerFn({ method: "POST" }).middleware([requireSupabaseAuth]).inputValidator((input)=>z.object({slug:z.string().regex(/^[a-z0-9.-]+$/),name:z.string().min(2),vendor:z.string().min(2),category:z.string().min(2),cycle:z.string().min(1),eolDate:z.string(),sourceName:z.string().min(2),sourceUrl:z.string().url().optional().or(z.literal(""))}).parse(input)).handler(async({data,context})=>{
-  const {data:allowed}=await context.supabase.rpc("has_role",{_user_id:context.userId,_role:"admin"}); if(!allowed)throw new Error("Administrator access is required.");
+  const {data:allowed}=await context.supabase.from("user_roles").select("role").eq("user_id",context.userId).eq("role","admin").maybeSingle(); if(!allowed)throw new Error("Administrator access is required.");
   const {data:product,error}=await context.supabase.from("products").upsert({slug:data.slug,name:data.name,vendor:data.vendor,category:data.category,description:"Custom lifecycle record"},{onConflict:"slug"}).select("id").single(); if(error||!product)throw new Error(error?.message??"Record creation failed.");
   const days=Math.ceil((new Date(data.eolDate).getTime()-Date.now())/86400000); const status=days<0?"end_of_life":days<365?"approaching_eol":"supported";
   const {data:cycle,error:cycleError}=await context.supabase.from("release_cycles").upsert({product_id:product.id,cycle:data.cycle,eol_date:data.eolDate,support_end:data.eolDate,status},{onConflict:"product_id,cycle"}).select("id").single(); if(cycleError||!cycle)throw new Error(cycleError?.message??"Cycle creation failed.");
