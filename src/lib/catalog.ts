@@ -63,12 +63,12 @@ export async function getProvenance(options?: { source?: string; entityType?: st
 }
 
 export async function getProvenanceSources(): Promise<string[]> {
-  const { data, error } = await supabase.rpc("get_provenance_sources");
+  const { data, error } = await supabase.from("provenance_records").select("source_name").order("source_name");
   if (error) {
     const { data: sources } = await supabase.from("data_sources").select("name").order("name");
     return (sources ?? []).map((s) => s.name);
   }
-  return (data ?? []).map((row: { source_name: string }) => row.source_name);
+  return Array.from(new Set((data ?? []).map((row) => row.source_name)));
 }
 
 export function statusLabel(status: LifecycleStatus) {
