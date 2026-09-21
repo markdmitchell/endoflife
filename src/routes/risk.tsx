@@ -260,7 +260,7 @@ function RiskDashboardPage() {
           risk_level: risk.risk_level,
           target_upgrade_path: targetIdx >= 0 && cells[targetIdx] ? cells[targetIdx] : `${platform} (Latest)`,
           migration_status,
-          business_owner: ownerIdx >= 0 ? cells[ownerIdx] : "Enterprise Fleet"
+          business_owner: (ownerIdx >= 0 ? cells[ownerIdx] : "Enterprise Fleet") || "Enterprise Fleet"
         });
       }
 
