@@ -47,12 +47,12 @@ export async function getSources() {
   return data ?? [];
 }
 
-export async function getProvenance() {
+export async function getProvenance(limit = 1000) {
   const { data, error } = await supabase
     .from("provenance_records")
     .select("*")
     .order("fetched_at", { ascending: false })
-    .limit(500);
+    .limit(limit);
   if (error) throw error;
   return data ?? [];
 }
