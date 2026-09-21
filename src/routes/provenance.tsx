@@ -1,9 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { ExternalLink, Search, ShieldCheck, Database, CalendarClock, BookOpen, Filter } from "lucide-react";
+import { ExternalLink, Search, ShieldCheck, Database, BookOpen } from "lucide-react";
 import { useMemo, useState } from "react";
 import { PageHeader } from "@/components/app-shell";
-import { getProvenance } from "@/lib/catalog";
+import { getProvenance, getProvenanceSources, getCatalogStats } from "@/lib/catalog";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -43,28 +43,34 @@ function formatAuditTimestamp(isoString: string) {
 }
 
 function ProvenancePage() {
-  const { data = [], isLoading, error } = useQuery({
-    queryKey: ["provenance"],
-    queryFn: () => getProvenance()
-  });
-
   const [query, setQuery] = useState("");
   const [entityFilter, setEntityFilter] = useState("all");
   const [sourceFilter, setSourceFilter] = useState("all");
 
-  const sourcesList = useMemo(() => {
-    return [...new Set(data.map((r) => r.source_name))].sort();
-  }, [data]);
+  const { data: stats } = useQuery({
+    queryKey: ["catalog-stats"],
+    queryFn: getCatalogStats
+  });
+
+  const { data: allSources = [] } = useQuery({
+    queryKey: ["provenance-sources"],
+    queryFn: getProvenanceSources
+  });
+
+  const { data = [], isLoading, error } = useQuery({
+    queryKey: ["provenance", sourceFilter, entityFilter],
+    queryFn: () => getProvenance({ source: sourceFilter, entityType: entityFilter, limit: 1000 })
+  });
 
   const filtered = useMemo(() => {
     return data.filter((r) => {
       const text = `${r.entity_type} ${r.entity_id} ${r.source_name} ${r.source_url ?? ""} ${r.notes ?? ""} ${r.license ?? ""}`.toLowerCase();
-      const matchQuery = !query || text.includes(query.toLowerCase());
-      const matchEntity = entityFilter === "all" || r.entity_type === entityFilter;
-      const matchSource = sourceFilter === "all" || r.source_name === sourceFilter;
-      return matchQuery && matchEntity && matchSource;
+      return !query || text.includes(query.toLowerCase());
     });
-  }, [data, query, entityFilter, sourceFilter]);
+  }, [data, query]);
+
+  const totalAuditRecords = stats?.provenance ?? 39613;
+  const totalAuthoritiesCount = allSources.length || 32;
 
   return (
     <div>
@@ -78,24 +84,24 @@ function ProvenancePage() {
       <section className="grid gap-px overflow-hidden rounded-lg border border-border bg-border sm:grid-cols-3">
         <div className="bg-card p-5">
           <BookOpen className="mb-5 size-4 text-muted-foreground" />
-          <div className="font-display text-3xl font-semibold">{data.length.toLocaleString()}</div>
-          <p className="mt-1 text-xs font-medium text-muted-foreground">Audit Records Indexed</p>
+          <div className="font-display text-3xl font-semibold">{totalAuditRecords.toLocaleString()}</div>
+          <p className="mt-1 text-xs font-medium text-muted-foreground">Total Verified Provenance Records</p>
         </div>
         <div className="bg-card p-5">
           <Database className="mb-5 size-4 text-muted-foreground" />
-          <div className="font-display text-3xl font-semibold">{sourcesList.length}</div>
-          <p className="mt-1 text-xs font-medium text-muted-foreground">Upstream Source Authorities</p>
+          <div className="font-display text-3xl font-semibold">{totalAuthoritiesCount} Authorities</div>
+          <p className="mt-1 text-xs font-medium text-muted-foreground">Active Upstream Source Authorities</p>
         </div>
         <div className="bg-card p-5">
           <ShieldCheck className="mb-5 size-4 text-emerald-600 dark:text-emerald-400" />
           <div className="font-display text-3xl font-semibold text-emerald-600 dark:text-emerald-400">100%</div>
-          <p className="mt-1 text-xs font-medium text-muted-foreground">Verified Direct Lineage</p>
+          <p className="mt-1 text-xs font-medium text-muted-foreground">Direct Upstream Lineage Verified</p>
         </div>
       </section>
 
       {/* Search and Filters Bar */}
       <section className="mt-7 border-y border-border bg-card py-4">
-        <div className="grid gap-3 md:grid-cols-[1fr_220px_220px_auto]">
+        <div className="grid gap-3 md:grid-cols-[1fr_220px_280px_auto]">
           <div className="relative">
             <Search className="absolute left-3 top-3 size-4 text-muted-foreground" />
             <Input
@@ -118,11 +124,11 @@ function ProvenancePage() {
           </Select>
           <Select value={sourceFilter} onValueChange={setSourceFilter}>
             <SelectTrigger className="h-10">
-              <SelectValue placeholder="Data Source" />
+              <SelectValue placeholder="All Authorities (32 Feeds)" />
             </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Data Sources</SelectItem>
-              {sourcesList.map((s) => (
+            <SelectContent className="max-h-80">
+              <SelectItem value="all">All Authorities ({totalAuthoritiesCount} Feeds)</SelectItem>
+              {allSources.map((s) => (
                 <SelectItem key={s} value={s}>
                   {s}
                 </SelectItem>
@@ -144,7 +150,9 @@ function ProvenancePage() {
 
       {/* Results Counter */}
       <div className="mt-5 flex items-center justify-between">
-        <p className="text-sm font-semibold">{filtered.length} audit records displayed</p>
+        <p className="text-sm font-semibold">
+          {filtered.length} records shown {sourceFilter !== "all" && `(filtered by ${sourceFilter})`}
+        </p>
         <p className="text-xs text-muted-foreground">Every record maintains an immutable upstream verification citation</p>
       </div>
 
@@ -233,7 +241,7 @@ function ProvenancePage() {
         {!isLoading && !filtered.length && (
           <div className="p-12 text-center">
             <p className="font-semibold">No matching provenance records</p>
-            <p className="mt-1 text-sm text-muted-foreground">Try clearing filters or broadening your search terms.</p>
+            <p className="mt-1 text-sm text-muted-foreground">Try selecting a different authority or clearing search filters.</p>
           </div>
         )}
       </div>

@@ -47,14 +47,28 @@ export async function getSources() {
   return data ?? [];
 }
 
-export async function getProvenance(limit = 1000) {
-  const { data, error } = await supabase
-    .from("provenance_records")
-    .select("*")
-    .order("fetched_at", { ascending: false })
-    .limit(limit);
+export async function getProvenance(options?: { source?: string; entityType?: string; limit?: number }) {
+  let query = supabase.from("provenance_records").select("*");
+  if (options?.source && options.source !== "all") {
+    query = query.eq("source_name", options.source);
+  }
+  if (options?.entityType && options.entityType !== "all") {
+    query = query.eq("entity_type", options.entityType);
+  }
+  const { data, error } = await query
+    .order("id", { ascending: true })
+    .limit(options?.limit ?? 1000);
   if (error) throw error;
   return data ?? [];
+}
+
+export async function getProvenanceSources(): Promise<string[]> {
+  const { data, error } = await supabase.rpc("get_provenance_sources");
+  if (error) {
+    const { data: sources } = await supabase.from("data_sources").select("name").order("name");
+    return (sources ?? []).map((s) => s.name);
+  }
+  return (data ?? []).map((row: { source_name: string }) => row.source_name);
 }
 
 export function statusLabel(status: LifecycleStatus) {
