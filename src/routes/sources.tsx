@@ -74,40 +74,56 @@ function SourcesPage() {
       </section>
 
       {/* Search and Filters Bar */}
-      <section className="mt-7 border-y border-border bg-card py-4">
-        <div className="grid gap-3 md:grid-cols-[1fr_280px_auto]">
-          <div className="relative">
-            <Search className="absolute left-3 top-3 size-4 text-muted-foreground" />
+      <section className="my-7 rounded-xl border border-border bg-card p-4 sm:p-5 shadow-xs">
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+          }}
+          className="flex flex-col gap-3 lg:flex-row lg:items-center"
+        >
+          <div className="flex flex-1 items-center gap-2">
             <Input
-              className="h-10 pl-9"
+              className="h-10 px-3.5"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder="Search source name, category, description, or URL..."
             />
+            <Button type="submit" className="h-10 px-4 gap-1.5 font-medium cursor-pointer shrink-0">
+              <Search className="size-4" />
+              <span>Search</span>
+            </Button>
           </div>
-          <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-            <SelectTrigger className="h-10">
-              <SelectValue placeholder="All Categories" />
-            </SelectTrigger>
-            <SelectContent className="max-h-80">
-              <SelectItem value="all">All Categories ({categories.length})</SelectItem>
-              {categories.map((c) => (
-                <SelectItem key={c} value={c}>
-                  {c}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          <Button
-            variant="outline"
-            onClick={() => {
-              setQuery("");
-              setCategoryFilter("all");
-            }}
-          >
-            Clear
-          </Button>
-        </div>
+
+          <div className="flex flex-wrap items-center gap-2.5">
+            <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+              <SelectTrigger className="h-10 w-full sm:w-[240px]">
+                <SelectValue placeholder="All Categories" />
+              </SelectTrigger>
+              <SelectContent className="max-h-80">
+                <SelectItem value="all">All Categories ({categories.length})</SelectItem>
+                {categories.map((c) => (
+                  <SelectItem key={c} value={c}>
+                    {c}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+
+            {(query || categoryFilter !== "all") && (
+              <Button
+                type="button"
+                variant="outline"
+                className="h-10 cursor-pointer"
+                onClick={() => {
+                  setQuery("");
+                  setCategoryFilter("all");
+                }}
+              >
+                Reset
+              </Button>
+            )}
+          </div>
+        </form>
       </section>
 
       {/* Results Counter */}

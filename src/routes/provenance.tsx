@@ -47,6 +47,7 @@ function ProvenancePage() {
   const [query, setQuery] = useState("");
   const [entityFilter, setEntityFilter] = useState("all");
   const [sourceFilter, setSourceFilter] = useState("all");
+  const [hasSearched, setHasSearched] = useState(false);
 
   const { data: stats } = useQuery({
     queryKey: ["catalog-stats"],
@@ -64,14 +65,33 @@ function ProvenancePage() {
   });
 
   const filtered = useMemo(() => {
+    if (!hasSearched) return [];
     return data.filter((r) => {
       const text = `${r.entity_type} ${r.entity_id} ${r.source_name} ${r.source_url ?? ""} ${r.notes ?? ""} ${r.license ?? ""}`.toLowerCase();
       return !query || text.includes(query.toLowerCase());
     });
-  }, [data, query]);
+  }, [data, query, hasSearched]);
 
   const totalAuditRecords = stats?.provenance ?? 39613;
   const totalAuthoritiesCount = allSources.length || 32;
+
+  const handleRunSearch = () => {
+    setHasSearched(true);
+  };
+
+  const handleShowAll = () => {
+    setQuery("");
+    setEntityFilter("all");
+    setSourceFilter("all");
+    setHasSearched(true);
+  };
+
+  const handleReset = () => {
+    setQuery("");
+    setEntityFilter("all");
+    setSourceFilter("all");
+    setHasSearched(false);
+  };
 
   return (
     <div>
@@ -82,15 +102,20 @@ function ProvenancePage() {
       />
 
       {/* KPI Stats Bar */}
-      <section className="grid gap-px overflow-hidden rounded-lg border border-border bg-border sm:grid-cols-3">
-        <div className="bg-card p-5">
-          <BookOpen className="mb-5 size-4 text-muted-foreground" />
-          <div className="font-display text-3xl font-semibold">{totalAuditRecords.toLocaleString()}</div>
+      <section className="grid gap-px overflow-hidden rounded-xl border border-border bg-border sm:grid-cols-3 shadow-xs">
+        <button
+          type="button"
+          onClick={handleShowAll}
+          className="group bg-card p-5 text-left transition-all hover:bg-muted/50 cursor-pointer"
+          title="Click to view all provenance records"
+        >
+          <BookOpen className="mb-5 size-4 text-muted-foreground group-hover:text-primary transition-colors" />
+          <div className="font-display text-3xl font-semibold text-foreground">{totalAuditRecords.toLocaleString()}</div>
           <p className="mt-1 text-xs font-medium text-muted-foreground">Total Verified Provenance Records</p>
-        </div>
+        </button>
         <div className="bg-card p-5">
           <Database className="mb-5 size-4 text-muted-foreground" />
-          <div className="font-display text-3xl font-semibold">{totalAuthoritiesCount} Authorities</div>
+          <div className="font-display text-3xl font-semibold text-foreground">{totalAuthoritiesCount} Authorities</div>
           <p className="mt-1 text-xs font-medium text-muted-foreground">Active Upstream Source Authorities</p>
         </div>
         <div className="bg-card p-5">
@@ -101,53 +126,99 @@ function ProvenancePage() {
       </section>
 
       {/* Search and Filters Bar */}
-      <section className="mt-7 border-y border-border bg-card py-4">
-        <div className="grid gap-3 md:grid-cols-[1fr_220px_280px_auto]">
-          <div className="relative">
-            <Search className="absolute left-3 top-3 size-4 text-muted-foreground" />
+      <section className="my-7 rounded-xl border border-border bg-card p-4 sm:p-5 shadow-xs">
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            handleRunSearch();
+          }}
+          className="flex flex-col gap-3 lg:flex-row lg:items-center"
+        >
+          <div className="flex flex-1 items-center gap-2">
             <Input
-              className="h-10 pl-9"
+              className="h-10 px-3.5"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder="Search source name, source URL, notes, license, or entity ID..."
             />
+            <Button type="submit" className="h-10 px-4 gap-1.5 font-medium cursor-pointer shrink-0">
+              <Search className="size-4" />
+              <span>Search</span>
+            </Button>
           </div>
-          <Select value={entityFilter} onValueChange={setEntityFilter}>
-            <SelectTrigger className="h-10">
-              <SelectValue placeholder="Entity Type" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Entity Types</SelectItem>
-              <SelectItem value="product">Product</SelectItem>
-              <SelectItem value="release_cycle">Release Cycle</SelectItem>
-              <SelectItem value="inventory">Inventory</SelectItem>
-            </SelectContent>
-          </Select>
-          <Select value={sourceFilter} onValueChange={setSourceFilter}>
-            <SelectTrigger className="h-10">
-              <SelectValue placeholder="All Authorities (32 Feeds)" />
-            </SelectTrigger>
-            <SelectContent className="max-h-80">
-              <SelectItem value="all">All Authorities ({totalAuthoritiesCount} Feeds)</SelectItem>
-              {allSources.map((s) => (
-                <SelectItem key={s} value={s}>
-                  {s}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          <Button
-            variant="outline"
-            onClick={() => {
-              setQuery("");
-              setEntityFilter("all");
-              setSourceFilter("all");
-            }}
-          >
-            Clear
-          </Button>
-        </div>
+
+          <div className="flex flex-wrap items-center gap-2.5">
+            <Select
+              value={entityFilter}
+              onValueChange={(val) => {
+                setEntityFilter(val);
+                setHasSearched(true);
+              }}
+            >
+              <SelectTrigger className="h-10 w-full sm:w-[170px]">
+                <SelectValue placeholder="Entity Type" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Entity Types</SelectItem>
+                <SelectItem value="product">Product</SelectItem>
+                <SelectItem value="release_cycle">Release Cycle</SelectItem>
+                <SelectItem value="inventory">Inventory</SelectItem>
+              </SelectContent>
+            </Select>
+
+            <Select
+              value={sourceFilter}
+              onValueChange={(val) => {
+                setSourceFilter(val);
+                setHasSearched(true);
+              }}
+            >
+              <SelectTrigger className="h-10 w-full sm:w-[220px]">
+                <SelectValue placeholder="All Authorities" />
+              </SelectTrigger>
+              <SelectContent className="max-h-80">
+                <SelectItem value="all">All Authorities ({totalAuthoritiesCount} Feeds)</SelectItem>
+                {allSources.map((s) => (
+                  <SelectItem key={s} value={s}>
+                    {s}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+
+            {(hasSearched || query || entityFilter !== "all" || sourceFilter !== "all") && (
+              <Button
+                type="button"
+                variant="outline"
+                className="h-10 cursor-pointer"
+                onClick={handleReset}
+              >
+                Reset
+              </Button>
+            )}
+          </div>
+        </form>
       </section>
+
+      {!hasSearched ? (
+        <div className="rounded-xl border border-dashed border-border bg-card/40 p-10 text-center my-2 shadow-2xs">
+          <p className="mx-auto max-w-md text-sm text-muted-foreground">
+            Enter a search query or select an authority above to inspect provenance audit trails, or click below to view all records.
+          </p>
+          <div className="mt-4 flex items-center justify-center gap-3">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleShowAll}
+              className="cursor-pointer gap-2"
+            >
+              <BookOpen className="size-4 text-primary" />
+              Browse All {totalAuditRecords.toLocaleString()} Records
+            </Button>
+          </div>
+        </div>
+      ) : (
+        <>
 
       {/* Results Counter */}
       <div className="mt-5 flex items-center justify-between">
@@ -246,6 +317,8 @@ function ProvenancePage() {
           </div>
         )}
       </div>
+      </>
+      )}
     </div>
   );
 }

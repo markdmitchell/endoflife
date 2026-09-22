@@ -518,51 +518,68 @@ function RiskDashboardPage() {
             </div>
           </section>
 
-          {/* Filters Bar */}
-          <section className="mt-7 border-y border-border bg-card py-4">
-            <div className="grid gap-3 md:grid-cols-[1fr_200px_200px_auto]">
-              <div className="relative">
-                <Search className="absolute left-3 top-3 size-4 text-muted-foreground" />
+          {/* Clean Padded Search & Filters Bar */}
+          <section className="my-7 rounded-xl border border-border bg-card p-4 sm:p-5 shadow-xs">
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+              }}
+              className="flex flex-col gap-3 lg:flex-row lg:items-center"
+            >
+              <div className="flex flex-1 items-center gap-2">
                 <Input
-                  className="h-10 pl-9"
+                  className="h-10 px-3.5"
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
-                  placeholder="Search environment name, platform, version, or owner"
+                  placeholder="Search environment name, platform, version, or owner..."
                 />
+                <Button type="submit" className="h-10 px-4 gap-1.5 font-medium cursor-pointer shrink-0">
+                  <Search className="size-4" />
+                  <span>Search</span>
+                </Button>
               </div>
-              <Select value={riskFilter} onValueChange={setRiskFilter}>
-                <SelectTrigger className="h-10">
-                  <SelectValue placeholder="Risk Level" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Risk Levels</SelectItem>
-                  <SelectItem value="CRITICAL (EOL)">Critical (EOL)</SelectItem>
-                  <SelectItem value="HIGH">High Risk (&lt; 6 Mo)</SelectItem>
-                  <SelectItem value="LOW">Low Risk (Active)</SelectItem>
-                </SelectContent>
-              </Select>
-              <Select value={statusFilter} onValueChange={setStatusFilter}>
-                <SelectTrigger className="h-10">
-                  <SelectValue placeholder="Migration Status" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Statuses</SelectItem>
-                  <SelectItem value="In Progress">In Progress</SelectItem>
-                  <SelectItem value="Migration Planned">Migration Planned</SelectItem>
-                  <SelectItem value="No Action Needed">No Action Needed</SelectItem>
-                </SelectContent>
-              </Select>
-              <Button
-                variant="outline"
-                onClick={() => {
-                  setQuery("");
-                  setRiskFilter("all");
-                  setStatusFilter("all");
-                }}
-              >
-                Clear
-              </Button>
-            </div>
+
+              <div className="flex flex-wrap items-center gap-2.5">
+                <Select value={riskFilter} onValueChange={setRiskFilter}>
+                  <SelectTrigger className="h-10 w-full sm:w-[170px]">
+                    <SelectValue placeholder="Risk Level" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Risk Levels</SelectItem>
+                    <SelectItem value="CRITICAL (EOL)">Critical (EOL)</SelectItem>
+                    <SelectItem value="HIGH">High Risk (&lt; 6 Mo)</SelectItem>
+                    <SelectItem value="LOW">Low Risk (Active)</SelectItem>
+                  </SelectContent>
+                </Select>
+
+                <Select value={statusFilter} onValueChange={setStatusFilter}>
+                  <SelectTrigger className="h-10 w-full sm:w-[180px]">
+                    <SelectValue placeholder="Migration Status" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Statuses</SelectItem>
+                    <SelectItem value="In Progress">In Progress</SelectItem>
+                    <SelectItem value="Migration Planned">Migration Planned</SelectItem>
+                    <SelectItem value="No Action Needed">No Action Needed</SelectItem>
+                  </SelectContent>
+                </Select>
+
+                {(query || riskFilter !== "all" || statusFilter !== "all") && (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className="h-10 cursor-pointer"
+                    onClick={() => {
+                      setQuery("");
+                      setRiskFilter("all");
+                      setStatusFilter("all");
+                    }}
+                  >
+                    Reset
+                  </Button>
+                )}
+              </div>
+            </form>
           </section>
 
           {/* Results Summary */}
