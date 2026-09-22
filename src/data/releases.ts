@@ -57,7 +57,7 @@ export const RELEASES: ReleaseNote[] = [
     highlights: [
       "Core Lifecycle Data Model: Established foundational relational schemas for products, release cycles, and support windows.",
       "Initial Catalog Directory: Seeded the first 50 core runtime languages, operating systems, and database engines.",
-      "Status Classification Engine: Implemented rule-based lifecycle states (Supported, Action Needed, End of Life).
+      "Status Classification Engine: Implemented rule-based lifecycle states (Supported, Action Needed, End of Life).",
       "Proof-of-Concept Interface: Initial search and filter interface for exploring lifecycle milestones."
     ]
   }
