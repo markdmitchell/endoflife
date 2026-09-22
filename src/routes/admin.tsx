@@ -407,7 +407,8 @@ function AdminPage() {
         const migration_status = (statusIdx >= 0 && cells[statusIdx] ? cells[statusIdx] : "Not started") || "Not started";
 
         const days = eol_date ? Math.ceil((new Date(eol_date).getTime() - Date.now()) / 86400000) : 9999;
-        const risk_status = days < 0 ? "end_of_life" : days < 365 ? "approaching_eol" : "supported";
+        const risk_status: "end_of_life" | "approaching_eol" | "supported" =
+          days < 0 ? "end_of_life" : days < 365 ? "approaching_eol" : "supported";
 
         rows.push({
           environment,
