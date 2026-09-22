@@ -1,7 +1,8 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import { BookOpen, Database, Gauge, Menu, Search, Settings2, ShieldCheck, Users, X } from "lucide-react";
-import { useState, type ReactNode } from "react";
+import { useState, useEffect, type ReactNode } from "react";
 import { Button } from "@/components/ui/button";
+import { supabase } from "@/integrations/supabase/client";
 
 const nav = [
   { to: "/", label: "Catalog", icon: Search },
@@ -11,9 +12,85 @@ const nav = [
   { to: "/admin", label: "Administration", icon: Settings2 },
 ] as const;
 
+const DESIGNATED_ADMIN_EMAILS = [
+  "fragglemark@gmail.com",
+  "markdmitchell@outlook.com",
+  "jbshenberger@gmail.com"
+];
+
 export function AppShell({ children }: { children: ReactNode }) {
   const [open, setOpen] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [isSignedIn, setIsSignedIn] = useState(false);
   const path = useRouterState({ select: (state) => state.location.pathname });
+
+  useEffect(() => {
+    let mounted = true;
+
+    async function checkRole() {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        const user = session?.user;
+        if (!user) {
+          if (mounted) {
+            setIsAdmin(false);
+            setIsSignedIn(false);
+          }
+          return;
+        }
+
+        if (mounted) setIsSignedIn(true);
+
+        const email = (user.email ?? "").toLowerCase().trim();
+        if (DESIGNATED_ADMIN_EMAILS.includes(email)) {
+          if (mounted) setIsAdmin(true);
+          return;
+        }
+
+        const { data: role } = await supabase
+          .from("user_roles")
+          .select("role")
+          .eq("user_id", user.id)
+          .eq("role", "admin")
+          .maybeSingle();
+
+        if (role?.role === "admin") {
+          if (mounted) setIsAdmin(true);
+          return;
+        }
+
+        const { data: allowed } = await supabase.rpc("has_role", {
+          _user_id: user.id,
+          _role: "admin"
+        });
+
+        if (mounted) setIsAdmin(Boolean(allowed));
+      } catch {
+        if (mounted) setIsAdmin(false);
+      }
+    }
+
+    void checkRole();
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (session?.user) {
+        void checkRole();
+      } else {
+        if (mounted) {
+          setIsAdmin(false);
+          setIsSignedIn(false);
+        }
+      }
+    });
+
+    return () => {
+      mounted = false;
+      subscription.unsubscribe();
+    };
+  }, []);
+
+  const visibleNav = nav.filter((item) => item.to !== "/admin" || isAdmin);
+
   return (
     <div className="min-h-screen bg-background text-foreground">
       <header className="sticky top-0 z-40 border-b border-border/80 bg-background/95 backdrop-blur">
@@ -24,7 +101,9 @@ export function AppShell({ children }: { children: ReactNode }) {
           </Link>
           <div className="flex items-center gap-2">
             <span className="hidden rounded-full border border-border bg-muted px-2.5 py-1 text-[11px] font-semibold text-muted-foreground sm:block">v1.0 beta</span>
-            <Button asChild variant="outline" size="sm"><Link to="/auth">Sign in</Link></Button>
+            <Button asChild variant="outline" size="sm">
+              <Link to="/auth">{isSignedIn ? "Account" : "Sign in"}</Link>
+            </Button>
             <Button variant="ghost" size="icon" className="lg:hidden" onClick={() => setOpen(!open)} aria-label="Toggle navigation">{open ? <X /> : <Menu />}</Button>
           </div>
         </div>
@@ -33,7 +112,7 @@ export function AppShell({ children }: { children: ReactNode }) {
         <aside className={`${open ? "block" : "hidden"} flex flex-col justify-between border-b border-border bg-sidebar px-4 py-4 lg:block lg:min-h-[calc(100vh-4rem)] lg:border-b-0 lg:border-r lg:px-3 lg:py-6`}>
           <div>
             <nav className="grid gap-1 sm:grid-cols-5 lg:grid-cols-1">
-              {nav.map((item) => {
+              {visibleNav.map((item) => {
                 const Icon = item.icon;
                 const active = item.to === "/" ? path === "/" || path.startsWith("/product/") : path.startsWith(item.to);
                 return <Link key={item.to} to={item.to} onClick={() => setOpen(false)} className={`flex items-center gap-3 rounded-md px-3 py-2.5 text-sm font-medium transition-colors ${active ? "bg-sidebar-accent text-sidebar-accent-foreground" : "text-muted-foreground hover:bg-sidebar-accent/60 hover:text-foreground"}`}><Icon className="size-4" />{item.label}</Link>;
