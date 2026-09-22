@@ -118,36 +118,32 @@ function isLtsCycle(c: { cycle: string; latest_version?: string | null }): boole
 }
 
 function TableStatusBadge({ status }: { status: LifecycleStatus | string }) {
-  const info =
+  const norm =
     status === "end_of_life"
-      ? STATUS_EXPLANATIONS.end_of_life
+      ? "end_of_life"
       : status === "approaching_eol"
-      ? STATUS_EXPLANATIONS.approaching_eol
-      : STATUS_EXPLANATIONS.supported;
+      ? "approaching_eol"
+      : "supported";
 
-  const badgeContent =
-    status === "end_of_life" ? (
-      <span className="inline-flex items-center gap-1.5 font-medium text-rose-600 dark:text-rose-400 cursor-help">
-        <span className="size-2 rounded-full bg-rose-500" />
-        End of Life (EOL)
-      </span>
-    ) : status === "approaching_eol" ? (
-      <span className="inline-flex items-center gap-1.5 font-medium text-amber-600 dark:text-amber-400 cursor-help">
-        <span className="size-2 rounded-full bg-amber-500" />
-        Action Needed
-      </span>
-    ) : (
-      <span className="inline-flex items-center gap-1.5 font-medium text-emerald-600 dark:text-emerald-400 cursor-help">
-        <span className="size-2 rounded-full bg-emerald-500" />
-        Supported
-      </span>
-    );
+  const label =
+    norm === "end_of_life"
+      ? "End of Life (EOL)"
+      : norm === "approaching_eol"
+      ? "Action Needed"
+      : "Supported";
+
+  const info = STATUS_EXPLANATIONS[norm];
 
   return (
     <TooltipProvider delayDuration={150}>
       <Tooltip>
         <TooltipTrigger asChild>
-          <span title={`${info.title}: ${info.description}`}>{badgeContent}</span>
+          <span
+            title={`${info.title}: ${info.description}`}
+            className={`status-badge status-${norm} cursor-help`}
+          >
+            {label}
+          </span>
         </TooltipTrigger>
         <TooltipContent side="top" className="max-w-xs text-xs bg-white text-zinc-900 border border-border shadow-md p-2.5">
           <p className="font-semibold text-zinc-950">{info.title}</p>
@@ -352,18 +348,18 @@ function ProductPage() {
                           </TooltipTrigger>
                           <TooltipContent side="top" className="max-w-xs bg-white text-zinc-900 border border-border shadow-md p-3 text-xs">
                             <p className="font-semibold mb-1.5 text-zinc-950">Lifecycle Status Definitions</p>
-                            <ul className="space-y-1.5 text-zinc-700">
-                              <li className="flex items-start gap-1.5">
-                                <span className="size-1.5 rounded-full bg-emerald-600 mt-1 shrink-0" />
-                                <span><strong className="text-zinc-950">Supported:</strong> &gt; 365 days to EOL or unannounced. Regular vendor updates continue.</span>
+                            <ul className="space-y-2 text-zinc-700">
+                              <li className="flex items-start gap-2">
+                                <span className="status-badge status-supported text-[9px] px-1.5 py-0.5 shrink-0">Supported</span>
+                                <span className="leading-snug">&gt; 365 days to EOL or unannounced. Regular vendor updates continue.</span>
                               </li>
-                              <li className="flex items-start gap-1.5">
-                                <span className="size-1.5 rounded-full bg-amber-600 mt-1 shrink-0" />
-                                <span><strong className="text-zinc-950">Action Needed:</strong> &lt; 365 days to EOL or in extended support. Plan upgrade/migration.</span>
+                              <li className="flex items-start gap-2">
+                                <span className="status-badge status-approaching_eol text-[9px] px-1.5 py-0.5 shrink-0">Action Needed</span>
+                                <span className="leading-snug">&lt; 365 days to EOL or in extended support. Plan upgrade/migration.</span>
                               </li>
-                              <li className="flex items-start gap-1.5">
-                                <span className="size-1.5 rounded-full bg-rose-600 mt-1 shrink-0" />
-                                <span><strong className="text-zinc-950">End of Life (EOL):</strong> Official vendor support and patches have ceased.</span>
+                              <li className="flex items-start gap-2">
+                                <span className="status-badge status-end_of_life text-[9px] px-1.5 py-0.5 shrink-0">End of Life</span>
+                                <span className="leading-snug">Official vendor support and security updates have ceased.</span>
                               </li>
                             </ul>
                           </TooltipContent>

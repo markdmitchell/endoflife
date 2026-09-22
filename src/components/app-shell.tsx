@@ -196,7 +196,6 @@ export function StatusBadge({ status }: { status: "supported" | "approaching_eol
             title={`${info.title}: ${info.description}`}
             className={`status-badge status-${status} cursor-help`}
           >
-            <span className="size-1.5 rounded-full bg-current" />
             {labels[status]}
           </span>
         </TooltipTrigger>
