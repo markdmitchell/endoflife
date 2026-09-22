@@ -35,21 +35,90 @@ export async function getCatalog() {
   }
 
   const seen = new Set<number>();
-  return all.filter((p) => {
+  const deduped = all.filter((p) => {
     if (!p || seen.has(p.id)) return false;
     seen.add(p.id);
     return true;
   });
+
+  // Prioritize products that have release cycles over empty stubs
+  deduped.sort((a, b) => {
+    const aCount = Array.isArray(a.release_cycles) ? a.release_cycles.length : 0;
+    const bCount = Array.isArray(b.release_cycles) ? b.release_cycles.length : 0;
+    if (aCount > 0 && bCount === 0) return -1;
+    if (aCount === 0 && bCount > 0) return 1;
+    return a.name.localeCompare(b.name);
+  });
+
+  return deduped;
 }
 
 export async function getProduct(slug: string) {
-  const { data, error } = await supabase
+  let { data, error } = await supabase
     .from("products")
     .select("*, release_cycles(*), data_sources(*)")
     .eq("slug", slug)
     .maybeSingle();
+
   if (error) throw error;
-  return data;
+
+  // If product not found or has 0 release cycles, check known aliases or canonical products by name
+  if (!data || !data.release_cycles || data.release_cycles.length === 0) {
+    const aliasMap: Record<string, string> = {
+      "microsoft-windows": "windows",
+      "microsoft-office": "office",
+      "microsoft-exchange-server": "exchange-server",
+      "microsoft-visual-studio": "visual-studio",
+      "microsoft-sql-server": "mssqlserver",
+      "joomla-joomla!": "joomla",
+    };
+
+    const targetSlug = aliasMap[slug] || slug.replace(/^microsoft-/, "");
+    if (targetSlug !== slug) {
+      const { data: aliasData } = await supabase
+        .from("products")
+        .select("*, release_cycles(*), data_sources(*)")
+        .eq("slug", targetSlug)
+        .maybeSingle();
+
+      if (aliasData && aliasData.release_cycles && aliasData.release_cycles.length > 0) {
+        data = aliasData;
+      }
+    }
+
+    // If still no cycles, attempt lookup by matching name for products that HAVE cycles
+    if (data && (!data.release_cycles || data.release_cycles.length === 0)) {
+      const { data: namedMatch } = await supabase
+        .from("products")
+        .select("*, release_cycles(*), data_sources(*)")
+        .eq("name", data.name)
+        .neq("id", data.id)
+        .limit(5);
+
+      const withCycles = (namedMatch || []).find((p) => p.release_cycles && p.release_cycles.length > 0);
+      if (withCycles) {
+        data = withCycles;
+      }
+    }
+  }
+
+  // Enrich with provenance record
+  if (data) {
+    const { data: prov } = await supabase
+      .from("provenance_records")
+      .select("*")
+      .eq("entity_id", data.id)
+      .order("id", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    return {
+      ...data,
+      provenance: prov || null,
+    };
+  }
+
+  return null;
 }
 
 export async function getSources() {
