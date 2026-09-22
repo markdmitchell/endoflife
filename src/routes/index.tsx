@@ -21,11 +21,11 @@ function CatalogPage() {
   const categories = useMemo(() => [...new Set(data.map((p) => p.category))].sort(), [data]);
   const filtered = data.filter((p) => {
     const text = `${p.name} ${p.vendor} ${p.category} ${p.slug}`.toLowerCase();
-    const statuses = p.release_cycles.map((r) => r.status);
+    const statuses = Array.isArray(p.release_cycles) ? p.release_cycles.map((r) => r.status) : [];
     return text.includes(query.toLowerCase()) && (category === "all" || p.category === category) && (status === "all" || statuses.includes(status as LifecycleStatus));
   });
   const productCount = stats?.products ?? data.length;
-  const cycleCount = stats?.cycles ?? data.reduce((n, p) => n + p.release_cycles.length, 0);
+  const cycleCount = stats?.cycles ?? data.reduce((n, p) => n + (Array.isArray(p.release_cycles) ? p.release_cycles.length : 0), 0);
   const provenanceCount = stats?.provenance ?? 0;
   return <div>
     <PageHeader eyebrow="Lifecycle catalog" title="Know what reaches end of life next." description="Search, filter, and track active support lifecycles, upcoming end-of-support deadlines, and verified end-of-life dates across thousands of software products and frameworks." action={<Button asChild><Link to="/risk">Review risk <ArrowRight /></Link></Button>} />
@@ -41,7 +41,7 @@ function CatalogPage() {
     {isLoading && <div className="py-20 text-center text-sm text-muted-foreground">Loading product lifecycle intelligence…</div>}
     {error && <div className="mt-6 rounded-md border border-destructive/30 bg-destructive/5 p-4 text-sm text-destructive">The catalog could not be loaded.</div>}
     <div className="mt-3 overflow-hidden rounded-lg border border-border bg-card">
-      {filtered.map((product, i) => { const cycles=[...product.release_cycles].sort((a,b)=>(b.release_date??"").localeCompare(a.release_date??"")); const top=cycles[0]; return <Link to="/product/$slug" params={{slug:product.slug}} key={product.id} className={`group grid gap-4 p-5 transition-colors hover:bg-muted/50 md:grid-cols-[1.6fr_1fr_1fr_auto] md:items-center ${i ? "border-t border-border" : ""}`}><div><h2 className="font-display text-base font-semibold group-hover:text-primary">{product.name}</h2><p className="mt-1 text-xs text-muted-foreground">{product.vendor} · {product.category}</p></div><div><p className="text-[11px] font-semibold uppercase text-muted-foreground">Current cycle</p><p className="mt-1 text-sm font-medium">{top?.cycle ?? "Not indexed"}</p></div><div>{top ? <StatusBadge status={top.status as LifecycleStatus}/> : <span className="text-xs text-muted-foreground">Awaiting data</span>}</div><ArrowRight className="hidden size-4 text-muted-foreground transition-transform group-hover:translate-x-1 md:block"/></Link>})}
+      {filtered.map((product, i) => { const cycles=Array.isArray(product.release_cycles) ? [...product.release_cycles].sort((a,b)=>(b.release_date??"").localeCompare(a.release_date??"")) : []; const top=cycles[0]; return <Link to="/product/$slug" params={{slug:product.slug}} key={product.id} className={`group grid gap-4 p-5 transition-colors hover:bg-muted/50 md:grid-cols-[1.6fr_1fr_1fr_auto] md:items-center ${i ? "border-t border-border" : ""}`}><div><h2 className="font-display text-base font-semibold group-hover:text-primary">{product.name}</h2><p className="mt-1 text-xs text-muted-foreground">{product.vendor} · {product.category}</p></div><div><p className="text-[11px] font-semibold uppercase text-muted-foreground">Current cycle</p><p className="mt-1 text-sm font-medium">{top?.cycle ?? "Not indexed"}</p></div><div>{top ? <StatusBadge status={top.status as LifecycleStatus}/> : <span className="text-xs text-muted-foreground">Awaiting data</span>}</div><ArrowRight className="hidden size-4 text-muted-foreground transition-transform group-hover:translate-x-1 md:block"/></Link>})}
       {!isLoading && !filtered.length && <div className="p-12 text-center"><p className="font-semibold">No matching products</p><p className="mt-1 text-sm text-muted-foreground">Try a broader search or clear the filters.</p></div>}
     </div>
   </div>;

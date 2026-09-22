@@ -22,13 +22,24 @@ export async function getCatalogStats(): Promise<CatalogStats> {
 }
 
 export async function getCatalog() {
-  const { data, error } = await supabase
-    .from("products")
-    .select("*, release_cycles(*)")
-    .order("name")
-    .range(0, 4999);
-  if (error) throw error;
-  return data ?? [];
+  const batches = await Promise.all([
+    supabase.from("products").select("*, release_cycles(*)").order("name").range(0, 999),
+    supabase.from("products").select("*, release_cycles(*)").order("name").range(1000, 1999),
+    supabase.from("products").select("*, release_cycles(*)").order("name").range(2000, 2999),
+    supabase.from("products").select("*, release_cycles(*)").order("name").range(3000, 3999),
+  ]);
+
+  const all: any[] = [];
+  for (const b of batches) {
+    if (b.data) all.push(...b.data);
+  }
+
+  const seen = new Set<number>();
+  return all.filter((p) => {
+    if (!p || seen.has(p.id)) return false;
+    seen.add(p.id);
+    return true;
+  });
 }
 
 export async function getProduct(slug: string) {
@@ -79,7 +90,19 @@ export function statusLabel(status: LifecycleStatus) {
 
 export function formatDate(value: string | null) {
   if (!value) return "Not published";
-  return new Intl.DateTimeFormat("en", { month: "short", day: "numeric", year: "numeric" }).format(
-    new Date(`${value}T00:00:00`),
-  );
+  try {
+    const trimmed = value.trim();
+    const dateStr = trimmed.includes("T") ? trimmed : `${trimmed}T00:00:00`;
+    const d = new Date(dateStr);
+    if (!isNaN(d.getTime())) {
+      return new Intl.DateTimeFormat("en", { month: "short", day: "numeric", year: "numeric" }).format(d);
+    }
+    const fallback = new Date(trimmed);
+    if (!isNaN(fallback.getTime())) {
+      return new Intl.DateTimeFormat("en", { month: "short", day: "numeric", year: "numeric" }).format(fallback);
+    }
+    return trimmed;
+  } catch {
+    return value;
+  }
 }

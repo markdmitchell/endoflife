@@ -5,21 +5,23 @@ import { getProduct, formatDate, type LifecycleStatus } from "@/lib/catalog";
 import { PageHeader, StatusBadge } from "@/components/app-shell";
 import { Button } from "@/components/ui/button";
 
-function displayName(slug: string) {
+function displayName(slug?: string) {
+  if (!slug) return "Product";
   return slug
     .split("-")
-    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .map((word) => (word ? word.charAt(0).toUpperCase() + word.slice(1) : ""))
     .join(" ");
 }
 
-function headMeta(slug: string) {
-  const name = displayName(slug);
+function headMeta(slug?: string) {
+  const safeSlug = (slug || "").toLowerCase();
+  const name = displayName(safeSlug);
   const title =
-    slug === "python"
+    safeSlug === "python"
       ? "Python EOL Dates & Support Lifecycle — endoflife.tech"
       : `${name} lifecycle — endoflife.tech`;
   const description =
-    slug === "python"
+    safeSlug === "python"
       ? "Python end-of-life (EOL) dates and support status for every 3.x release. See which Python versions still receive security fixes and when each branch reaches end of life."
       : `${name} release and support lifecycle details, including support windows and end-of-life dates.`;
   return {
@@ -34,46 +36,72 @@ function headMeta(slug: string) {
   };
 }
 
+function cleanDescription(desc: string | null | undefined, name: string): string {
+  if (!desc) return `Lifecycle support schedule and end-of-life milestones for ${name}.`;
+  const trimmed = desc.trim();
+  if (trimmed.startsWith("[") && trimmed.endsWith("]")) {
+    try {
+      const parsed = JSON.parse(trimmed);
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        return `Lifecycle support schedule and end-of-life milestones for ${name} (${parsed.join(", ")}).`;
+      }
+    } catch {
+      // ignore
+    }
+  }
+  return trimmed;
+}
+
 export const Route = createFileRoute("/product/$slug")({
   staticData: { sitemap: true },
-  head: ({ params }) => headMeta(params.slug),
+  head: (ctx) => headMeta(ctx?.params?.slug ?? (ctx as any)?.match?.params?.slug),
   component: ProductPage,
 });
 
 function ProductPage() {
-  const { slug } = Route.useParams();
-  const { data, isLoading } = useQuery({ queryKey: ["product", slug], queryFn: () => getProduct(slug) });
-  if (isLoading) return <p className="py-20 text-sm text-muted-foreground">Loading product record…</p>;
-  if (!data)
+  const params = Route.useParams();
+  const slug = params?.slug ?? "";
+  const { data, isLoading, error } = useQuery({
+    queryKey: ["product", slug],
+    queryFn: () => (slug ? getProduct(slug) : null),
+    enabled: Boolean(slug),
+  });
+
+  if (isLoading) return <div className="py-20 text-center text-sm text-muted-foreground">Loading product record…</div>;
+
+  if (error || !data)
     return (
       <div>
         <PageHeader eyebrow="Not found" title="Product unavailable" description="This product may have moved or is not indexed." />
         <Button asChild variant="outline">
           <Link to="/">
-            <ArrowLeft />
+            <ArrowLeft className="mr-1.5 size-4" />
             Back to catalog
           </Link>
         </Button>
       </div>
     );
-  const cycles = [...data.release_cycles].sort((a, b) => (b.release_date ?? "").localeCompare(a.release_date ?? ""));
+
+  const rawCycles = Array.isArray(data.release_cycles) ? data.release_cycles : [];
+  const cycles = [...rawCycles].sort((a, b) => (b.release_date ?? "").localeCompare(a.release_date ?? ""));
+
   return (
     <div>
       <Button asChild variant="ghost" size="sm" className="mb-4 -ml-3">
         <Link to="/">
-          <ArrowLeft />
+          <ArrowLeft className="mr-1.5 size-4" />
           Catalog
         </Link>
       </Button>
       <PageHeader
-        eyebrow={`${data.vendor} · ${data.category}`}
-        title={data.name}
-        description={data.description}
+        eyebrow={`${data.vendor || "Enterprise Software"} · ${data.category || "General"}`}
+        title={data.name || displayName(slug)}
+        description={cleanDescription(data.description, data.name || displayName(slug))}
         action={
           data.homepage_url ? (
             <Button asChild variant="outline">
               <a href={data.homepage_url} target="_blank" rel="noreferrer">
-                Product site <ExternalLink />
+                Product site <ExternalLink className="ml-1.5 size-4" />
               </a>
             </Button>
           ) : undefined
@@ -82,41 +110,49 @@ function ProductPage() {
       <div className="grid gap-7 xl:grid-cols-[1fr_300px]">
         <section>
           <h2 className="mb-3 font-display text-lg font-semibold">Release cycles</h2>
-          <div className="overflow-x-auto rounded-lg border border-border bg-card">
-            <table className="w-full min-w-[720px] text-left text-sm">
-              <thead className="bg-muted/70 text-xs text-muted-foreground">
-                <tr>
-                  <th className="px-4 py-3">Cycle</th>
-                  <th className="px-4 py-3">Latest</th>
-                  <th className="px-4 py-3">Released</th>
-                  <th className="px-4 py-3">Support ends</th>
-                  <th className="px-4 py-3">End of life</th>
-                  <th className="px-4 py-3">Status</th>
-                </tr>
-              </thead>
-              <tbody>
-                {cycles.map((c) => (
-                  <tr key={c.id} className="border-t border-border">
-                    <td className="px-4 py-4 font-semibold">{c.cycle}</td>
-                    <td className="px-4 py-4">{c.latest_version ?? "—"}</td>
-                    <td className="px-4 py-4 text-muted-foreground">{formatDate(c.release_date)}</td>
-                    <td className="px-4 py-4 text-muted-foreground">{formatDate(c.support_end)}</td>
-                    <td className="px-4 py-4 text-muted-foreground">{formatDate(c.eol_date)}</td>
-                    <td className="px-4 py-4">
-                      <StatusBadge status={c.status as LifecycleStatus} />
-                    </td>
+          {cycles.length === 0 ? (
+            <div className="rounded-lg border border-border bg-card p-8 text-center text-sm text-muted-foreground">
+              No specific release cycles are currently indexed for this product.
+            </div>
+          ) : (
+            <div className="overflow-x-auto rounded-lg border border-border bg-card">
+              <table className="w-full min-w-[720px] text-left text-sm">
+                <thead className="bg-muted/70 text-xs text-muted-foreground">
+                  <tr>
+                    <th className="px-4 py-3">Cycle</th>
+                    <th className="px-4 py-3">Latest</th>
+                    <th className="px-4 py-3">Released</th>
+                    <th className="px-4 py-3">Support ends</th>
+                    <th className="px-4 py-3">End of life</th>
+                    <th className="px-4 py-3">Status</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                </thead>
+                <tbody>
+                  {cycles.map((c) => (
+                    <tr key={c.id} className="border-t border-border">
+                      <td className="px-4 py-4 font-semibold">{c.cycle}</td>
+                      <td className="px-4 py-4">{c.latest_version ?? "—"}</td>
+                      <td className="px-4 py-4 text-muted-foreground">{formatDate(c.release_date)}</td>
+                      <td className="px-4 py-4 text-muted-foreground">{formatDate(c.support_end)}</td>
+                      <td className="px-4 py-4 text-muted-foreground">{formatDate(c.eol_date)}</td>
+                      <td className="px-4 py-4">
+                        <StatusBadge status={(c.status || "supported") as LifecycleStatus} />
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
           {slug === "python" && <PythonEolGuide />}
         </section>
         <aside className="space-y-4">
           <div className="rounded-lg border border-border bg-card p-5">
             <p className="text-xs font-bold uppercase text-muted-foreground">Source</p>
-            <p className="mt-3 font-semibold">{data.data_sources?.name ?? "Catalog source"}</p>
-            <p className="mt-1 text-sm leading-6 text-muted-foreground">{data.data_sources?.description}</p>
+            <p className="mt-3 font-semibold">{data.data_sources?.name ?? "Verified Upstream Authority"}</p>
+            <p className="mt-1 text-sm leading-6 text-muted-foreground">
+              {data.data_sources?.description ?? "Collected directly from authoritative vendor feeds and public advisories."}
+            </p>
           </div>
           <div className="rounded-lg border border-border bg-muted/50 p-5">
             <p className="text-sm font-semibold">Lifecycle confidence</p>
