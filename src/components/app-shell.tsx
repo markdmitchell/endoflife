@@ -99,7 +99,7 @@ export function AppShell({ children }: { children: ReactNode }) {
         <div className="mx-auto flex h-28 max-w-[1600px] items-center justify-between px-4 lg:px-7">
           <Link to="/" className="flex items-center gap-3" aria-label="endoflife.tech home">
             <img src={bannerIconAsset.url} alt="" className="size-18 rounded-md" />
-            <span><strong className="block text-[28px] leading-tight">endoflife.tech</strong><span className="block text-[22px] leading-tight text-muted-foreground">Lifecycle intelligence</span></span>
+            <span><strong className="block text-[28px] leading-tight">endoflife.tech</strong><span className="block text-[22px] leading-tight text-muted-foreground">Product Lifecycle Intelligence</span></span>
           </Link>
           <div className="flex items-center gap-2">
             <ReleaseNotesModal
