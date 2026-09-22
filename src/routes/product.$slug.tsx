@@ -1,12 +1,24 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { ArrowLeft, Check, Copy, ExternalLink, ShieldCheck, Terminal } from "lucide-react";
+import { ArrowLeft, Check, Copy, ExternalLink, HelpCircle, ShieldCheck, Terminal } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
-import { getProduct, formatDate, type LifecycleStatus } from "@/lib/catalog";
+import {
+  getProduct,
+  formatDate,
+  formatCategoryName,
+  STATUS_EXPLANATIONS,
+  type LifecycleStatus,
+} from "@/lib/catalog";
 import { PageHeader } from "@/components/app-shell";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 function displayName(slug?: string) {
   if (!slug) return "Product";
@@ -40,8 +52,9 @@ function headMeta(slug?: string) {
 }
 
 function parseTags(desc: string | null | undefined, category: string, slug: string): string[] {
+  const friendlyCat = formatCategoryName(category);
   if (!desc) {
-    return Array.from(new Set([category, slug.replace(/-/g, " ")]));
+    return Array.from(new Set([friendlyCat, slug.replace(/-/g, " ")]));
   }
   const trimmed = desc.trim();
   if (trimmed.startsWith("[") && trimmed.endsWith("]")) {
@@ -54,7 +67,7 @@ function parseTags(desc: string | null | undefined, category: string, slug: stri
       // ignore
     }
   }
-  return Array.from(new Set([category, slug.replace(/-/g, " ")]));
+  return Array.from(new Set([friendlyCat, slug.replace(/-/g, " ")]));
 }
 
 function getVerificationCommand(slug: string, name: string): string | null {
@@ -105,27 +118,43 @@ function isLtsCycle(c: { cycle: string; latest_version?: string | null }): boole
 }
 
 function TableStatusBadge({ status }: { status: LifecycleStatus | string }) {
-  if (status === "end_of_life") {
-    return (
-      <span className="inline-flex items-center gap-1.5 font-medium text-rose-600 dark:text-rose-400">
+  const info =
+    status === "end_of_life"
+      ? STATUS_EXPLANATIONS.end_of_life
+      : status === "approaching_eol"
+      ? STATUS_EXPLANATIONS.approaching_eol
+      : STATUS_EXPLANATIONS.supported;
+
+  const badgeContent =
+    status === "end_of_life" ? (
+      <span className="inline-flex items-center gap-1.5 font-medium text-rose-600 dark:text-rose-400 cursor-help">
         <span className="size-2 rounded-full bg-rose-500" />
         End of Life (EOL)
       </span>
-    );
-  }
-  if (status === "approaching_eol") {
-    return (
-      <span className="inline-flex items-center gap-1.5 font-medium text-amber-600 dark:text-amber-400">
+    ) : status === "approaching_eol" ? (
+      <span className="inline-flex items-center gap-1.5 font-medium text-amber-600 dark:text-amber-400 cursor-help">
         <span className="size-2 rounded-full bg-amber-500" />
         Action Needed
       </span>
+    ) : (
+      <span className="inline-flex items-center gap-1.5 font-medium text-emerald-600 dark:text-emerald-400 cursor-help">
+        <span className="size-2 rounded-full bg-emerald-500" />
+        Supported
+      </span>
     );
-  }
+
   return (
-    <span className="inline-flex items-center gap-1.5 font-medium text-emerald-600 dark:text-emerald-400">
-      <span className="size-2 rounded-full bg-emerald-500" />
-      Supported
-    </span>
+    <TooltipProvider delayDuration={150}>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <span title={`${info.title}: ${info.description}`}>{badgeContent}</span>
+        </TooltipTrigger>
+        <TooltipContent side="top" className="max-w-xs text-xs">
+          <p className="font-semibold">{info.title}</p>
+          <p className="mt-0.5 text-muted-foreground">{info.description}</p>
+        </TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
   );
 }
 
@@ -198,8 +227,8 @@ function ProductPage() {
             </h1>
             <span className="text-sm text-muted-foreground">
               — Vendor: <strong className="text-foreground">{data.vendor || "N/A"}</strong> | Category:{" "}
-              <span className="rounded bg-muted px-1.5 py-0.5 font-mono text-xs uppercase text-foreground">
-                {data.category}
+              <span className="rounded bg-muted px-2 py-0.5 text-xs font-semibold text-foreground">
+                {formatCategoryName(data.category)}
               </span>
             </span>
           </div>
@@ -307,7 +336,41 @@ function ProductPage() {
                   <th className="px-4 py-3.5">End of Active Support</th>
                   <th className="px-4 py-3.5">End of Life (EOL) Date</th>
                   <th className="px-4 py-3.5">LTS Status</th>
-                  <th className="px-4 py-3.5">Status</th>
+                  <th className="px-4 py-3.5">
+                    <div className="flex items-center gap-1.5">
+                      <span>Status</span>
+                      <TooltipProvider delayDuration={150}>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <span
+                              tabIndex={0}
+                              className="text-muted-foreground/80 hover:text-foreground cursor-help"
+                              title="Lifecycle Status Definitions: Supported (> 365 days), Action Needed (< 365 days), End of Life (Support ended)"
+                            >
+                              <HelpCircle className="size-3.5" />
+                            </span>
+                          </TooltipTrigger>
+                          <TooltipContent side="top" className="max-w-xs p-2.5 text-xs">
+                            <p className="font-semibold mb-1.5 text-foreground">Lifecycle Status Definitions</p>
+                            <ul className="space-y-1.5 text-muted-foreground">
+                              <li className="flex items-start gap-1.5">
+                                <span className="size-1.5 rounded-full bg-emerald-500 mt-1 shrink-0" />
+                                <span><strong className="text-foreground">Supported:</strong> &gt; 365 days to EOL or unannounced. Regular vendor updates continue.</span>
+                              </li>
+                              <li className="flex items-start gap-1.5">
+                                <span className="size-1.5 rounded-full bg-amber-500 mt-1 shrink-0" />
+                                <span><strong className="text-foreground">Action Needed:</strong> &lt; 365 days to EOL or in extended support. Plan upgrade/migration.</span>
+                              </li>
+                              <li className="flex items-start gap-1.5">
+                                <span className="size-1.5 rounded-full bg-rose-500 mt-1 shrink-0" />
+                                <span><strong className="text-foreground">End of Life (EOL):</strong> Official vendor support and patches have ceased.</span>
+                              </li>
+                            </ul>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+                    </div>
+                  </th>
                   <th className="px-4 py-3.5">Latest Version</th>
                 </tr>
               </thead>

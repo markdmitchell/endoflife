@@ -1,11 +1,12 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { BookOpen, Compass, Database, Gauge, Menu, Search, Settings2, Sparkles, Users, X } from "lucide-react";
+import { BookOpen, Database, Gauge, Menu, Search, Settings2, Sparkles, Users, X } from "lucide-react";
 import { useState, useEffect, type ReactNode } from "react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { ReleaseNotesModal } from "@/components/release-notes-modal";
-import { RoadmapModal } from "@/components/roadmap-modal";
 import bannerIconAsset from "@/assets/endoflife-banner-icon-green.png.asset.json";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { STATUS_EXPLANATIONS } from "@/lib/catalog";
 
 const nav = [
   { to: "/", label: "Catalog", icon: Search },
@@ -135,35 +136,8 @@ export function AppShell({ children }: { children: ReactNode }) {
             </nav>
           </div>
 
-          {/* Bottom Sidebar Area: What's New + Roadmap + Authors & Contributors */}
+          {/* Bottom Sidebar Area: Authors & Contributors */}
           <div className="mt-auto border-t border-sidebar-border pt-4">
-            <div className="mb-3 grid grid-cols-2 gap-1.5">
-              <ReleaseNotesModal
-                trigger={
-                  <button
-                    type="button"
-                    className="flex items-center justify-center gap-1.5 rounded-lg border border-sidebar-border bg-card/60 px-2 py-2 text-[11px] font-medium text-muted-foreground transition-colors hover:bg-sidebar-accent hover:text-foreground cursor-pointer shadow-2xs"
-                    title="View Platform Release Notes"
-                  >
-                    <Sparkles className="size-3 text-primary shrink-0" />
-                    <span className="truncate">Release Notes</span>
-                  </button>
-                }
-              />
-              <RoadmapModal
-                trigger={
-                  <button
-                    type="button"
-                    className="flex items-center justify-center gap-1.5 rounded-lg border border-sidebar-border bg-card/60 px-2 py-2 text-[11px] font-medium text-muted-foreground transition-colors hover:bg-sidebar-accent hover:text-foreground cursor-pointer shadow-2xs"
-                    title="View Phased Product Roadmap"
-                  >
-                    <Compass className="size-3 text-primary shrink-0" />
-                    <span className="truncate">Roadmap</span>
-                  </button>
-                }
-              />
-            </div>
-
             <div className="rounded-xl border border-sidebar-border bg-card/60 p-3 shadow-xs">
               <div className="mb-2.5 flex items-center gap-2 px-1 text-xs font-semibold text-foreground">
                 <Users className="size-3.5 text-primary" />
@@ -212,5 +186,25 @@ export function PageHeader({ eyebrow, title, description, action }: { eyebrow: s
 
 export function StatusBadge({ status }: { status: "supported" | "approaching_eol" | "end_of_life" }) {
   const labels = { supported: "Supported", approaching_eol: "Action needed", end_of_life: "End of life" };
-  return <span className={`status-badge status-${status}`}><span className="size-1.5 rounded-full bg-current" />{labels[status]}</span>;
+  const info = STATUS_EXPLANATIONS[status] ?? STATUS_EXPLANATIONS.supported;
+
+  return (
+    <TooltipProvider delayDuration={150}>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <span
+            title={`${info.title}: ${info.description}`}
+            className={`status-badge status-${status} cursor-help`}
+          >
+            <span className="size-1.5 rounded-full bg-current" />
+            {labels[status]}
+          </span>
+        </TooltipTrigger>
+        <TooltipContent side="top" className="max-w-xs text-xs">
+          <p className="font-semibold">{info.title}</p>
+          <p className="mt-0.5 text-muted-foreground">{info.description}</p>
+        </TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
+  );
 }

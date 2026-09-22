@@ -151,6 +151,47 @@ export async function getProvenanceSources(): Promise<string[]> {
   return (sources ?? []).map((s) => s.name);
 }
 
+export const CATEGORY_FRIENDLY_NAMES: Record<string, string> = {
+  app: "Application",
+  database: "Database",
+  "defense-gots": "Defense GOTS",
+  "desktop-app": "Desktop App",
+  device: "Device",
+  framework: "Framework",
+  "healthcare-sys": "Healthcare System",
+  lang: "Language",
+  "niche-app": "Niche App",
+  os: "Operating System",
+  "security-tool": "Security Tool",
+  "server-app": "Server App",
+  service: "Service",
+  standard: "Standard",
+};
+
+export function formatCategoryName(category?: string | null): string {
+  if (!category) return "Uncategorized";
+  const key = category.toLowerCase().trim();
+  return CATEGORY_FRIENDLY_NAMES[key] || category;
+}
+
+export const STATUS_EXPLANATIONS = {
+  supported: {
+    title: "Supported",
+    short: "Supported",
+    description: "Active vendor maintenance. Regular patches and updates continue (> 365 days to EOL or unannounced).",
+  },
+  approaching_eol: {
+    title: "Action Needed",
+    short: "Action Needed",
+    description: "Approaching End of Life within 12 months (< 365 days) or in extended support. Plan migration or upgrade.",
+  },
+  end_of_life: {
+    title: "End of Life (EOL)",
+    short: "End of Life",
+    description: "Official vendor support and security updates have ceased (EOL date has passed). Poses vulnerability and compliance risks.",
+  },
+} as const;
+
 export function statusLabel(status: LifecycleStatus) {
   if (status === "end_of_life") return "End of life";
   if (status === "approaching_eol") return "Action needed";
