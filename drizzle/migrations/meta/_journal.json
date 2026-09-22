@@ -15,6 +15,13 @@
       "when": 1790034868537,
       "tag": "0001_harden_role_checks",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1790035800000,
+      "tag": "0002_restore_public_rpc_functions",
+      "breakpoints": true
     }
   ]
 }
