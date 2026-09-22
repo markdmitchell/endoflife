@@ -210,9 +210,37 @@ export function AppShell({ children }: { children: ReactNode }) {
                 </a>
               </div>
             </div>
+
+            {/* Quick Policy & Platform Links */}
+            <div className="mt-3 flex flex-wrap items-center justify-between gap-x-1.5 px-1 text-[11px] text-muted-foreground">
+              <Link to="/about" onClick={() => setOpen(false)} className="hover:text-foreground transition-colors">About</Link>
+              <span>•</span>
+              <Link to="/contact" onClick={() => setOpen(false)} className="hover:text-foreground transition-colors">Contact</Link>
+              <span>•</span>
+              <Link to="/privacy" onClick={() => setOpen(false)} className="hover:text-foreground transition-colors">Privacy</Link>
+              <span>•</span>
+              <Link to="/terms" onClick={() => setOpen(false)} className="hover:text-foreground transition-colors">Terms</Link>
+            </div>
           </div>
         </aside>
-        <main className="min-w-0 px-4 py-7 md:px-7 lg:px-10 lg:py-9">{children}</main>
+        <main className="min-w-0 flex flex-col justify-between min-h-[calc(100vh-7rem)] px-4 py-7 md:px-7 lg:px-10 lg:py-9">
+          <div className="flex-1">{children}</div>
+          <footer className="mt-16 border-t border-border pt-6 pb-2 text-xs text-muted-foreground">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+              <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+                <span className="font-semibold text-foreground">endoflife.tech</span>
+                <span className="text-muted-foreground/60 hidden sm:inline">•</span>
+                <span>Product Lifecycle Intelligence</span>
+              </div>
+              <nav className="flex flex-wrap items-center gap-x-5 gap-y-2">
+                <Link to="/about" className="transition-colors hover:text-foreground">About</Link>
+                <Link to="/contact" className="transition-colors hover:text-foreground">Contact</Link>
+                <Link to="/privacy" className="transition-colors hover:text-foreground">Privacy</Link>
+                <Link to="/terms" className="transition-colors hover:text-foreground">Terms</Link>
+              </nav>
+            </div>
+          </footer>
+        </main>
       </div>
     </div>
   );
