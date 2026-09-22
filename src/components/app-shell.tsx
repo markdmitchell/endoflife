@@ -1,8 +1,9 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { BookOpen, Database, Gauge, Menu, Search, Settings2, ShieldCheck, Users, X } from "lucide-react";
+import { BookOpen, Database, Gauge, Menu, Search, Settings2, ShieldCheck, Sparkles, Users, X } from "lucide-react";
 import { useState, useEffect, type ReactNode } from "react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
+import { ReleaseNotesModal } from "@/components/release-notes-modal";
 
 const nav = [
   { to: "/", label: "Catalog", icon: Search },
@@ -100,7 +101,19 @@ export function AppShell({ children }: { children: ReactNode }) {
             <span><strong className="block text-sm">endoflife.tech</strong><span className="block text-[11px] text-muted-foreground">Lifecycle intelligence</span></span>
           </Link>
           <div className="flex items-center gap-2">
-            <span className="hidden rounded-full border border-border bg-muted px-2.5 py-1 text-[11px] font-semibold text-muted-foreground sm:block">0.9b beta</span>
+            <ReleaseNotesModal
+              trigger={
+                <button
+                  type="button"
+                  className="hidden items-center gap-1.5 rounded-full border border-border bg-muted/80 px-2.5 py-1 text-[11px] font-semibold text-foreground transition-all hover:border-primary/40 hover:bg-accent sm:inline-flex cursor-pointer shadow-2xs"
+                  title="View What's New & Release Notes"
+                >
+                  <Sparkles className="size-3 text-primary" />
+                  <span>v1.0.0</span>
+                  <span className="rounded bg-primary/15 px-1 py-0.2 text-[9px] font-bold uppercase tracking-wider text-primary">GA</span>
+                </button>
+              }
+            />
             <Button asChild variant="outline" size="sm">
               <Link to="/auth">{isSignedIn ? "Account" : "Sign in"}</Link>
             </Button>
@@ -120,8 +133,24 @@ export function AppShell({ children }: { children: ReactNode }) {
             </nav>
           </div>
 
-          {/* Authors & Contributors */}
+          {/* Bottom Sidebar Area: What's New + Authors & Contributors */}
           <div className="mt-auto border-t border-sidebar-border pt-4">
+            <ReleaseNotesModal
+              trigger={
+                <button
+                  type="button"
+                  className="mb-3 flex w-full items-center justify-between rounded-lg border border-sidebar-border bg-card/60 px-3 py-2 text-xs font-medium text-muted-foreground transition-colors hover:bg-sidebar-accent hover:text-foreground cursor-pointer shadow-2xs"
+                  title="View Platform Release Notes"
+                >
+                  <span className="flex items-center gap-2">
+                    <Sparkles className="size-3.5 text-primary" />
+                    <span>What&apos;s New in v1.0.0</span>
+                  </span>
+                  <span className="rounded bg-primary/15 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider text-primary">GA</span>
+                </button>
+              }
+            />
+
             <div className="rounded-xl border border-sidebar-border bg-card/60 p-3 shadow-xs">
               <div className="mb-2.5 flex items-center gap-2 px-1 text-xs font-semibold text-foreground">
                 <Users className="size-3.5 text-primary" />
