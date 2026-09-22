@@ -1,6 +1,6 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
-import { CheckCircle2, Github, Mail, MessageSquare, Send, ShieldCheck, Sparkles } from "lucide-react";
+import { ArrowRight, CheckCircle2, Github, Mail, MessageSquare, Send, ShieldCheck, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 import { PageHeader } from "@/components/app-shell";
 import { Button } from "@/components/ui/button";
@@ -190,42 +190,15 @@ function ContactPage() {
               </div>
 
               <div className="rounded-lg border border-border bg-muted/40 p-3">
-                <div className="text-xs font-semibold text-foreground">Data Provenance Verification</div>
-                <p className="mt-1 text-[11px] text-muted-foreground">Notice a discrepancy with vendor release cycles? You can submit verifiable documentation to ensure audit fidelity.</p>
-              </div>
-            </div>
-          </div>
-
-          <div className="rounded-2xl border border-border bg-card p-6 shadow-xs">
-            <h4 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Founders &amp; Authors</h4>
-            <div className="mt-4 space-y-3">
-              <div className="flex items-center justify-between">
-                <div>
-                  <div className="text-xs font-semibold text-foreground">Mark D. Mitchell</div>
-                  <div className="text-[11px] text-muted-foreground">Creator &amp; Principal Maintainer</div>
-                </div>
-                <a
-                  href="https://www.linkedin.com/in/markdmitchell/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="rounded-md border border-border bg-muted/60 px-2.5 py-1 text-xs font-medium text-foreground hover:bg-accent hover:text-primary transition-colors"
+                <div className="text-xs font-semibold text-foreground">Meet the Maintainers</div>
+                <p className="mt-1 text-[11px] text-muted-foreground">Learn more about the origins, mission, and creators behind endoflife.tech.</p>
+                <Link
+                  to="/about"
+                  className="mt-2.5 inline-flex items-center gap-1.5 text-xs font-semibold text-primary hover:underline"
                 >
-                  LinkedIn
-                </a>
-              </div>
-              <div className="flex items-center justify-between pt-2 border-t border-border">
-                <div>
-                  <div className="text-xs font-semibold text-foreground">James Shenberger</div>
-                  <div className="text-[11px] text-muted-foreground">Co-Founder &amp; Contributor</div>
-                </div>
-                <a
-                  href="https://www.linkedin.com/in/jamesshenberger/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="rounded-md border border-border bg-muted/60 px-2.5 py-1 text-xs font-medium text-foreground hover:bg-accent hover:text-primary transition-colors"
-                >
-                  LinkedIn
-                </a>
+                  <span>Read our story on the About page</span>
+                  <ArrowRight className="size-3.5" />
+                </Link>
               </div>
             </div>
           </div>
