@@ -1,5 +1,5 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { BookOpen, Database, Gauge, Menu, Search, Settings2, ShieldCheck, X } from "lucide-react";
+import { BookOpen, Database, Gauge, Menu, Search, Settings2, ShieldCheck, Users, X } from "lucide-react";
 import { useState, type ReactNode } from "react";
 import { Button } from "@/components/ui/button";
 
@@ -30,16 +30,56 @@ export function AppShell({ children }: { children: ReactNode }) {
         </div>
       </header>
       <div className="mx-auto grid max-w-[1600px] lg:grid-cols-[240px_minmax(0,1fr)]">
-        <aside className={`${open ? "block" : "hidden"} border-b border-border bg-sidebar px-4 py-4 lg:block lg:min-h-[calc(100vh-4rem)] lg:border-b-0 lg:border-r lg:px-3 lg:py-6`}>
-          <nav className="grid gap-1 sm:grid-cols-5 lg:grid-cols-1">
-            {nav.map((item) => {
-              const Icon = item.icon;
-              const active = item.to === "/" ? path === "/" || path.startsWith("/product/") : path.startsWith(item.to);
-              return <Link key={item.to} to={item.to} onClick={() => setOpen(false)} className={`flex items-center gap-3 rounded-md px-3 py-2.5 text-sm font-medium transition-colors ${active ? "bg-sidebar-accent text-sidebar-accent-foreground" : "text-muted-foreground hover:bg-sidebar-accent/60 hover:text-foreground"}`}><Icon className="size-4" />{item.label}</Link>;
-            })}
-          </nav>
-          <div className="mt-8 hidden border-t border-sidebar-border pt-5 lg:block">
-            <p className="px-3 text-xs leading-5 text-muted-foreground">Open lifecycle data for confident platform decisions.</p>
+        <aside className={`${open ? "block" : "hidden"} flex flex-col justify-between border-b border-border bg-sidebar px-4 py-4 lg:block lg:min-h-[calc(100vh-4rem)] lg:border-b-0 lg:border-r lg:px-3 lg:py-6`}>
+          <div>
+            <nav className="grid gap-1 sm:grid-cols-5 lg:grid-cols-1">
+              {nav.map((item) => {
+                const Icon = item.icon;
+                const active = item.to === "/" ? path === "/" || path.startsWith("/product/") : path.startsWith(item.to);
+                return <Link key={item.to} to={item.to} onClick={() => setOpen(false)} className={`flex items-center gap-3 rounded-md px-3 py-2.5 text-sm font-medium transition-colors ${active ? "bg-sidebar-accent text-sidebar-accent-foreground" : "text-muted-foreground hover:bg-sidebar-accent/60 hover:text-foreground"}`}><Icon className="size-4" />{item.label}</Link>;
+              })}
+            </nav>
+          </div>
+
+          {/* Authors & Contributors */}
+          <div className="mt-8 border-t border-sidebar-border pt-5">
+            <div className="rounded-xl border border-sidebar-border bg-card/60 p-3 shadow-xs">
+              <div className="mb-2.5 flex items-center gap-2 px-1 text-xs font-semibold text-foreground">
+                <Users className="size-3.5 text-primary" />
+                <span>Authors &amp; Contributors</span>
+              </div>
+              <div className="space-y-1">
+                <a
+                  href="https://www.linkedin.com/in/markdmitchell/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-2.5 rounded-md px-2 py-1.5 text-xs font-medium text-foreground transition-colors hover:bg-sidebar-accent hover:text-primary"
+                >
+                  <span className="flex size-4 shrink-0 items-center justify-center rounded bg-[#0A66C2] text-white">
+                    <svg className="size-2.5 fill-white" viewBox="0 0 24 24">
+                      <path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.28 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.75M6.46 10.9v8.37H9.2V10.9H6.46M7.83 6.35a1.65 1.65 0 0 0-1.66 1.65 1.66 1.66 0 0 0 1.66 1.66 1.66 1.66 0 0 0 1.65-1.66c0-.91-.74-1.65-1.65-1.65Z" />
+                    </svg>
+                  </span>
+                  <span className="truncate">Mark D. Mitchell</span>
+                </a>
+                <a
+                  href="https://www.linkedin.com/in/jamesshenberger/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-2.5 rounded-md px-2 py-1.5 text-xs font-medium text-foreground transition-colors hover:bg-sidebar-accent hover:text-primary"
+                >
+                  <span className="flex size-4 shrink-0 items-center justify-center rounded bg-[#0A66C2] text-white">
+                    <svg className="size-2.5 fill-white" viewBox="0 0 24 24">
+                      <path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.28 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.75M6.46 10.9v8.37H9.2V10.9H6.46M7.83 6.35a1.65 1.65 0 0 0-1.66 1.65 1.66 1.66 0 0 0 1.66 1.66 1.65 1.65 0 0 0 1.65-1.66c0-.91-.74-1.65-1.65-1.65Z" />
+                    </svg>
+                  </span>
+                  <span className="truncate">James Shenberger</span>
+                </a>
+              </div>
+            </div>
+            <p className="mt-3.5 hidden px-1 text-[11px] leading-relaxed text-muted-foreground lg:block">
+              Open lifecycle data for confident platform decisions.
+            </p>
           </div>
         </aside>
         <main className="min-w-0 px-4 py-7 md:px-7 lg:px-10 lg:py-9">{children}</main>

@@ -47,3 +47,160 @@ export const addCustomProduct = createServerFn({ method: "POST" }).middleware([r
   const {data:cycle,error:cycleError}=await context.supabase.from("release_cycles").upsert({product_id:product.id,cycle:data.cycle,eol_date:data.eolDate,support_end:data.eolDate,status},{onConflict:"product_id,cycle"}).select("id").single(); if(cycleError||!cycle)throw new Error(cycleError?.message??"Cycle creation failed.");
   const {error:provError}=await context.supabase.from("provenance_records").insert({entity_type:"release_cycle",entity_id:cycle.id,source_name:data.sourceName,source_url:data.sourceUrl||null,confidence_score:1,notes:"Administrator supplied lifecycle record"}); if(provError)throw new Error(provError.message); return {name:data.name};
 });
+
+export const syncEnterpriseSuites = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { data: allowed } = await context.supabase.rpc("has_role", { _user_id: context.userId, _role: "admin" });
+    if (!allowed) throw new Error("Administrator access is required.");
+
+    const suiteConfigs = [
+      { slug: "jira", name: "Atlassian Jira Software", vendor: "Atlassian", category: "Business applications" },
+      { slug: "confluence", name: "Atlassian Confluence", vendor: "Atlassian", category: "Business applications" },
+      { slug: "bitbucket", name: "Atlassian Bitbucket", vendor: "Atlassian", category: "DevOps & CI/CD" },
+      { slug: "splunk", name: "Splunk Enterprise", vendor: "Splunk / Cisco", category: "Monitoring & Analytics" },
+      { slug: "cisco-ios", name: "Cisco IOS", vendor: "Cisco", category: "Networking & Security" },
+      { slug: "cisco-nx-os", name: "Cisco NX-OS", vendor: "Cisco", category: "Networking & Security" },
+      { slug: "cisco-asa", name: "Cisco ASA Software", vendor: "Cisco", category: "Networking & Security" }
+    ];
+
+    let updatedProducts = 0;
+    let updatedCycles = 0;
+    const syncedNames: string[] = [];
+
+    const { data: source } = await context.supabase
+      .from("data_sources")
+      .select("id")
+      .eq("name", "endoflife.date API v1")
+      .maybeSingle();
+
+    for (const item of suiteConfigs) {
+      try {
+        const response = await fetch(`https://endoflife.date/api/v1/products/${item.slug}`);
+        if (!response.ok) continue;
+        const payload = (await response.json()) as { result?: { name?: string; label?: string; category?: string; releases?: unknown[] } };
+        const raw = payload.result;
+        if (!raw) continue;
+        const releases = z.array(cycleSchema).parse(raw.releases ?? []);
+
+        const { data: product, error } = await context.supabase
+          .from("products")
+          .upsert(
+            {
+              slug: item.slug,
+              name: raw.label ?? raw.name ?? item.name,
+              category: raw.category ?? item.category,
+              vendor: item.vendor,
+              source_id: source?.id ?? null,
+              updated_at: new Date().toISOString()
+            },
+            { onConflict: "slug" }
+          )
+          .select("id")
+          .single();
+
+        if (error || !product) continue;
+
+        for (const release of releases) {
+          const eol = release.eolFrom ?? null;
+          const days = eol ? Math.ceil((new Date(eol).getTime() - Date.now()) / 86400000) : 9999;
+          const status = days < 0 ? "end_of_life" : days < 365 ? "approaching_eol" : "supported";
+          await context.supabase.from("release_cycles").upsert(
+            {
+              product_id: product.id,
+              cycle: release.name,
+              release_date: release.releaseDate ?? null,
+              eol_date: eol,
+              support_end: eol,
+              latest_version: release.latest?.name ?? null,
+              latest_release_date: release.latest?.date ?? null,
+              status
+            },
+            { onConflict: "product_id,cycle" }
+          );
+        }
+
+        updatedProducts++;
+        updatedCycles += releases.length;
+        syncedNames.push(item.name);
+      } catch (err) {
+        console.error(`Error syncing suite ${item.slug}:`, err);
+      }
+    }
+
+    return { updatedProducts, updatedCycles, syncedNames };
+  });
+
+export const syncBulkCatalog = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { data: allowed } = await context.supabase.rpc("has_role", { _user_id: context.userId, _role: "admin" });
+    if (!allowed) throw new Error("Administrator access is required.");
+
+    const res = await fetch("https://endoflife.date/api/all.json");
+    if (!res.ok) throw new Error("Could not reach upstream catalog index.");
+    const allSlugs = (await res.json()) as string[];
+
+    const prioritySlugs = allSlugs.slice(0, 20);
+    let updatedProducts = 0;
+    let updatedCycles = 0;
+
+    const { data: source } = await context.supabase
+      .from("data_sources")
+      .select("id")
+      .eq("name", "endoflife.date API v1")
+      .maybeSingle();
+
+    for (const slug of prioritySlugs) {
+      try {
+        const prodRes = await fetch(`https://endoflife.date/api/v1/products/${slug}`);
+        if (!prodRes.ok) continue;
+        const payload = (await prodRes.json()) as { result?: { name?: string; label?: string; category?: string; releases?: unknown[] } };
+        const raw = payload.result;
+        if (!raw) continue;
+        const releases = z.array(cycleSchema).parse(raw.releases ?? []);
+
+        const { data: product } = await context.supabase
+          .from("products")
+          .upsert(
+            {
+              slug,
+              name: raw.label ?? raw.name ?? slug,
+              category: raw.category ?? "software",
+              source_id: source?.id ?? null,
+              updated_at: new Date().toISOString()
+            },
+            { onConflict: "slug" }
+          )
+          .select("id")
+          .single();
+
+        if (product) {
+          updatedProducts++;
+          for (const release of releases) {
+            const eol = release.eolFrom ?? null;
+            const days = eol ? Math.ceil((new Date(eol).getTime() - Date.now()) / 86400000) : 9999;
+            const status = days < 0 ? "end_of_life" : days < 365 ? "approaching_eol" : "supported";
+            await context.supabase.from("release_cycles").upsert(
+              {
+                product_id: product.id,
+                cycle: release.name,
+                release_date: release.releaseDate ?? null,
+                eol_date: eol,
+                support_end: eol,
+                latest_version: release.latest?.name ?? null,
+                latest_release_date: release.latest?.date ?? null,
+                status
+              },
+              { onConflict: "product_id,cycle" }
+            );
+          }
+          updatedCycles += releases.length;
+        }
+      } catch {
+        // continue
+      }
+    }
+
+    return { totalSlugs: allSlugs.length, updatedProducts, updatedCycles };
+  });
