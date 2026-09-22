@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { ExternalLink, Search, ShieldCheck, Database, BookOpen } from "lucide-react";
 import { useMemo, useState } from "react";
 import { PageHeader } from "@/components/app-shell";
-import { getProvenance, getProvenanceSources, getCatalogStats } from "@/lib/catalog";
+import { getProvenance, getProvenanceSources, getCatalogStats, getCachedCatalogStats } from "@/lib/catalog";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -51,17 +51,23 @@ function ProvenancePage() {
 
   const { data: stats } = useQuery({
     queryKey: ["catalog-stats"],
-    queryFn: getCatalogStats
+    queryFn: getCatalogStats,
+    initialData: getCachedCatalogStats,
+    staleTime: 1000 * 60 * 30,
+    gcTime: 1000 * 60 * 60 * 24,
   });
 
   const { data: allSources = [] } = useQuery({
     queryKey: ["provenance-sources"],
-    queryFn: getProvenanceSources
+    queryFn: getProvenanceSources,
+    staleTime: 1000 * 60 * 30,
+    gcTime: 1000 * 60 * 60 * 24,
   });
 
   const { data = [], isLoading, error } = useQuery({
     queryKey: ["provenance", sourceFilter, entityFilter],
-    queryFn: () => getProvenance({ source: sourceFilter, entityType: entityFilter, limit: 1000 })
+    queryFn: () => getProvenance({ source: sourceFilter, entityType: entityFilter, limit: 1000 }),
+    staleTime: 1000 * 60 * 15,
   });
 
   const filtered = useMemo(() => {
@@ -72,7 +78,7 @@ function ProvenancePage() {
     });
   }, [data, query, hasSearched]);
 
-  const totalAuditRecords = stats?.provenance ?? 39613;
+  const totalAuditRecords = stats?.provenance ?? getCachedCatalogStats().provenance;
   const totalAuthoritiesCount = allSources.length || 32;
 
   const handleRunSearch = () => {

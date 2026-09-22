@@ -8,17 +8,67 @@ export interface CatalogStats {
   provenance: number;
 }
 
+export const DEFAULT_CATALOG_STATS: CatalogStats = {
+  products: 2978,
+  cycles: 8843,
+  provenance: 39613,
+};
+
+const STATS_STORAGE_KEY = "endoflife_catalog_stats_v1";
+
+export function getCachedCatalogStats(): CatalogStats {
+  if (typeof window !== "undefined" && window.localStorage) {
+    try {
+      const stored = localStorage.getItem(STATS_STORAGE_KEY);
+      if (stored) {
+        const parsed = JSON.parse(stored) as Partial<CatalogStats>;
+        if (
+          typeof parsed?.products === "number" &&
+          typeof parsed?.cycles === "number" &&
+          typeof parsed?.provenance === "number"
+        ) {
+          return {
+            products: parsed.products,
+            cycles: parsed.cycles,
+            provenance: parsed.provenance,
+          };
+        }
+      }
+    } catch {
+      // ignore
+    }
+  }
+  return DEFAULT_CATALOG_STATS;
+}
+
 export async function getCatalogStats(): Promise<CatalogStats> {
-  const [prodRes, cycRes, provRes] = await Promise.all([
-    supabase.from("products").select("*", { count: "exact", head: true }),
-    supabase.from("release_cycles").select("*", { count: "exact", head: true }),
-    supabase.from("provenance_records").select("*", { count: "exact", head: true }),
-  ]);
-  return {
-    products: prodRes.count ?? 0,
-    cycles: cycRes.count ?? 0,
-    provenance: provRes.count ?? 0,
-  };
+  try {
+    const [prodRes, cycRes, provRes] = await Promise.all([
+      supabase.from("products").select("*", { count: "exact", head: true }),
+      supabase.from("release_cycles").select("*", { count: "exact", head: true }),
+      supabase.from("provenance_records").select("*", { count: "exact", head: true }),
+    ]);
+
+    const cached = getCachedCatalogStats();
+    const stats: CatalogStats = {
+      products: prodRes.count ?? cached.products,
+      cycles: cycRes.count ?? cached.cycles,
+      provenance: provRes.count ?? cached.provenance,
+    };
+
+    if (typeof window !== "undefined" && window.localStorage) {
+      try {
+        localStorage.setItem(STATS_STORAGE_KEY, JSON.stringify(stats));
+      } catch {
+        // ignore
+      }
+    }
+
+    return stats;
+  } catch (err) {
+    console.warn("Could not retrieve real-time catalog stats, using cached fallback:", err);
+    return getCachedCatalogStats();
+  }
 }
 
 export async function getCatalog() {

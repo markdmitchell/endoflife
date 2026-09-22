@@ -2,7 +2,14 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { ArrowRight, Boxes, CalendarClock, Search, ShieldCheck } from "lucide-react";
 import { useMemo, useState } from "react";
-import { getCatalog, getCatalogStats, formatCategoryName, type LifecycleStatus } from "@/lib/catalog";
+import { 
+  getCatalog, 
+  getCatalogStats, 
+  getCachedCatalogStats, 
+  DEFAULT_CATALOG_STATS, 
+  formatCategoryName, 
+  type LifecycleStatus 
+} from "@/lib/catalog";
 import { PageHeader, StatusBadge } from "@/components/app-shell";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -15,8 +22,19 @@ export const Route = createFileRoute("/")({
 });
 
 function CatalogPage() {
-  const { data = [], isLoading, error } = useQuery({ queryKey: ["catalog"], queryFn: getCatalog });
-  const { data: stats } = useQuery({ queryKey: ["catalog-stats"], queryFn: getCatalogStats });
+  const { data = [], isLoading, error } = useQuery({
+    queryKey: ["catalog"],
+    queryFn: getCatalog,
+    staleTime: 1000 * 60 * 30,
+    gcTime: 1000 * 60 * 60 * 24,
+  });
+  const { data: stats } = useQuery({
+    queryKey: ["catalog-stats"],
+    queryFn: getCatalogStats,
+    initialData: getCachedCatalogStats,
+    staleTime: 1000 * 60 * 30,
+    gcTime: 1000 * 60 * 60 * 24,
+  });
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState("all");
   const [status, setStatus] = useState("all");
@@ -40,9 +58,10 @@ function CatalogPage() {
     });
   }, [data, hasSearched, query, category, status]);
 
-  const productCount = stats?.products ?? data.length;
-  const cycleCount = stats?.cycles ?? data.reduce((n, p) => n + (Array.isArray(p.release_cycles) ? p.release_cycles.length : 0), 0);
-  const provenanceCount = stats?.provenance ?? 0;
+  const fallbackStats = getCachedCatalogStats();
+  const productCount = stats?.products ?? fallbackStats.products;
+  const cycleCount = stats?.cycles ?? fallbackStats.cycles;
+  const provenanceCount = stats?.provenance ?? fallbackStats.provenance;
 
   const handleRunSearch = () => {
     setHasSearched(true);
@@ -88,7 +107,7 @@ function CatalogPage() {
         >
           <Boxes className="mb-5 size-4 text-muted-foreground group-hover:text-primary transition-colors" />
           <div className="font-display text-3xl font-semibold text-foreground">
-            {productCount ? productCount.toLocaleString() : "..."}
+            {productCount.toLocaleString()}
           </div>
           <p className="mt-1 text-xs font-medium text-muted-foreground">Enterprise Products</p>
         </button>
@@ -96,7 +115,7 @@ function CatalogPage() {
         <div className="bg-card p-5">
           <CalendarClock className="mb-5 size-4 text-muted-foreground" />
           <div className="font-display text-3xl font-semibold text-foreground">
-            {cycleCount ? cycleCount.toLocaleString() : "..."}
+            {cycleCount.toLocaleString()}
           </div>
           <p className="mt-1 text-xs font-medium text-muted-foreground">Release Cycles Tracked</p>
         </div>
@@ -104,7 +123,7 @@ function CatalogPage() {
         <div className="bg-card p-5">
           <ShieldCheck className="mb-5 size-4 text-muted-foreground" />
           <div className="font-display text-3xl font-semibold text-foreground">
-            {provenanceCount ? provenanceCount.toLocaleString() : "..."}
+            {provenanceCount.toLocaleString()}
           </div>
           <p className="mt-1 text-xs font-medium text-muted-foreground">Verified Provenance Records</p>
         </div>
