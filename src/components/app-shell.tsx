@@ -96,10 +96,10 @@ export function AppShell({ children }: { children: ReactNode }) {
   return (
     <div className="min-h-screen bg-background text-foreground">
       <header className="sticky top-0 z-40 border-b border-border/80 bg-background/95 backdrop-blur">
-        <div className="mx-auto flex h-16 max-w-[1600px] items-center justify-between px-4 lg:px-7">
+        <div className="mx-auto flex h-28 max-w-[1600px] items-center justify-between px-4 lg:px-7">
           <Link to="/" className="flex items-center gap-3" aria-label="endoflife.tech home">
-            <img src={bannerIconAsset.url} alt="" className="size-9 rounded-md" />
-            <span><strong className="block text-sm">endoflife.tech</strong><span className="block text-[11px] text-muted-foreground">Lifecycle intelligence</span></span>
+            <img src={bannerIconAsset.url} alt="" className="size-18 rounded-md" />
+            <span><strong className="block text-[28px] leading-tight">endoflife.tech</strong><span className="block text-[22px] leading-tight text-muted-foreground">Lifecycle intelligence</span></span>
           </Link>
           <div className="flex items-center gap-2">
             <ReleaseNotesModal
@@ -123,7 +123,7 @@ export function AppShell({ children }: { children: ReactNode }) {
         </div>
       </header>
       <div className="mx-auto grid max-w-[1600px] lg:grid-cols-[240px_minmax(0,1fr)]">
-        <aside className={`${open ? "flex flex-col justify-between" : "hidden"} border-b border-border bg-sidebar px-4 py-4 lg:flex lg:flex-col lg:justify-between lg:sticky lg:top-16 lg:h-[calc(100vh-4rem)] lg:border-b-0 lg:border-r lg:px-3 lg:py-6`}>
+        <aside className={`${open ? "flex flex-col justify-between" : "hidden"} border-b border-border bg-sidebar px-4 py-4 lg:flex lg:flex-col lg:justify-between lg:sticky lg:top-28 lg:h-[calc(100vh-7rem)] lg:border-b-0 lg:border-r lg:px-3 lg:py-6`}>
           <div>
             <nav className="grid gap-1 sm:grid-cols-5 lg:grid-cols-1">
               {visibleNav.map((item) => {
