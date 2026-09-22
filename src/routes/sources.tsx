@@ -10,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Badge } from "@/components/ui/badge";
 
 export const Route = createFileRoute("/sources")({
+  staticData: { sitemap: true },
   head: () => ({
     meta: [
       { title: "Integrated Data Sources Registry — endoflife.tech" },

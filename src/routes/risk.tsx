@@ -29,6 +29,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Badge } from "@/components/ui/badge";
 
 export const Route = createFileRoute("/risk")({
+  staticData: { sitemap: true },
   head: () => ({
     meta: [
       { title: "Runtime Environment Risk Dashboard — endoflife.tech" },
