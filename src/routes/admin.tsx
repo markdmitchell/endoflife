@@ -29,8 +29,10 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 
 export const Route = createFileRoute("/admin")({
+  staticData: { sitemap: false },
   head: () => ({
     meta: [
+      { name: "robots", content: "noindex" },
       { title: "Administration — endoflife.tech" },
       { name: "description", content: "Manage lifecycle sources, records, and enterprise synchronization." },
       { property: "og:title", content: "Administration — endoflife.tech" },
