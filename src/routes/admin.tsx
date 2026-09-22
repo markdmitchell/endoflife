@@ -169,7 +169,7 @@ function AdminPage() {
         return;
       }
 
-      const headers = lines[0].split(",").map((h) => h.trim().toLowerCase().replace(/['"]/g, ""));
+      const headers = (lines[0] ?? "").split(",").map((h) => h.trim().toLowerCase().replace(/['"]/g, ""));
       const getIndex = (keys: string[]) => headers.findIndex((h) => keys.includes(h));
 
       const envIdx = getIndex(["deployment_env", "environment", "env", "server", "app", "workload"]);
@@ -181,13 +181,13 @@ function AdminPage() {
 
       const rows = [];
       for (let i = 1; i < lines.length; i++) {
-        const cells = lines[i].split(",").map((c) => c.trim().replace(/^["']|["']$/g, ""));
-        const environment = envIdx >= 0 && cells[envIdx] ? cells[envIdx] : `Host-${i}`;
-        const product_name = platformIdx >= 0 && cells[platformIdx] ? cells[platformIdx] : "Application";
-        const installed_version = versionIdx >= 0 && cells[versionIdx] ? cells[versionIdx] : "1.0";
+        const cells = (lines[i] ?? "").split(",").map((c) => c.trim().replace(/^["']|["']$/g, ""));
+        const environment = (envIdx >= 0 && cells[envIdx] ? cells[envIdx] : `Host-${i}`) || `Host-${i}`;
+        const product_name = (platformIdx >= 0 && cells[platformIdx] ? cells[platformIdx] : "Application") || "Application";
+        const installed_version = (versionIdx >= 0 && cells[versionIdx] ? cells[versionIdx] : "1.0") || "1.0";
         const eol_date = eolIdx >= 0 && cells[eolIdx] ? cells[eolIdx] : null;
-        const business_owner = ownerIdx >= 0 && cells[ownerIdx] ? cells[ownerIdx] : "Unassigned";
-        const migration_status = statusIdx >= 0 && cells[statusIdx] ? cells[statusIdx] : "Not started";
+        const business_owner = (ownerIdx >= 0 && cells[ownerIdx] ? cells[ownerIdx] : "Unassigned") || "Unassigned";
+        const migration_status = (statusIdx >= 0 && cells[statusIdx] ? cells[statusIdx] : "Not started") || "Not started";
 
         rows.push({
           environment,
