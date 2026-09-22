@@ -83,6 +83,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { title: "endoflife.tech" },
       { name: "description", content: "Enterprise software lifecycle intelligence." },
       { name: "author", content: "endoflife.tech" },
+      { name: "google-site-verification", content: "4vPlcpZn4SgkrE_ShVZC7g_DP25Sg7lXl2zvNwqjl3Q" },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:site", content: "@Lovable" },
