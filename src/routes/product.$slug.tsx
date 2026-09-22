@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { ArrowLeft, Check, Copy, ExternalLink, HelpCircle, ShieldCheck, Terminal } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -163,15 +163,27 @@ export const Route = createFileRoute("/product/$slug")({
 function ProductPage() {
   const params = Route.useParams();
   const slug = params?.slug ?? "";
+  const queryClient = useQueryClient();
+
   const { data, isLoading, error } = useQuery({
     queryKey: ["product", slug],
     queryFn: () => (slug ? getProduct(slug) : null),
     enabled: Boolean(slug),
+    initialData: () => {
+      const catalog = queryClient.getQueryData<any[]>(["catalog"]);
+      if (Array.isArray(catalog)) {
+        const found = catalog.find((p) => p.slug === slug);
+        if (found && Array.isArray(found.release_cycles) && found.release_cycles.length > 0) {
+          return found;
+        }
+      }
+      return undefined;
+    },
   });
 
   const [copied, setCopied] = useState(false);
 
-  if (isLoading) return <div className="py-20 text-center text-sm text-muted-foreground">Loading product record…</div>;
+  if (isLoading && !data) return <div className="py-20 text-center text-sm text-muted-foreground">Loading product record…</div>;
 
   if (error || !data)
     return (

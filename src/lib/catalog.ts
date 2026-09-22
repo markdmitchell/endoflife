@@ -171,10 +171,39 @@ export async function getProduct(slug: string) {
   return null;
 }
 
+const SOURCES_STORAGE_KEY = "endoflife_data_sources_v1";
+
+export function getCachedSources() {
+  if (typeof window !== "undefined" && window.localStorage) {
+    try {
+      const stored = localStorage.getItem(SOURCES_STORAGE_KEY);
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      }
+    } catch {
+      // ignore
+    }
+  }
+  return [];
+}
+
 export async function getSources() {
-  const { data, error } = await supabase.from("data_sources").select("*").order("name");
-  if (error) throw error;
-  return data ?? [];
+  try {
+    const { data, error } = await supabase.from("data_sources").select("*").order("name");
+    if (error) throw error;
+    if (data && typeof window !== "undefined" && window.localStorage) {
+      try {
+        localStorage.setItem(SOURCES_STORAGE_KEY, JSON.stringify(data));
+      } catch {
+        // ignore
+      }
+    }
+    return data ?? [];
+  } catch (err) {
+    console.warn("Could not retrieve sources, using cached:", err);
+    return getCachedSources();
+  }
 }
 
 export async function getProvenance(options?: { source?: string; entityType?: string; limit?: number }) {

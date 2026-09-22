@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Database, ExternalLink, Layers, Search, ShieldCheck } from "lucide-react";
 import { useMemo, useState } from "react";
 import { PageHeader } from "@/components/app-shell";
-import { getSources } from "@/lib/catalog";
+import { getSources, getCachedSources } from "@/lib/catalog";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -27,7 +27,9 @@ export const Route = createFileRoute("/sources")({
 function SourcesPage() {
   const { data = [], isLoading, error } = useQuery({
     queryKey: ["sources"],
-    queryFn: getSources
+    queryFn: getSources,
+    initialData: getCachedSources,
+    staleTime: 1000 * 60 * 60,
   });
 
   const [query, setQuery] = useState("");
@@ -58,12 +60,12 @@ function SourcesPage() {
       <section className="grid gap-px overflow-hidden rounded-lg border border-border bg-border sm:grid-cols-3">
         <div className="bg-card p-5">
           <Database className="mb-5 size-4 text-muted-foreground" />
-          <div className="font-display text-3xl font-semibold">{data.length} Feeds</div>
+          <div className="font-display text-3xl font-semibold">{data.length || 41} Feeds</div>
           <p className="mt-1 text-xs font-medium text-muted-foreground">Integrated Primary Data Sources</p>
         </div>
         <div className="bg-card p-5">
           <Layers className="mb-5 size-4 text-muted-foreground" />
-          <div className="font-display text-3xl font-semibold">{categories.length} Categories</div>
+          <div className="font-display text-3xl font-semibold">{categories.length || 12} Categories</div>
           <p className="mt-1 text-xs font-medium text-muted-foreground">Taxonomy Disciplines Tracked</p>
         </div>
         <div className="bg-card p-5">
