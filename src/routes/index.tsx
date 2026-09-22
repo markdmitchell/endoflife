@@ -10,7 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 
 export const Route = createFileRoute("/")({
   staticData: { sitemap: true },
-  head: () => ({ meta: [{ title: "Software lifecycle catalog — endoflife.tech" }, { name: "description", content: "Search software releases, support windows, and end-of-life dates." }, { property: "og:title", content: "Software lifecycle catalog — endoflife.tech" }, { property: "og:description", content: "Search software releases, support windows, and end-of-life dates." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary_large_image" }] }),
+  head: () => ({ meta: [{ title: "endoflife.tech - Product Lifecycle Intelligence" }, { name: "description", content: "Search software releases, support windows, and end-of-life dates." }, { property: "og:title", content: "endoflife.tech - Product Lifecycle Intelligence" }, { property: "og:description", content: "Search software releases, support windows, and end-of-life dates." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary_large_image" }] }),
   component: CatalogPage,
 });
 

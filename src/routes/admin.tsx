@@ -10,6 +10,7 @@ import {
   Globe, 
   Layers, 
   Loader2, 
+  LogOut,
   Plus, 
   RefreshCw, 
   Server, 
@@ -553,8 +554,23 @@ function AdminPage() {
             </Button>
           )}
           {access === "denied" && userEmail && (
-            <div className="mt-4 rounded-md border border-border bg-muted/40 p-2.5 text-xs font-mono text-muted-foreground">
-              Signed in as: {userEmail}
+            <div className="mt-4 space-y-3">
+              <div className="rounded-md border border-border bg-muted/40 p-2.5 text-xs font-mono text-muted-foreground">
+                Signed in as: {userEmail}
+              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                className="gap-1.5 cursor-pointer text-xs"
+                onClick={async () => {
+                  await supabase.auth.signOut();
+                  setAccess("signedout");
+                  toast.success("Signed out successfully");
+                }}
+              >
+                <LogOut className="size-3.5" />
+                <span>Sign out</span>
+              </Button>
             </div>
           )}
         </div>
@@ -576,6 +592,20 @@ function AdminPage() {
             </span>
             <Button asChild variant="outline" size="sm">
               <Link to="/auth">Account</Link>
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={async () => {
+                await supabase.auth.signOut();
+                setAccess("signedout");
+                toast.success("Signed out successfully");
+              }}
+              className="gap-1.5 cursor-pointer text-muted-foreground hover:text-foreground"
+              title="Log out of your account"
+            >
+              <LogOut className="size-3.5" />
+              <span>Log out</span>
             </Button>
           </div>
         }

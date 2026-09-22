@@ -80,7 +80,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "endoflife.tech" },
+      { title: "endoflife.tech - Product Lifecycle Intelligence" },
       { name: "description", content: "Enterprise product lifecycle intelligence." },
       { name: "author", content: "endoflife.tech" },
       { name: "google-site-verification", content: "4vPlcpZn4SgkrE_ShVZC7g_DP25Sg7lXl2zvNwqjl3Q" },

@@ -1,6 +1,7 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { BookOpen, Database, Gauge, Menu, Search, Settings2, Sparkles, Users, X } from "lucide-react";
+import { BookOpen, Database, Gauge, LogOut, Menu, Search, Settings2, Sparkles, Users, X } from "lucide-react";
 import { useState, useEffect, type ReactNode } from "react";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { ReleaseNotesModal } from "@/components/release-notes-modal";
@@ -93,6 +94,18 @@ export function AppShell({ children }: { children: ReactNode }) {
     };
   }, []);
 
+  const handleSignOut = async () => {
+    try {
+      await supabase.auth.signOut();
+      setIsSignedIn(false);
+      setIsAdmin(false);
+      toast.success("Signed out successfully");
+    } catch (err) {
+      console.error("Sign out error:", err);
+      toast.error("Failed to sign out");
+    }
+  };
+
   const visibleNav = nav.filter((item) => item.to !== "/admin" || isAdmin);
 
   return (
@@ -120,6 +133,18 @@ export function AppShell({ children }: { children: ReactNode }) {
             <Button asChild variant="outline" size="sm">
               <Link to="/auth">{isSignedIn ? "Account" : "Sign in"}</Link>
             </Button>
+            {isSignedIn && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleSignOut}
+                className="gap-1.5 text-muted-foreground hover:text-foreground cursor-pointer"
+                title="Log out of your account"
+              >
+                <LogOut className="size-3.5" />
+                <span>Log out</span>
+              </Button>
+            )}
             <Button variant="ghost" size="icon" className="lg:hidden" onClick={() => setOpen(!open)} aria-label="Toggle navigation">{open ? <X /> : <Menu />}</Button>
           </div>
         </div>
@@ -133,6 +158,19 @@ export function AppShell({ children }: { children: ReactNode }) {
                 const active = item.to === "/" ? path === "/" || path.startsWith("/product/") : path.startsWith(item.to);
                 return <Link key={item.to} to={item.to} onClick={() => setOpen(false)} className={`flex items-center gap-3 rounded-md px-3 py-2.5 text-sm font-medium transition-colors ${active ? "bg-sidebar-accent text-sidebar-accent-foreground" : "text-muted-foreground hover:bg-sidebar-accent/60 hover:text-foreground"}`}><Icon className="size-4" />{item.label}</Link>;
               })}
+              {isSignedIn && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setOpen(false);
+                    void handleSignOut();
+                  }}
+                  className="flex lg:hidden items-center gap-3 rounded-md px-3 py-2.5 text-sm font-medium text-destructive hover:bg-destructive/10 transition-colors cursor-pointer text-left w-full"
+                >
+                  <LogOut className="size-4" />
+                  <span>Log out</span>
+                </button>
+              )}
             </nav>
           </div>
 
