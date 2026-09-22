@@ -200,9 +200,9 @@ export function StatusBadge({ status }: { status: "supported" | "approaching_eol
             {labels[status]}
           </span>
         </TooltipTrigger>
-        <TooltipContent side="top" className="max-w-xs text-xs">
-          <p className="font-semibold">{info.title}</p>
-          <p className="mt-0.5 text-muted-foreground">{info.description}</p>
+        <TooltipContent side="top" className="max-w-xs text-xs bg-white text-zinc-900 border border-border shadow-md p-2.5">
+          <p className="font-semibold text-zinc-950">{info.title}</p>
+          <p className="mt-0.5 text-zinc-600 leading-snug">{info.description}</p>
         </TooltipContent>
       </Tooltip>
     </TooltipProvider>

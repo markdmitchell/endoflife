@@ -149,9 +149,9 @@ function TableStatusBadge({ status }: { status: LifecycleStatus | string }) {
         <TooltipTrigger asChild>
           <span title={`${info.title}: ${info.description}`}>{badgeContent}</span>
         </TooltipTrigger>
-        <TooltipContent side="top" className="max-w-xs text-xs">
-          <p className="font-semibold">{info.title}</p>
-          <p className="mt-0.5 text-muted-foreground">{info.description}</p>
+        <TooltipContent side="top" className="max-w-xs text-xs bg-white text-zinc-900 border border-border shadow-md p-2.5">
+          <p className="font-semibold text-zinc-950">{info.title}</p>
+          <p className="mt-0.5 text-zinc-600 leading-snug">{info.description}</p>
         </TooltipContent>
       </Tooltip>
     </TooltipProvider>
@@ -350,20 +350,20 @@ function ProductPage() {
                               <HelpCircle className="size-3.5" />
                             </span>
                           </TooltipTrigger>
-                          <TooltipContent side="top" className="max-w-xs p-2.5 text-xs">
-                            <p className="font-semibold mb-1.5 text-foreground">Lifecycle Status Definitions</p>
-                            <ul className="space-y-1.5 text-muted-foreground">
+                          <TooltipContent side="top" className="max-w-xs bg-white text-zinc-900 border border-border shadow-md p-3 text-xs">
+                            <p className="font-semibold mb-1.5 text-zinc-950">Lifecycle Status Definitions</p>
+                            <ul className="space-y-1.5 text-zinc-700">
                               <li className="flex items-start gap-1.5">
-                                <span className="size-1.5 rounded-full bg-emerald-500 mt-1 shrink-0" />
-                                <span><strong className="text-foreground">Supported:</strong> &gt; 365 days to EOL or unannounced. Regular vendor updates continue.</span>
+                                <span className="size-1.5 rounded-full bg-emerald-600 mt-1 shrink-0" />
+                                <span><strong className="text-zinc-950">Supported:</strong> &gt; 365 days to EOL or unannounced. Regular vendor updates continue.</span>
                               </li>
                               <li className="flex items-start gap-1.5">
-                                <span className="size-1.5 rounded-full bg-amber-500 mt-1 shrink-0" />
-                                <span><strong className="text-foreground">Action Needed:</strong> &lt; 365 days to EOL or in extended support. Plan upgrade/migration.</span>
+                                <span className="size-1.5 rounded-full bg-amber-600 mt-1 shrink-0" />
+                                <span><strong className="text-zinc-950">Action Needed:</strong> &lt; 365 days to EOL or in extended support. Plan upgrade/migration.</span>
                               </li>
                               <li className="flex items-start gap-1.5">
-                                <span className="size-1.5 rounded-full bg-rose-500 mt-1 shrink-0" />
-                                <span><strong className="text-foreground">End of Life (EOL):</strong> Official vendor support and patches have ceased.</span>
+                                <span className="size-1.5 rounded-full bg-rose-600 mt-1 shrink-0" />
+                                <span><strong className="text-zinc-950">End of Life (EOL):</strong> Official vendor support and patches have ceased.</span>
                               </li>
                             </ul>
                           </TooltipContent>
