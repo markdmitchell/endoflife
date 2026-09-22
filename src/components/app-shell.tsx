@@ -1,9 +1,10 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { BookOpen, Database, Gauge, Menu, Search, Settings2, ShieldCheck, Sparkles, Users, X } from "lucide-react";
+import { BookOpen, Database, Gauge, Menu, Search, Settings2, Sparkles, Users, X } from "lucide-react";
 import { useState, useEffect, type ReactNode } from "react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { ReleaseNotesModal } from "@/components/release-notes-modal";
+import bannerIconAsset from "@/assets/endoflife-banner-icon.png.asset.json";
 
 const nav = [
   { to: "/", label: "Catalog", icon: Search },
@@ -97,7 +98,7 @@ export function AppShell({ children }: { children: ReactNode }) {
       <header className="sticky top-0 z-40 border-b border-border/80 bg-background/95 backdrop-blur">
         <div className="mx-auto flex h-16 max-w-[1600px] items-center justify-between px-4 lg:px-7">
           <Link to="/" className="flex items-center gap-3" aria-label="endoflife.tech home">
-            <span className="grid size-9 place-items-center rounded-md bg-primary text-primary-foreground"><ShieldCheck className="size-5" /></span>
+            <img src={bannerIconAsset.url} alt="" className="size-9 rounded-md" />
             <span><strong className="block text-sm">endoflife.tech</strong><span className="block text-[11px] text-muted-foreground">Lifecycle intelligence</span></span>
           </Link>
           <div className="flex items-center gap-2">
