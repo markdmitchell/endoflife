@@ -50,7 +50,7 @@ function SourcesPage() {
       <PageHeader
         eyebrow="Data Lineage & Feeds"
         title="Software EOL Data Sources Registry"
-        description="Comprehensive directory of all primary APIs, vendor lifecycle portals, international standards (TEA / ECMA-428 CLE), and government dictionaries powering the catalog."
+        description="Browse and search the directory of official vendor portals, public APIs, international standards (ECMA-428 CLE), and telemetry feeds that supply raw lifecycle intelligence to this platform."
       />
 
       {/* KPI Stats Bar */}

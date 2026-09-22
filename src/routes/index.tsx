@@ -27,7 +27,7 @@ function CatalogPage() {
   const cycleCount = stats?.cycles ?? data.reduce((n, p) => n + p.release_cycles.length, 0);
   const provenanceCount = stats?.provenance ?? 0;
   return <div>
-    <PageHeader eyebrow="Lifecycle catalog" title="Know what reaches end of life next." description="A decision-ready view of software support windows, maintained from public and vendor sources." action={<Button asChild><Link to="/risk">Review risk <ArrowRight /></Link></Button>} />
+    <PageHeader eyebrow="Lifecycle catalog" title="Know what reaches end of life next." description="Search, filter, and track active support lifecycles, upcoming end-of-support deadlines, and verified end-of-life dates across thousands of software products and frameworks." action={<Button asChild><Link to="/risk">Review risk <ArrowRight /></Link></Button>} />
     <section className="grid gap-px overflow-hidden rounded-lg border border-border bg-border sm:grid-cols-3">
       {[
         { icon: Boxes, value: productCount ? productCount.toLocaleString() : "...", label: "Enterprise Products" },

@@ -330,7 +330,7 @@ function RiskDashboardPage() {
       <PageHeader
         eyebrow="Governance & Remediation"
         title="Runtime Environment Risk Dashboard"
-        description="Audit enterprise deployment environments, host fleets, and software versions against verified end-of-life timelines to proactively eliminate security vulnerabilities and technical debt."
+        description="Assess infrastructure exposure and technical debt by mapping deployed host fleets and runtime versions against verified end-of-life timelines to prioritize upgrade remediation."
         action={
           <div className="flex flex-wrap items-center gap-2">
             <input

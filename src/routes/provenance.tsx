@@ -77,7 +77,7 @@ function ProvenancePage() {
       <PageHeader
         eyebrow="Audit Trail & Lineage"
         title="Data Provenance Inspector"
-        description="Inspect cryptographic integrity, verified upstream source URLs, exact ingestion timestamps, licensing constraints, and confidence scores behind every catalog record."
+        description="Audit verifiable evidence, upstream source authority URLs, ingestion timestamps, licensing constraints, and confidence scores behind every individual product lifecycle milestone in the database."
       />
 
       {/* KPI Stats Bar */}

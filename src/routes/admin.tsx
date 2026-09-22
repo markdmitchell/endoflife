@@ -528,7 +528,7 @@ function AdminPage() {
         <PageHeader
           eyebrow="Administration"
           title="Protected Ingestion &amp; Governance"
-          description="Catalog synchronization, enterprise suite ingestion, and database records management are restricted to authenticated administrators."
+          description="Administrative controls to manage data ingestion pipelines, synchronize vendor APIs, import host fleet inventories, and publish custom enterprise lifecycle records."
         />
         <div className="mx-auto mt-16 max-w-md rounded-xl border border-border bg-card p-8 text-center shadow-sm">
           <ShieldAlert className="mx-auto size-10 text-primary" />
@@ -564,7 +564,7 @@ function AdminPage() {
       <PageHeader
         eyebrow="Enterprise Governance &amp; Ingestion"
         title="Data Ingestion &amp; Management Console"
-        description="Synchronize enterprise suites, trigger bulk REST API updates, ingest runtime inventory CSV files, and register proprietary lifecycle milestones."
+        description="Manage data ingestion pipelines, trigger automated synchronizations with external APIs and enterprise vendor suites, import fleet CSV inventories, and publish custom lifecycle milestones."
         action={
           <div className="flex items-center gap-2">
             <span className="hidden rounded-full border border-emerald-300 bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-800 dark:border-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 sm:inline-flex items-center gap-1.5">
