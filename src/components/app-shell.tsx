@@ -4,7 +4,7 @@ import { useState, useEffect, type ReactNode } from "react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { ReleaseNotesModal } from "@/components/release-notes-modal";
-import bannerIconAsset from "@/assets/endoflife-banner-icon.png.asset.json";
+import bannerIconAsset from "@/assets/endoflife-banner-icon-green.png.asset.json";
 
 const nav = [
   { to: "/", label: "Catalog", icon: Search },
