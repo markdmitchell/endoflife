@@ -86,18 +86,11 @@ function CatalogPage() {
           className="group bg-card p-5 text-left transition-all hover:bg-muted/50 cursor-pointer"
           title="Click to view all products"
         >
-          <div className="mb-5 flex items-center justify-between">
-            <Boxes className="size-4 text-muted-foreground group-hover:text-primary transition-colors" />
-            <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-semibold text-primary group-hover:bg-primary group-hover:text-primary-foreground transition-all">
-              View All <ArrowRight className="size-2.5" />
-            </span>
-          </div>
+          <Boxes className="mb-5 size-4 text-muted-foreground group-hover:text-primary transition-colors" />
           <div className="font-display text-3xl font-semibold text-foreground">
             {productCount ? productCount.toLocaleString() : "..."}
           </div>
-          <p className="mt-1 text-xs font-medium text-muted-foreground">
-            Enterprise Products <span className="text-primary font-normal">(click to list)</span>
-          </p>
+          <p className="mt-1 text-xs font-medium text-muted-foreground">Enterprise Products</p>
         </button>
 
         <div className="bg-card p-5">
@@ -128,15 +121,12 @@ function CatalogPage() {
         >
           {/* Search Field + Search Button */}
           <div className="flex flex-1 items-center gap-2">
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-3 size-4 text-muted-foreground" />
-              <Input
-                className="h-10 pl-9"
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                placeholder="Search products, vendors, or categories (e.g. Windows, Cisco, Python)"
-              />
-            </div>
+            <Input
+              className="h-10 px-3.5"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="Search products, vendors, or categories (e.g. Windows, Cisco, Python)"
+            />
             <Button type="submit" className="h-10 px-4 gap-1.5 font-medium cursor-pointer shrink-0">
               <Search className="size-4" />
               <span>Search</span>
@@ -199,17 +189,11 @@ function CatalogPage() {
 
       {/* Main Content Area: Prompt when not searched, Results when searched */}
       {!hasSearched ? (
-        <div className="rounded-xl border border-dashed border-border bg-card/40 p-12 text-center my-2 shadow-2xs">
-          <div className="mx-auto flex size-12 items-center justify-center rounded-full bg-primary/10 text-primary mb-3.5">
-            <Search className="size-6" />
-          </div>
-          <h2 className="font-display text-lg font-semibold text-foreground">
-            Search the Lifecycle Catalog
-          </h2>
-          <p className="mx-auto mt-1 max-w-md text-sm text-muted-foreground">
+        <div className="rounded-xl border border-dashed border-border bg-card/40 p-10 text-center my-2 shadow-2xs">
+          <p className="mx-auto max-w-md text-sm text-muted-foreground">
             Enter a product or vendor above to look up support lifecycles, or click below to view the full product index.
           </p>
-          <div className="mt-5 flex items-center justify-center gap-3">
+          <div className="mt-4 flex items-center justify-center gap-3">
             <Button
               variant="outline"
               size="sm"
