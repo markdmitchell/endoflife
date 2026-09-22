@@ -417,7 +417,7 @@ function AdminPage() {
           business_owner,
           migration_status,
           risk_status,
-          owner_id: currentUserId
+          owner_id: currentUserId ?? ""
         });
       }
 
