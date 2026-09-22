@@ -1,9 +1,10 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { BookOpen, Database, Gauge, Menu, Search, Settings2, Sparkles, Users, X } from "lucide-react";
+import { BookOpen, Compass, Database, Gauge, Menu, Search, Settings2, Sparkles, Users, X } from "lucide-react";
 import { useState, useEffect, type ReactNode } from "react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { ReleaseNotesModal } from "@/components/release-notes-modal";
+import { RoadmapModal } from "@/components/roadmap-modal";
 import bannerIconAsset from "@/assets/endoflife-banner-icon-green.png.asset.json";
 
 const nav = [
@@ -134,23 +135,34 @@ export function AppShell({ children }: { children: ReactNode }) {
             </nav>
           </div>
 
-          {/* Bottom Sidebar Area: What's New + Authors & Contributors */}
+          {/* Bottom Sidebar Area: What's New + Roadmap + Authors & Contributors */}
           <div className="mt-auto border-t border-sidebar-border pt-4">
-            <ReleaseNotesModal
-              trigger={
-                <button
-                  type="button"
-                  className="mb-3 flex w-full items-center justify-between rounded-lg border border-sidebar-border bg-card/60 px-3 py-2 text-xs font-medium text-muted-foreground transition-colors hover:bg-sidebar-accent hover:text-foreground cursor-pointer shadow-2xs"
-                  title="View Platform Release Notes"
-                >
-                  <span className="flex items-center gap-2">
-                    <Sparkles className="size-3.5 text-primary" />
-                    <span>What&apos;s New in v1.0.0</span>
-                  </span>
-                  <span className="rounded bg-primary/15 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider text-primary">GA</span>
-                </button>
-              }
-            />
+            <div className="mb-3 grid grid-cols-2 gap-1.5">
+              <ReleaseNotesModal
+                trigger={
+                  <button
+                    type="button"
+                    className="flex items-center justify-center gap-1.5 rounded-lg border border-sidebar-border bg-card/60 px-2 py-2 text-[11px] font-medium text-muted-foreground transition-colors hover:bg-sidebar-accent hover:text-foreground cursor-pointer shadow-2xs"
+                    title="View Platform Release Notes"
+                  >
+                    <Sparkles className="size-3 text-primary shrink-0" />
+                    <span className="truncate">Release Notes</span>
+                  </button>
+                }
+              />
+              <RoadmapModal
+                trigger={
+                  <button
+                    type="button"
+                    className="flex items-center justify-center gap-1.5 rounded-lg border border-sidebar-border bg-card/60 px-2 py-2 text-[11px] font-medium text-muted-foreground transition-colors hover:bg-sidebar-accent hover:text-foreground cursor-pointer shadow-2xs"
+                    title="View Phased Product Roadmap"
+                  >
+                    <Compass className="size-3 text-primary shrink-0" />
+                    <span className="truncate">Roadmap</span>
+                  </button>
+                }
+              />
+            </div>
 
             <div className="rounded-xl border border-sidebar-border bg-card/60 p-3 shadow-xs">
               <div className="mb-2.5 flex items-center gap-2 px-1 text-xs font-semibold text-foreground">

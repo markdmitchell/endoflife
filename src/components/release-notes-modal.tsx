@@ -1,5 +1,5 @@
 import { useState, type ReactNode } from "react";
-import { Sparkles, Calendar, CheckCircle2, ChevronRight, Tag } from "lucide-react";
+import { Sparkles, Calendar, CheckCircle2, ChevronRight, Tag, Compass, ArrowRight } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -9,7 +9,9 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { RELEASES } from "@/data/releases";
+import { RoadmapModal } from "@/components/roadmap-modal";
 
 interface ReleaseNotesModalProps {
   trigger?: ReactNode;
@@ -19,31 +21,79 @@ interface ReleaseNotesModalProps {
 
 export function ReleaseNotesModal({ trigger, open, onOpenChange }: ReleaseNotesModalProps) {
   const [internalOpen, setInternalOpen] = useState(false);
+  const [roadmapOpen, setRoadmapOpen] = useState(false);
   const isControlled = open !== undefined;
   const showModal = isControlled ? open : internalOpen;
   const setShowModal = isControlled ? (onOpenChange ?? (() => {})) : setInternalOpen;
 
-  return (
-    <Dialog open={showModal} onOpenChange={setShowModal}>
-      {trigger && <DialogTrigger asChild>{trigger}</DialogTrigger>}
-      <DialogContent className="max-h-[88vh] max-w-2xl overflow-hidden p-0 sm:max-w-2xl">
-        <DialogHeader className="border-b border-border bg-card/80 px-6 py-5 text-left">
-          <div className="flex items-center gap-2">
-            <span className="flex size-7 items-center justify-center rounded-lg bg-primary/10 text-primary">
-              <Sparkles className="size-4" />
-            </span>
-            <div>
-              <DialogTitle className="text-xl font-bold tracking-tight">
-                What&apos;s New in endoflife.tech
-              </DialogTitle>
-              <DialogDescription className="mt-1 text-xs text-muted-foreground">
-                Release notes and major milestones tracking platform evolution.
-              </DialogDescription>
-            </div>
-          </div>
-        </DialogHeader>
+  const handleOpenRoadmap = () => {
+    setShowModal(false);
+    setTimeout(() => setRoadmapOpen(true), 150);
+  };
 
-        <div className="max-h-[calc(88vh-8rem)] space-y-7 overflow-y-auto px-6 py-6">
+  const handleReturnFromRoadmap = () => {
+    setRoadmapOpen(false);
+    setTimeout(() => setShowModal(true), 150);
+  };
+
+  return (
+    <>
+      <RoadmapModal
+        open={roadmapOpen}
+        onOpenChange={setRoadmapOpen}
+        onSwitchToReleaseNotes={handleReturnFromRoadmap}
+      />
+      <Dialog open={showModal} onOpenChange={setShowModal}>
+        {trigger && <DialogTrigger asChild>{trigger}</DialogTrigger>}
+        <DialogContent className="max-h-[88vh] max-w-2xl overflow-hidden p-0 sm:max-w-2xl">
+          <DialogHeader className="border-b border-border bg-card/80 px-6 py-5 text-left">
+            <div className="flex items-center justify-between gap-4">
+              <div className="flex items-center gap-2.5">
+                <span className="flex size-7 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                  <Sparkles className="size-4" />
+                </span>
+                <div>
+                  <DialogTitle className="text-xl font-bold tracking-tight">
+                    What&apos;s New in endoflife.tech
+                  </DialogTitle>
+                  <DialogDescription className="mt-0.5 text-xs text-muted-foreground">
+                    Release notes and major milestones tracking platform evolution.
+                  </DialogDescription>
+                </div>
+              </div>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="hidden text-xs text-muted-foreground hover:text-foreground sm:inline-flex"
+                onClick={handleOpenRoadmap}
+              >
+                <Compass className="mr-1.5 size-3.5 text-primary" />
+                View Roadmap
+              </Button>
+            </div>
+          </DialogHeader>
+
+          <div className="max-h-[calc(88vh-8rem)] space-y-6 overflow-y-auto px-6 py-6">
+            {/* Roadmap Callout Banner */}
+            <div className="flex flex-col gap-3 rounded-xl border border-primary/30 bg-primary/5 p-4 sm:flex-row sm:items-center sm:justify-between">
+              <div className="text-xs leading-relaxed">
+                <p className="font-semibold text-foreground">
+                  Curious where we&apos;re headed next?
+                </p>
+                <p className="mt-0.5 text-muted-foreground">
+                  Explore our phased product roadmap for automated syncs, public APIs, and SBOM ingestion.
+                </p>
+              </div>
+              <Button
+                size="sm"
+                variant="outline"
+                className="shrink-0 border-primary/30 text-xs font-semibold hover:bg-primary hover:text-primary-foreground"
+                onClick={handleOpenRoadmap}
+              >
+                <Compass className="mr-1.5 size-3.5" />
+                Explore Roadmap
+              </Button>
+            </div>
           {RELEASES.map((rel, idx) => {
             const isLatest = idx === 0;
             return (
@@ -116,5 +166,6 @@ export function ReleaseNotesModal({ trigger, open, onOpenChange }: ReleaseNotesM
         </div>
       </DialogContent>
     </Dialog>
+  </>
   );
 }
