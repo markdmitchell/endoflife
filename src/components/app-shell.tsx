@@ -100,7 +100,7 @@ export function AppShell({ children }: { children: ReactNode }) {
             <span><strong className="block text-sm">endoflife.tech</strong><span className="block text-[11px] text-muted-foreground">Lifecycle intelligence</span></span>
           </Link>
           <div className="flex items-center gap-2">
-            <span className="hidden rounded-full border border-border bg-muted px-2.5 py-1 text-[11px] font-semibold text-muted-foreground sm:block">v1.0 beta</span>
+            <span className="hidden rounded-full border border-border bg-muted px-2.5 py-1 text-[11px] font-semibold text-muted-foreground sm:block">0.9b beta</span>
             <Button asChild variant="outline" size="sm">
               <Link to="/auth">{isSignedIn ? "Account" : "Sign in"}</Link>
             </Button>
