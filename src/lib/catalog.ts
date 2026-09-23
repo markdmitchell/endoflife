@@ -9,9 +9,9 @@ export interface CatalogStats {
 }
 
 export const DEFAULT_CATALOG_STATS: CatalogStats = {
-  products: 2978,
-  cycles: 8843,
-  provenance: 39613,
+  products: 3204,
+  cycles: 9332,
+  provenance: 40330,
 };
 
 const STATS_STORAGE_KEY = "endoflife_catalog_stats_v1";

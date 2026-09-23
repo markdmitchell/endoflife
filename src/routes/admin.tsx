@@ -22,7 +22,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { PageHeader } from "@/components/app-shell";
-import { getCatalogStats } from "@/lib/catalog";
+import { getCatalogStats, DEFAULT_CATALOG_STATS } from "@/lib/catalog";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -58,9 +58,9 @@ function AdminPage() {
   const [slug, setSlug] = useState("kubernetes");
   const [busyAction, setBusyAction] = useState<string | null>(null);
   const [stats, setStats] = useState<{ products: number; cycles: number; provenance: number }>({
-    products: 2978,
-    cycles: 8843,
-    provenance: 39613
+    products: DEFAULT_CATALOG_STATS.products,
+    cycles: DEFAULT_CATALOG_STATS.cycles,
+    provenance: DEFAULT_CATALOG_STATS.provenance
   });
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -142,9 +142,9 @@ function AdminPage() {
       .then((s) => {
         if (mounted && s) {
           setStats({
-            products: s.products ?? 2978,
-            cycles: s.cycles ?? 8843,
-            provenance: s.provenance ?? 39613
+            products: s.products ?? DEFAULT_CATALOG_STATS.products,
+            cycles: s.cycles ?? DEFAULT_CATALOG_STATS.cycles,
+            provenance: s.provenance ?? DEFAULT_CATALOG_STATS.provenance
           });
         }
       })
@@ -618,7 +618,7 @@ function AdminPage() {
             <Server className="size-4" />
             <Badge variant="outline" className="text-[10px] uppercase font-bold">Postgres DB</Badge>
           </div>
-          <p className="mt-3 font-display text-2xl font-semibold">{(stats?.products ?? 2978).toLocaleString()}</p>
+          <p className="mt-3 font-display text-2xl font-semibold">{(stats?.products ?? DEFAULT_CATALOG_STATS.products).toLocaleString()}</p>
           <p className="text-xs text-muted-foreground">Enterprise Products</p>
         </div>
         <div className="bg-card p-5">
@@ -626,7 +626,7 @@ function AdminPage() {
             <Layers className="size-4" />
             <Badge variant="outline" className="text-[10px] uppercase font-bold">100% Tracked</Badge>
           </div>
-          <p className="mt-3 font-display text-2xl font-semibold">{(stats?.cycles ?? 8843).toLocaleString()}</p>
+          <p className="mt-3 font-display text-2xl font-semibold">{(stats?.cycles ?? DEFAULT_CATALOG_STATS.cycles).toLocaleString()}</p>
           <p className="text-xs text-muted-foreground">Release Cycles</p>
         </div>
         <div className="bg-card p-5">
@@ -634,7 +634,7 @@ function AdminPage() {
             <ShieldCheck className="size-4" />
             <Badge variant="outline" className="text-[10px] uppercase font-bold">Audit Lineage</Badge>
           </div>
-          <p className="mt-3 font-display text-2xl font-semibold">{(stats?.provenance ?? 39613).toLocaleString()}</p>
+          <p className="mt-3 font-display text-2xl font-semibold">{(stats?.provenance ?? DEFAULT_CATALOG_STATS.provenance).toLocaleString()}</p>
           <p className="text-xs text-muted-foreground">Verified Provenance Records</p>
         </div>
         <div className="bg-card p-5">
