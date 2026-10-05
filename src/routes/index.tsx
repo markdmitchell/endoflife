@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { ArrowRight, Boxes, CalendarClock, Search, ShieldCheck } from "lucide-react";
+import { ArrowRight, Boxes, CalendarClock, Flame, Search, ShieldCheck } from "lucide-react";
 import { useMemo, useState } from "react";
 import { 
   getCatalog, 
@@ -10,6 +10,7 @@ import {
   formatCategoryName, 
   type LifecycleStatus 
 } from "@/lib/catalog";
+import { getThreatIntel } from "@/lib/threat-intel";
 import { PageHeader, StatusBadge } from "@/components/app-shell";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -49,11 +50,22 @@ function CatalogPage() {
     if (!hasSearched) return [];
     return data.filter((p) => {
       const text = `${p.name} ${p.vendor} ${p.category} ${formatCategoryName(p.category)} ${p.slug}`.toLowerCase();
-      const statuses = Array.isArray(p.release_cycles) ? p.release_cycles.map((r) => r.status) : [];
+      const cycles = Array.isArray(p.release_cycles) ? p.release_cycles : [];
+      const statuses = cycles.map((r) => r.status);
+      
+      let matchStatus = true;
+      if (status === "cisa_kev") {
+        matchStatus = cycles.some((c) => getThreatIntel(p.name, c.cycle, c.status === "end_of_life").hasCisaKev);
+      } else if (status === "pci_dss") {
+        matchStatus = statuses.includes("end_of_life");
+      } else if (status !== "all") {
+        matchStatus = statuses.includes(status as LifecycleStatus);
+      }
+
       return (
         text.includes(query.toLowerCase()) &&
         (category === "all" || p.category === category) &&
-        (status === "all" || statuses.includes(status as LifecycleStatus))
+        matchStatus
       );
     });
   }, [data, hasSearched, query, category, status]);
@@ -181,14 +193,16 @@ function CatalogPage() {
                 setHasSearched(true);
               }}
             >
-              <SelectTrigger className="h-10 w-full sm:w-[160px]">
-                <SelectValue placeholder="Status" />
+              <SelectTrigger className="h-10 w-full sm:w-[170px]">
+                <SelectValue placeholder="Status & Threat" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All statuses</SelectItem>
                 <SelectItem value="supported">Supported</SelectItem>
                 <SelectItem value="approaching_eol">Action needed</SelectItem>
                 <SelectItem value="end_of_life">End of life</SelectItem>
+                <SelectItem value="cisa_kev">🚨 CISA KEV Exploited</SelectItem>
+                <SelectItem value="pci_dss">🛡️ PCI-DSS 4.0 Gaps</SelectItem>
               </SelectContent>
             </Select>
 
@@ -253,6 +267,9 @@ function CatalogPage() {
                   )
                 : [];
               const top = cycles[0];
+              const hasKev = cycles.some((c) => getThreatIntel(product.name, c.cycle, c.status === "end_of_life").hasCisaKev);
+              const hasEol = cycles.some((c) => c.status === "end_of_life");
+
               return (
                 <Link
                   to="/product/$slug"
@@ -269,6 +286,20 @@ function CatalogPage() {
                     <p className="mt-1 text-xs text-muted-foreground">
                       {product.vendor} · {formatCategoryName(product.category)}
                     </p>
+                    {(hasKev || hasEol) && (
+                      <div className="flex flex-wrap items-center gap-1.5 mt-2">
+                        {hasKev && (
+                          <span className="inline-flex items-center gap-1 rounded-full border border-rose-300 bg-rose-50 px-2 py-0.5 text-[10px] font-bold text-rose-700 dark:border-rose-800 dark:bg-rose-950 dark:text-rose-300">
+                            <Flame className="size-2.5 text-rose-600 animate-pulse" /> CISA KEV
+                          </span>
+                        )}
+                        {hasEol && (
+                          <span className="rounded border border-amber-300 bg-amber-50 px-1.5 py-0.5 text-[10px] font-semibold text-amber-800 dark:border-amber-800 dark:bg-amber-950 dark:text-amber-300">
+                            PCI-DSS 4.0
+                          </span>
+                        )}
+                      </div>
+                    )}
                   </div>
                   <div>
                     <p className="text-[11px] font-semibold uppercase text-muted-foreground">

@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { ArrowLeft, Check, Copy, ExternalLink, HelpCircle, ShieldCheck, Terminal } from "lucide-react";
+import { ArrowLeft, ArrowRight, Check, Copy, ExternalLink, Flame, HelpCircle, Shield, ShieldAlert, ShieldCheck, Sparkles, Terminal, Ticket } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import {
@@ -10,6 +10,7 @@ import {
   STATUS_EXPLANATIONS,
   type LifecycleStatus,
 } from "@/lib/catalog";
+import { getThreatIntel } from "@/lib/threat-intel";
 import { PageHeader } from "@/components/app-shell";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -318,6 +319,142 @@ function ProductPage() {
         </div>
       </section>
 
+      {/* Enterprise SecOps & Compliance Telemetry Panel */}
+      {(() => {
+        const top = cycles[0];
+        const intel = getThreatIntel(data.name, top?.cycle ?? "latest", top?.status === "end_of_life");
+        const hasEolCycles = cycles.some(c => c.status === "end_of_life");
+        const bridge = intel.commercialBridge;
+        const kevList = intel.knownExploitedCves || [];
+
+        return (
+          <section className="mb-8 overflow-hidden rounded-xl border border-border bg-card p-6 shadow-xs">
+            <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border/70 pb-4">
+              <div className="flex items-center gap-2">
+                <ShieldAlert className="size-5 text-primary" />
+                <h2 className="text-lg font-bold tracking-tight text-foreground">
+                  SecOps Threat Intelligence &amp; GRC Compliance Profile
+                </h2>
+              </div>
+              <div className="flex items-center gap-2">
+                {intel.hasCisaKev ? (
+                  <Badge variant="destructive" className="bg-rose-600 text-xs font-bold gap-1">
+                    <Flame className="size-3 animate-pulse" /> CISA KEV: Active Zero-Day Campaign
+                  </Badge>
+                ) : (
+                  <Badge variant="outline" className="border-emerald-300 bg-emerald-50 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 text-xs font-medium gap-1">
+                    <ShieldCheck className="size-3" /> No Active KEVs Flagged
+                  </Badge>
+                )}
+                {hasEolCycles && (
+                  <Badge variant="outline" className="border-amber-300 bg-amber-50 text-amber-800 dark:border-amber-800 dark:bg-amber-950 dark:text-amber-300 text-xs font-semibold">
+                    PCI-DSS 4.0 Scope
+                  </Badge>
+                )}
+              </div>
+            </div>
+
+            <div className="mt-5 grid gap-4 md:grid-cols-3">
+              {/* Threat & Vulnerability Status */}
+              <div className="rounded-lg border border-border bg-muted/30 p-4">
+                <div className="flex items-center justify-between text-xs font-bold text-muted-foreground uppercase tracking-wider">
+                  <span>Threat Intelligence</span>
+                  <Flame className="size-4 text-rose-500" />
+                </div>
+                <div className="mt-2.5">
+                  {intel.hasCisaKev ? (
+                    <div>
+                      <p className="text-sm font-bold text-rose-600 dark:text-rose-400">
+                        {kevList.length} Active CISA KEV Vulnerabilities
+                      </p>
+                      <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
+                        Weaponized in-the-wild exploitation confirmed by CISA. P1 emergency remediation cutoff applies.
+                      </p>
+                    </div>
+                  ) : (
+                    <div>
+                      <p className="text-sm font-semibold text-foreground">Standard Vulnerability Surface</p>
+                      <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
+                        No active weaponized CISA catalog exploits registered against current baseline.
+                      </p>
+                    </div>
+                  )}
+                  <div className="mt-3 flex items-center gap-2 text-xs font-mono">
+                    <span className="font-semibold text-rose-600">{intel.cveCount.critical} Critical</span>
+                    <span>·</span>
+                    <span className="font-medium text-amber-600">{intel.cveCount.high} High CVEs</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Regulatory Standards Impact */}
+              <div className="rounded-lg border border-border bg-muted/30 p-4">
+                <div className="flex items-center justify-between text-xs font-bold text-muted-foreground uppercase tracking-wider">
+                  <span>Compliance Mandates</span>
+                  <ShieldCheck className="size-4 text-emerald-500" />
+                </div>
+                <div className="mt-2.5 space-y-1.5 text-xs">
+                  <div className="flex items-start gap-1.5">
+                    <span className="rounded bg-amber-100 dark:bg-amber-950 px-1 py-0.5 text-[10px] font-bold text-amber-800 dark:text-amber-300 shrink-0">
+                      PCI 4.0
+                    </span>
+                    <span className="text-muted-foreground leading-snug">
+                      <strong>Req 6.3.3:</strong> System software components must be vendor-supported.
+                    </span>
+                  </div>
+                  <div className="flex items-start gap-1.5">
+                    <span className="rounded bg-blue-100 dark:bg-blue-950 px-1 py-0.5 text-[10px] font-bold text-blue-800 dark:text-blue-300 shrink-0">
+                      NIST
+                    </span>
+                    <span className="text-muted-foreground leading-snug">
+                      <strong>SA-22 / SI-2:</strong> Flaw remediation &amp; unsupported component tracking.
+                    </span>
+                  </div>
+                  <div className="flex items-start gap-1.5">
+                    <span className="rounded bg-purple-100 dark:bg-purple-950 px-1 py-0.5 text-[10px] font-bold text-purple-800 dark:text-purple-300 shrink-0">
+                      ISO 27001
+                    </span>
+                    <span className="text-muted-foreground leading-snug">
+                      <strong>Control A.8.8:</strong> Management of technical vulnerabilities.
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Recommended Upgrade Target or Commercial Bridge */}
+              <div className="rounded-lg border border-border bg-muted/30 p-4">
+                <div className="flex items-center justify-between text-xs font-bold text-muted-foreground uppercase tracking-wider">
+                  <span>Remediation &amp; Bridge</span>
+                  <Sparkles className="size-4 text-primary" />
+                </div>
+                <div className="mt-2.5">
+                  <div className="flex items-center gap-1.5 text-xs font-semibold text-foreground">
+                    <span>Target:</span>
+                    <span className="rounded bg-primary/10 text-primary px-1.5 py-0.5 font-mono">
+                      {intel.recommendedUpgrade.targetVersion}
+                    </span>
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-1.5 leading-relaxed">
+                    {intel.recommendedUpgrade.breakingChangesSummary}
+                  </p>
+
+                  {bridge && (
+                    <div className="mt-3 pt-2.5 border-t border-border/60">
+                      <span className="text-[11px] font-semibold text-blue-600 dark:text-blue-400 block">
+                        Commercial Bridge: {bridge.programName}
+                      </span>
+                      <p className="text-[11px] text-muted-foreground">
+                        Supported until {bridge.supportedUntil} ({bridge.costModel})
+                      </p>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          </section>
+        );
+      })()}
+
       {/* Release Cycles Table */}
       <section>
         <div className="mb-4 flex items-center justify-between">
@@ -325,7 +462,7 @@ function ProductPage() {
             Release Cycles ({cycles.length})
           </h2>
           <span className="text-xs text-muted-foreground">
-            Support windows and verified end-of-life dates
+            Support windows, verified end-of-life dates, and compliance posture
           </span>
         </div>
 
@@ -335,7 +472,7 @@ function ProductPage() {
           </div>
         ) : (
           <div className="overflow-x-auto rounded-xl border border-border bg-card shadow-xs">
-            <table className="w-full min-w-[840px] text-left text-sm">
+            <table className="w-full min-w-[920px] text-left text-sm">
               <thead className="bg-muted/70 text-xs font-semibold text-muted-foreground">
                 <tr className="border-b border-border">
                   <th className="w-12 px-4 py-3.5 text-center text-[11px] font-mono">#</th>
@@ -344,6 +481,7 @@ function ProductPage() {
                   <th className="px-4 py-3.5">End of Active Support</th>
                   <th className="px-4 py-3.5">End of Life (EOL) Date</th>
                   <th className="px-4 py-3.5">LTS Status</th>
+                  <th className="px-4 py-3.5">SecOps Threat &amp; GRC</th>
                   <th className="px-4 py-3.5">
                     <div className="flex items-center gap-1.5">
                       <span>Status</span>
@@ -385,6 +523,9 @@ function ProductPage() {
               <tbody className="divide-y divide-border">
                 {cycles.map((c, idx) => {
                   const isLts = isLtsCycle(c);
+                  const isEol = c.status === "end_of_life";
+                  const cycleIntel = getThreatIntel(data.name, c.cycle, isEol);
+
                   return (
                     <tr key={c.id} className="transition-colors hover:bg-muted/40">
                       <td className="px-4 py-3.5 text-center font-mono text-xs text-muted-foreground">
@@ -411,6 +552,31 @@ function ProductPage() {
                           <span className="text-muted-foreground font-medium">Standard</span>
                         )}
                       </td>
+
+                      {/* SecOps Threat & Compliance Column */}
+                      <td className="px-4 py-3.5 text-xs">
+                        <div className="flex flex-wrap items-center gap-1">
+                          {cycleIntel.hasCisaKev && (
+                            <span className="inline-flex items-center gap-1 rounded-full border border-rose-300 bg-rose-50 px-2 py-0.5 text-[10px] font-bold text-rose-700 dark:border-rose-800 dark:bg-rose-950 dark:text-rose-300">
+                              <Flame className="size-2.5 text-rose-600 animate-pulse" /> KEV Exploit
+                            </span>
+                          )}
+                          {isEol && (
+                            <span className="rounded border border-amber-300 bg-amber-50 px-1.5 py-0.5 text-[10px] font-semibold text-amber-800 dark:border-amber-800 dark:bg-amber-950 dark:text-amber-300">
+                              PCI 4.0
+                            </span>
+                          )}
+                          {cycleIntel.commercialBridge && (
+                            <span className="rounded border border-blue-300 bg-blue-50 px-1.5 py-0.5 text-[10px] font-medium text-blue-800 dark:border-blue-800 dark:bg-blue-950 dark:text-blue-300">
+                              ESM Bridge
+                            </span>
+                          )}
+                          {!cycleIntel.hasCisaKev && !isEol && (
+                            <span className="text-muted-foreground text-[11px]">Compliant</span>
+                          )}
+                        </div>
+                      </td>
+
                       <td className="px-4 py-3.5 text-xs">
                         <TableStatusBadge status={c.status || "supported"} />
                       </td>

@@ -11,7 +11,7 @@ import { STATUS_EXPLANATIONS } from "@/lib/catalog";
 
 const nav = [
   { to: "/", label: "Catalog", icon: Search },
-  { to: "/risk", label: "Risk overview", icon: Gauge },
+  { to: "/risk", label: "SecOps & Risk", icon: Gauge },
   { to: "/sources", label: "Data sources", icon: Database },
   { to: "/provenance", label: "Provenance", icon: BookOpen },
   { to: "/admin", label: "Administration", icon: Settings2 },
