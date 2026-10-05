@@ -9,9 +9,9 @@ export interface CatalogStats {
 }
 
 export const DEFAULT_CATALOG_STATS: CatalogStats = {
-  products: 3204,
-  cycles: 9332,
-  provenance: 40330,
+  products: 4228,
+  cycles: 11461,
+  provenance: 43384,
 };
 
 const STATS_STORAGE_KEY = "endoflife_catalog_stats_v1";
@@ -77,6 +77,7 @@ export async function getCatalog() {
     supabase.from("products").select("*, release_cycles(*)").order("name").range(1000, 1999),
     supabase.from("products").select("*, release_cycles(*)").order("name").range(2000, 2999),
     supabase.from("products").select("*, release_cycles(*)").order("name").range(3000, 3999),
+    supabase.from("products").select("*, release_cycles(*)").order("name").range(4000, 4999),
   ]);
 
   const all: any[] = [];
