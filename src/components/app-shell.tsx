@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { ReleaseNotesModal } from "@/components/release-notes-modal";
+import { RELEASES } from "@/data/releases";
 import bannerIconAsset from "@/assets/endoflife-banner-icon-green.png.asset.json";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { STATUS_EXPLANATIONS } from "@/lib/catalog";
@@ -125,8 +126,10 @@ export function AppShell({ children }: { children: ReactNode }) {
                   title="View What's New & Release Notes"
                 >
                   <Sparkles className="size-3 text-primary" />
-                  <span>v1.0.0</span>
-                  <span className="rounded bg-primary/15 px-1 py-0.2 text-[9px] font-bold uppercase tracking-wider text-primary">GA</span>
+                  <span>{RELEASES[0]?.version ?? "v1.2.0"}</span>
+                  <span className="rounded bg-primary/15 px-1 py-0.2 text-[9px] font-bold uppercase tracking-wider text-primary">
+                    {RELEASES[0]?.badge?.includes("SecOps") ? "SecOps" : (RELEASES[0]?.badge ?? "GA")}
+                  </span>
                 </button>
               }
             />
