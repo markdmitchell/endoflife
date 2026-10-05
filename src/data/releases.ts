@@ -9,6 +9,21 @@ export interface ReleaseNote {
 
 export const RELEASES: ReleaseNote[] = [
   {
+    version: "v1.2.0",
+    badge: "Enterprise SecOps & Scale",
+    releaseDate: "October 2026",
+    title: "Enterprise SecOps, SBOM Risk Engine & 4,200+ Products Scale",
+    tagline: "CycloneDX/SPDX SBOM ingestion, CISA KEV active exploit correlation, PCI-DSS/GRC audit reporting, commercial support bridges, and catalog expansion to 4,228 products.",
+    highlights: [
+      "Machine-Readable SBOM & Scanner Ingestion: Drag-and-drop parsing for CycloneDX JSON (1.4–1.6), SPDX JSON (2.2–2.3), Trivy, Syft, and CMDB CSVs with instant container and cluster risk evaluation.",
+      "Active Threat Correlation & CISA KEV Alerts: Real-time flags for vulnerabilities in the CISA Known Exploited Vulnerabilities catalog (e.g. CVE-2024-4577, CVE-2023-32002) paired with CVSS Critical/High severities.",
+      "GRC Compliance Mapping & Audit-Ready Reporting: Built-in regulatory checks for PCI-DSS 4.0 (Req 6.3.3), NIST SP 800-53 (SA-22/SI-2), ISO 27001 (A.8.8), and SOC 2 with printable 1-click executive compliance reports.",
+      "Commercial Extended Support & LTS Migration Targets: Enterprise support bridge windows for Ubuntu Pro ESM, Red Hat ELS, Microsoft ESU, AWS EKS, and HeroDevs NES, plus stable LTS upgrade paths.",
+      "Operational Exception & Waiver Workflows: Formal Risk Acceptance logging with executive approvers, finite expiration dates, and compensating WAF/network controls, plus copyable Jira and ServiceNow issue templates.",
+      "Massive Enterprise Catalog Expansion: Scaled database to 4,228 products (+1,024 new enterprise products), 11,461 release cycles, and 43,384 audit-verified provenance records with expanded 5,000-item pagination."
+    ]
+  },
+  {
     version: "v1.0.0",
     badge: "General Availability",
     releaseDate: "September 21, 2026",
