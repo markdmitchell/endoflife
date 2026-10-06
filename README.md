@@ -6,10 +6,10 @@
 
 ## 🚀 Key Features & Capabilities
 
-### 1. Searchable Enterprise Product Catalog (4,200+ Products)
+### 1. Searchable Enterprise Product Catalog (4,100+ Products)
 - **Multi-dimensional Search**: Instant keyword search across product names, vendor names, software categories, and release slugs (e.g., *7-Zip, WinZip, Python, Jira, OpenText, Cisco, RHEL, Windows Server, MongoDB*).
 - **Flexible Lifecycle Filtering**: Filter products by category (*OS, Language, Framework, Database, Server App, Niche App*), enterprise vendor (*Atlassian, IBM, SAP, Cisco, OpenText, Microsoft, Red Hat*), or support status (*Supported, Action Needed, End of Life*).
-- **Interactive Metric Overview**: At-a-glance Bento-style summary stats tracking 4,200+ products, 11,400+ release cycles, and 43,000+ verified provenance records.
+- **Interactive Metric Overview**: At-a-glance Bento-style summary stats tracking 4,100+ products, 11,200+ release cycles, and 40,000+ verified provenance records. Records not yet confirmed against vendor documentation are flagged as unverified.
 
 ### 2. Deep Product Detail & Support Timelines
 - **Release Cycle Breakdown**: Detailed matrix for each product release cycle detailing release dates, end of active support dates, EOL dates, LTS status, and latest patch versions.

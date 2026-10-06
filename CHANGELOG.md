@@ -29,11 +29,15 @@ All notable changes to **[endoflife.tech](https://endoflife.tech)** are document
   - Formal **Risk Acceptance Waiver** logging with executive approvers, finite non-perpetual expiration dates, and mandatory compensating controls (WAF, network isolation).
   - One-click copyable **Jira / ServiceNow Issue Exporter** formatting markdown tickets with vulnerability severity, audit impact, and remediation steps.
 
-### 🌐 Massive Enterprise Catalog Expansion
-- **4,228 Enterprise Products**: Ingested 1,024 brand-new enterprise products across CNCF, Apache, HashiCorp, VMware Tanzu, Red Hat, Linux Foundation, Google Cloud, AWS, and Azure.
-- **11,461 Release Cycles**: Added 2,129 verified release cycles detailing release dates, mainstream support windows, EOL cutoffs, and latest patch versions.
-- **43,384 Audit Provenance Records**: Added 3,052 verified provenance records guaranteeing 100% provenance linkage to official vendor documentation.
-- **Query Optimization**: Expanded catalog range pagination to 4,999 items (`range(4000, 4999)`) with client-side localStorage caching for instant page loads.
+### 🌐 Enterprise Catalog Expansion & Data-Quality Remediation
+- **Catalog size**: 4,138 products and 11,277 release cycles.
+- **Unverified bulk records**: A bulk load on 2026-10-05 added 1,024 products whose lifecycle dates were templated placeholders rather than sourced from vendor documentation. After review:
+  - 90 that duplicated existing products were removed (the original products and their real data were kept).
+  - The remaining 934 products and 1,844 cycles are flagged **UNVERIFIED** (confidence 30% / 10%), and product pages show a warning banner.
+  - The "verified provenance" stat now counts only records with confidence ≥ 50% (currently 40,332).
+- **Status correction**: 952 release cycles whose status contradicted their own EOL dates were recomputed (801 → End of life, 151 → Action needed).
+- **Query fix**: Product provenance lookup now filters by `entity_type = 'product'`.
+- Catalog pagination extended to 5,000 items.
 
 ### 🏛️ Corporate Heritage & Legal Governance
 - Added dedicated **About Us** page detailing the Defense Health Agency (DHA) operational origin, founders James Shenberger and Mark D. Mitchell with LinkedIn profile integration.

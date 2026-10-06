@@ -311,12 +311,32 @@ function ProductPage() {
 
             <div className="text-xs">
               <span className="font-semibold text-foreground">Provenance Score: </span>
-              <span className="font-semibold text-emerald-600 dark:text-emerald-400">
+              <span
+                className={
+                  confidenceScore >= 0.8
+                    ? "font-semibold text-emerald-600 dark:text-emerald-400"
+                    : confidenceScore >= 0.5
+                      ? "font-semibold text-amber-600 dark:text-amber-400"
+                      : "font-semibold text-rose-600 dark:text-rose-400"
+                }
+              >
                 {Math.round(confidenceScore * 100)}%
               </span>
             </div>
           </div>
         </div>
+
+        {confidenceScore < 0.5 && (
+          <div
+            role="alert"
+            className="mt-4 rounded-lg border border-amber-300 bg-amber-50 p-3.5 text-xs text-amber-900 dark:border-amber-800 dark:bg-amber-950/40 dark:text-amber-200"
+          >
+            <strong className="font-semibold">Unverified lifecycle data.</strong>{" "}
+            The release and end-of-life dates for this product have not yet been confirmed against vendor
+            lifecycle documentation and should not be used for compliance or remediation decisions.
+            {data.provenance?.notes ? <span className="mt-1 block opacity-80">{data.provenance.notes}</span> : null}
+          </div>
+        )}
       </section>
 
       {/* Enterprise SecOps & Compliance Telemetry Panel */}

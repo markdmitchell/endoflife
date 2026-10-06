@@ -9,12 +9,12 @@ export interface CatalogStats {
 }
 
 export const DEFAULT_CATALOG_STATS: CatalogStats = {
-  products: 4228,
-  cycles: 11461,
-  provenance: 43384,
+  products: 4138,
+  cycles: 11277,
+  provenance: 40332,
 };
 
-const STATS_STORAGE_KEY = "endoflife_catalog_stats_v1";
+const STATS_STORAGE_KEY = "endoflife_catalog_stats_v2";
 
 export function getCachedCatalogStats(): CatalogStats {
   if (typeof window !== "undefined" && window.localStorage) {
@@ -46,7 +46,7 @@ export async function getCatalogStats(): Promise<CatalogStats> {
     const [prodRes, cycRes, provRes] = await Promise.all([
       supabase.from("products").select("*", { count: "exact", head: true }),
       supabase.from("release_cycles").select("*", { count: "exact", head: true }),
-      supabase.from("provenance_records").select("*", { count: "exact", head: true }),
+      supabase.from("provenance_records").select("*", { count: "exact", head: true }).gte("confidence_score", 0.5),
     ]);
 
     const cached = getCachedCatalogStats();
@@ -158,6 +158,7 @@ export async function getProduct(slug: string) {
     const { data: prov } = await supabase
       .from("provenance_records")
       .select("*")
+      .eq("entity_type", "product")
       .eq("entity_id", data.id)
       .order("id", { ascending: false })
       .limit(1)

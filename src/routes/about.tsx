@@ -97,15 +97,15 @@ function AboutPage() {
       {/* Platform Scale KPI Grid */}
       <section className="mt-12 rounded-xl border border-border bg-border overflow-hidden grid gap-px sm:grid-cols-3">
         <div className="bg-card p-6 text-center">
-          <span className="block font-display text-3xl font-bold text-foreground">4,200+</span>
+          <span className="block font-display text-3xl font-bold text-foreground">4,100+</span>
           <span className="mt-1 block text-xs font-semibold uppercase tracking-wider text-muted-foreground">Enterprise Products</span>
         </div>
         <div className="bg-card p-6 text-center">
-          <span className="block font-display text-3xl font-bold text-foreground">11,400+</span>
+          <span className="block font-display text-3xl font-bold text-foreground">11,200+</span>
           <span className="mt-1 block text-xs font-semibold uppercase tracking-wider text-muted-foreground">Tracked Release Cycles</span>
         </div>
         <div className="bg-card p-6 text-center">
-          <span className="block font-display text-3xl font-bold text-foreground">43,000+</span>
+          <span className="block font-display text-3xl font-bold text-foreground">40,000+</span>
           <span className="mt-1 block text-xs font-semibold uppercase tracking-wider text-muted-foreground">Audit Provenance Records</span>
         </div>
       </section>

@@ -20,7 +20,7 @@ export const RELEASES: ReleaseNote[] = [
       "GRC Compliance Mapping & Audit-Ready Reporting: Built-in regulatory checks for PCI-DSS 4.0 (Req 6.3.3), NIST SP 800-53 (SA-22/SI-2), ISO 27001 (A.8.8), and SOC 2 with printable 1-click executive compliance reports.",
       "Commercial Extended Support & LTS Migration Targets: Enterprise support bridge windows for Ubuntu Pro ESM, Red Hat ELS, Microsoft ESU, AWS EKS, and HeroDevs NES, plus stable LTS upgrade paths.",
       "Operational Exception & Waiver Workflows: Formal Risk Acceptance logging with executive approvers, finite expiration dates, and compensating WAF/network controls, plus copyable Jira and ServiceNow issue templates.",
-      "Massive Enterprise Catalog Expansion: Scaled database to 4,228 products (+1,024 new enterprise products), 11,461 release cycles, and 43,384 audit-verified provenance records with expanded 5,000-item pagination."
+      "Enterprise Catalog Expansion: Catalog now lists 4,138 products and 11,277 release cycles. About 930 products added in this release are flagged as unverified pending vendor source review; duplicates of existing products were removed and lifecycle statuses recomputed from their dates."
     ]
   },
   {
