@@ -273,6 +273,23 @@ export const STATUS_EXPLANATIONS = {
   },
 } as const;
 
+export function resolveCycleStatus(cycle: { status?: LifecycleStatus | string | null; eol_date?: string | null }): LifecycleStatus {
+  if (cycle.eol_date) {
+    const trimmed = cycle.eol_date.trim();
+    const dateStr = trimmed.includes("T") ? trimmed : `${trimmed}T00:00:00`;
+    const eol = new Date(dateStr);
+    if (!isNaN(eol.getTime())) {
+      const now = new Date();
+      if (eol < now) return "end_of_life";
+      const inOneYear = new Date();
+      inOneYear.setDate(inOneYear.getDate() + 365);
+      if (eol <= inOneYear) return "approaching_eol";
+      return "supported";
+    }
+  }
+  return (cycle.status as LifecycleStatus) || "supported";
+}
+
 export function statusLabel(status: LifecycleStatus) {
   if (status === "end_of_life") return "End of life";
   if (status === "approaching_eol") return "Action needed";

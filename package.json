@@ -3,6 +3,9 @@
   "private": true,
   "sideEffects": false,
   "type": "module",
+  "bin": {
+    "endoflife-check": "./bin/endoflife-check.js"
+  },
   "scripts": {
     "dev": "vite dev",
     "build": "vite build",
