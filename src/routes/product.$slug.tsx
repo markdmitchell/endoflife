@@ -19,6 +19,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 import {
   getProduct,
+  getCatalog,
   formatDate,
   formatCategoryName,
   STATUS_EXPLANATIONS,
@@ -186,13 +187,13 @@ function ProductPage() {
     queryFn: () => (slug ? getProduct(slug) : null),
     enabled: Boolean(slug),
     initialData: () => {
-      const catalog = queryClient.getQueryData<Array<{ slug: string; release_cycles?: unknown[] }>>(
+      const catalog = queryClient.getQueryData<Awaited<ReturnType<typeof getCatalog>>>(
         ["catalog"],
       );
       if (Array.isArray(catalog)) {
         const found = catalog.find((p) => p.slug === slug);
         if (found && Array.isArray(found.release_cycles) && found.release_cycles.length > 0) {
-          return found;
+          return { ...found, data_sources: null, provenance: null };
         }
       }
       return undefined;
