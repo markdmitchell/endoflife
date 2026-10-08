@@ -488,7 +488,7 @@ export async function fetchCisaKevCatalog(): Promise<CisaKevEntry[]> {
           Array.isArray(parsed.entries)
         ) {
           memoryKevEntries = parsed.entries;
-          return memoryKevEntries;
+          return memoryKevEntries ?? [];
         }
       }
     } catch {
@@ -515,7 +515,7 @@ export async function fetchCisaKevCatalog(): Promise<CisaKevEntry[]> {
           // ignore
         }
       }
-      return memoryKevEntries;
+      return memoryKevEntries ?? [];
     }
   } catch (err) {
     console.warn("Could not retrieve live CISA KEV catalog, using offline fallback:", err);
@@ -581,7 +581,7 @@ export function getThreatIntel(
       cveCount: exactProfile.cveCount ?? { critical: 0, high: 0, medium: 0 },
       knownExploitedCves: exactProfile.knownExploitedCves ?? [],
       complianceImpacts: isEol ? UNIVERSAL_EOL_COMPLIANCE_IMPACTS : [],
-      commercialBridge: exactProfile.commercialBridge,
+      ...(exactProfile.commercialBridge ? { commercialBridge: exactProfile.commercialBridge } : {}),
       recommendedUpgrade: exactProfile.recommendedUpgrade ?? {
         targetVersion: `${platform} (Latest LTS)`,
         targetCycle: "Latest",

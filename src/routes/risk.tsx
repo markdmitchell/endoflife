@@ -601,7 +601,7 @@ function RiskDashboardPage() {
               approvedBy: waiverApprover,
               expiresAt: waiverExpires,
               compensatingControl: waiverControl,
-              acceptedAt: new Date().toISOString().split("T")[0],
+              acceptedAt: new Date().toISOString().slice(0, 10),
             },
           };
         }
