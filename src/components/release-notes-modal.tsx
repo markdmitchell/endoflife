@@ -1,5 +1,13 @@
 import { useState, type ReactNode } from "react";
-import { Sparkles, Calendar, CheckCircle2, ChevronRight, Tag, Compass, ArrowRight } from "lucide-react";
+import {
+  Sparkles,
+  Calendar,
+  CheckCircle2,
+  ChevronRight,
+  Tag,
+  Compass,
+  ArrowRight,
+} from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -81,7 +89,8 @@ export function ReleaseNotesModal({ trigger, open, onOpenChange }: ReleaseNotesM
                   Curious where we&apos;re headed next?
                 </p>
                 <p className="mt-0.5 text-muted-foreground">
-                  Explore our phased product roadmap for automated syncs, public APIs, and SBOM ingestion.
+                  Explore our phased product roadmap for automated syncs, public APIs, and SBOM
+                  ingestion.
                 </p>
               </div>
               <Button
@@ -94,78 +103,76 @@ export function ReleaseNotesModal({ trigger, open, onOpenChange }: ReleaseNotesM
                 Explore Roadmap
               </Button>
             </div>
-          {RELEASES.map((rel, idx) => {
-            const isLatest = idx === 0;
-            return (
-              <article
-                key={rel.version}
-                className={`relative rounded-xl border p-5 transition-colors ${
-                  isLatest
-                    ? "border-primary/40 bg-primary/[0.03] shadow-xs"
-                    : "border-border/80 bg-card/40"
-                }`}
-              >
-                <div className="flex flex-wrap items-center justify-between gap-2 border-b border-border/60 pb-3">
-                  <div className="flex items-center gap-2.5">
-                    <span className="font-mono text-base font-bold text-foreground">
-                      {rel.version}
-                    </span>
-                    {rel.badge && (
-                      <Badge
-                        variant={isLatest ? "default" : "secondary"}
-                        className="text-[10px] uppercase tracking-wider font-semibold"
-                      >
-                        {rel.badge}
-                      </Badge>
-                    )}
+            {RELEASES.map((rel, idx) => {
+              const isLatest = idx === 0;
+              return (
+                <article
+                  key={rel.version}
+                  className={`relative rounded-xl border p-5 transition-colors ${
+                    isLatest
+                      ? "border-primary/40 bg-primary/[0.03] shadow-xs"
+                      : "border-border/80 bg-card/40"
+                  }`}
+                >
+                  <div className="flex flex-wrap items-center justify-between gap-2 border-b border-border/60 pb-3">
+                    <div className="flex items-center gap-2.5">
+                      <span className="font-mono text-base font-bold text-foreground">
+                        {rel.version}
+                      </span>
+                      {rel.badge && (
+                        <Badge
+                          variant={isLatest ? "default" : "secondary"}
+                          className="text-[10px] uppercase tracking-wider font-semibold"
+                        >
+                          {rel.badge}
+                        </Badge>
+                      )}
+                    </div>
+                    <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                      <Calendar className="size-3.5" />
+                      <span>{rel.releaseDate}</span>
+                    </div>
                   </div>
-                  <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                    <Calendar className="size-3.5" />
-                    <span>{rel.releaseDate}</span>
+
+                  <div className="mt-3">
+                    <h3 className="text-sm font-semibold text-foreground">{rel.title}</h3>
+                    <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
+                      {rel.tagline}
+                    </p>
+
+                    <ul className="mt-4 space-y-2">
+                      {rel.highlights.map((highlight, hIdx) => {
+                        const [headline, ...rest] = highlight.split(":");
+                        return (
+                          <li key={hIdx} className="flex items-start gap-2 text-xs leading-relaxed">
+                            <CheckCircle2
+                              className={`mt-0.5 size-3.5 shrink-0 ${
+                                isLatest ? "text-primary" : "text-muted-foreground"
+                              }`}
+                            />
+                            <span className="text-foreground/90">
+                              {rest.length > 0 ? (
+                                <>
+                                  <strong className="font-semibold text-foreground">
+                                    {headline}:
+                                  </strong>
+                                  {rest.join(":")}
+                                </>
+                              ) : (
+                                highlight
+                              )}
+                            </span>
+                          </li>
+                        );
+                      })}
+                    </ul>
                   </div>
-                </div>
-
-                <div className="mt-3">
-                  <h3 className="text-sm font-semibold text-foreground">
-                    {rel.title}
-                  </h3>
-                  <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
-                    {rel.tagline}
-                  </p>
-
-                  <ul className="mt-4 space-y-2">
-                    {rel.highlights.map((highlight, hIdx) => {
-                      const [headline, ...rest] = highlight.split(":");
-                      return (
-                        <li key={hIdx} className="flex items-start gap-2 text-xs leading-relaxed">
-                          <CheckCircle2
-                            className={`mt-0.5 size-3.5 shrink-0 ${
-                              isLatest ? "text-primary" : "text-muted-foreground"
-                            }`}
-                          />
-                          <span className="text-foreground/90">
-                            {rest.length > 0 ? (
-                              <>
-                                <strong className="font-semibold text-foreground">
-                                  {headline}:
-                                </strong>
-                                {rest.join(":")}
-                              </>
-                            ) : (
-                              highlight
-                            )}
-                          </span>
-                        </li>
-                      );
-                    })}
-                  </ul>
-                </div>
-              </article>
-            );
-          })}
-        </div>
-      </DialogContent>
-    </Dialog>
-  </>
+                </article>
+              );
+            })}
+          </div>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 }

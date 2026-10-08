@@ -1,36 +1,36 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { 
+import {
   AlertOctagon,
-  AlertTriangle, 
+  AlertTriangle,
   Check,
-  CheckCircle2, 
+  CheckCircle2,
   ChevronDown,
   ChevronUp,
-  Clock3, 
+  Clock3,
   Copy,
-  Download, 
+  Download,
   ExternalLink,
   FileCheck2,
   FileCode2,
-  FileSpreadsheet, 
+  FileSpreadsheet,
   FileText,
   Flame,
   HelpCircle,
   Info,
-  Layers, 
+  Layers,
   Printer,
-  RefreshCw, 
-  RotateCcw, 
-  Search, 
-  Server, 
+  RefreshCw,
+  RotateCcw,
+  Search,
+  Server,
   Shield,
-  ShieldAlert, 
+  ShieldAlert,
   ShieldCheck,
   Sparkles,
   Ticket,
   Upload,
-  Workflow
+  Workflow,
 } from "lucide-react";
 import { useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
@@ -39,14 +39,15 @@ import { getCatalog, formatDate, type LifecycleStatus } from "@/lib/catalog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Badge } from "@/components/ui/badge";
 import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Badge } from "@/components/ui/badge";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import {
   Dialog,
   DialogContent,
@@ -56,11 +57,11 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { 
-  parseSbom, 
-  SAMPLE_CYCLONEDX_SBOM, 
-  SAMPLE_SPDX_SBOM, 
-  type SbomParsedEnvironment 
+import {
+  parseSbom,
+  SAMPLE_CYCLONEDX_SBOM,
+  SAMPLE_SPDX_SBOM,
+  type SbomParsedEnvironment,
 } from "@/lib/sbom";
 import { getThreatIntel, type ThreatIntelRecord } from "@/lib/threat-intel";
 
@@ -69,14 +70,22 @@ export const Route = createFileRoute("/risk")({
   head: () => ({
     meta: [
       { title: "Enterprise SecOps & EOL Risk Dashboard — endoflife.tech" },
-      { name: "description", content: "Ingest CycloneDX/SPDX SBOMs, correlate EOL runtimes with CISA KEV exploits, track PCI-DSS 4.0 compliance, and manage risk waivers." },
+      {
+        name: "description",
+        content:
+          "Ingest CycloneDX/SPDX SBOMs, correlate EOL runtimes with CISA KEV exploits, track PCI-DSS 4.0 compliance, and manage risk waivers.",
+      },
       { property: "og:title", content: "Enterprise SecOps & EOL Risk Dashboard — endoflife.tech" },
-      { property: "og:description", content: "Ingest CycloneDX/SPDX SBOMs, correlate EOL runtimes with CISA KEV exploits, track PCI-DSS 4.0 compliance, and manage risk waivers." },
+      {
+        property: "og:description",
+        content:
+          "Ingest CycloneDX/SPDX SBOMs, correlate EOL runtimes with CISA KEV exploits, track PCI-DSS 4.0 compliance, and manage risk waivers.",
+      },
       { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary_large_image" }
-    ]
+      { name: "twitter:card", content: "summary_large_image" },
+    ],
   }),
-  component: RiskDashboardPage
+  component: RiskDashboardPage,
 });
 
 export type RuntimeEnvironment = SbomParsedEnvironment;
@@ -95,7 +104,7 @@ const INITIAL_SAMPLE_ENVIRONMENTS: RuntimeEnvironment[] = [
     migration_status: "Migration Planned",
     business_owner: "Data Platform Eng",
     sourceType: "CSV",
-    threatIntel: getThreatIntel("Python", "3.10", false)
+    threatIntel: getThreatIntel("Python", "3.10", false),
   },
   {
     id: "env-2",
@@ -110,7 +119,7 @@ const INITIAL_SAMPLE_ENVIRONMENTS: RuntimeEnvironment[] = [
     migration_status: "In Progress",
     business_owner: "Edge Web Core",
     sourceType: "CycloneDX",
-    threatIntel: getThreatIntel("Node.js", "18", true)
+    threatIntel: getThreatIntel("Node.js", "18", true),
   },
   {
     id: "env-3",
@@ -125,7 +134,7 @@ const INITIAL_SAMPLE_ENVIRONMENTS: RuntimeEnvironment[] = [
     migration_status: "Migration Planned",
     business_owner: "Checkout Payments",
     sourceType: "Trivy",
-    threatIntel: getThreatIntel("Node.js", "20", true)
+    threatIntel: getThreatIntel("Node.js", "20", true),
   },
   {
     id: "env-4",
@@ -140,7 +149,7 @@ const INITIAL_SAMPLE_ENVIRONMENTS: RuntimeEnvironment[] = [
     migration_status: "In Progress",
     business_owner: "Digital Marketing Tech",
     sourceType: "CSV",
-    threatIntel: getThreatIntel("PHP", "8.1", true)
+    threatIntel: getThreatIntel("PHP", "8.1", true),
   },
   {
     id: "env-5",
@@ -155,7 +164,7 @@ const INITIAL_SAMPLE_ENVIRONMENTS: RuntimeEnvironment[] = [
     migration_status: "Migration Planned",
     business_owner: "Cloud Platform Ops",
     sourceType: "SPDX",
-    threatIntel: getThreatIntel("Ubuntu", "20.04", true)
+    threatIntel: getThreatIntel("Ubuntu", "20.04", true),
   },
   {
     id: "env-6",
@@ -170,7 +179,7 @@ const INITIAL_SAMPLE_ENVIRONMENTS: RuntimeEnvironment[] = [
     migration_status: "In Progress",
     business_owner: "NetOps Security",
     sourceType: "CycloneDX",
-    threatIntel: getThreatIntel("OpenSSL", "1.1.1", true)
+    threatIntel: getThreatIntel("OpenSSL", "1.1.1", true),
   },
   {
     id: "env-7",
@@ -185,7 +194,7 @@ const INITIAL_SAMPLE_ENVIRONMENTS: RuntimeEnvironment[] = [
     migration_status: "No Action Needed",
     business_owner: "Supply Chain Services",
     sourceType: "CSV",
-    threatIntel: getThreatIntel(".NET", "8.0", false)
+    threatIntel: getThreatIntel(".NET", "8.0", false),
   },
   {
     id: "env-8",
@@ -200,14 +209,14 @@ const INITIAL_SAMPLE_ENVIRONMENTS: RuntimeEnvironment[] = [
     migration_status: "No Action Needed",
     business_owner: "AI/ML Infrastructure",
     sourceType: "CSV",
-    threatIntel: getThreatIntel("Python", "3.12", false)
-  }
+    threatIntel: getThreatIntel("Python", "3.12", false),
+  },
 ];
 
-function calculateRiskFromDate(eolDate: string | null): { 
-  risk_level: "CRITICAL (EOL)" | "HIGH" | "LOW"; 
-  days_to_eol: number; 
-  phase: string 
+function calculateRiskFromDate(eolDate: string | null): {
+  risk_level: "CRITICAL (EOL)" | "HIGH" | "LOW";
+  days_to_eol: number;
+  phase: string;
 } {
   if (!eolDate) {
     return { risk_level: "LOW", days_to_eol: 9999, phase: "Active Support" };
@@ -226,7 +235,9 @@ function calculateRiskFromDate(eolDate: string | null): {
 function RiskDashboardPage() {
   const { data: catalog = [] } = useQuery({ queryKey: ["catalog"], queryFn: getCatalog });
   const [activeTab, setActiveTab] = useState<"fleet" | "catalog">("fleet");
-  const [environments, setEnvironments] = useState<RuntimeEnvironment[]>(INITIAL_SAMPLE_ENVIRONMENTS);
+  const [environments, setEnvironments] = useState<RuntimeEnvironment[]>(
+    INITIAL_SAMPLE_ENVIRONMENTS,
+  );
   const [isSampleData, setIsSampleData] = useState(true);
   const [showHowItWorks, setShowHowItWorks] = useState(false);
   const [query, setQuery] = useState("");
@@ -239,18 +250,24 @@ function RiskDashboardPage() {
   const [activeWaiverEnv, setActiveWaiverEnv] = useState<RuntimeEnvironment | null>(null);
   const [waiverApprover, setWaiverApprover] = useState("Jane Doe (CISO / SecOps Lead)");
   const [waiverExpires, setWaiverExpires] = useState("2027-06-30");
-  const [waiverControl, setWaiverControl] = useState("Compensating WAF rules (OWASP CRS) deployed; isolated in private VPC security group.");
+  const [waiverControl, setWaiverControl] = useState(
+    "Compensating WAF rules (OWASP CRS) deployed; isolated in private VPC security group.",
+  );
 
   const [activeJiraEnv, setActiveJiraEnv] = useState<RuntimeEnvironment | null>(null);
   const [copiedJira, setCopiedJira] = useState(false);
 
-  const [activeThreatDetailEnv, setActiveThreatDetailEnv] = useState<RuntimeEnvironment | null>(null);
+  const [activeThreatDetailEnv, setActiveThreatDetailEnv] = useState<RuntimeEnvironment | null>(
+    null,
+  );
   const [showAuditReport, setShowAuditReport] = useState(false);
   const [showConnectorsModal, setShowConnectorsModal] = useState(false);
 
   // Catalog release cycles calculations
   const catalogCycles = useMemo(() => {
-    return catalog.flatMap((p) => p.release_cycles.map((c) => ({ ...c, product: p.name, vendor: p.vendor, slug: p.slug })));
+    return catalog.flatMap((p) =>
+      p.release_cycles.map((c) => ({ ...c, product: p.name, vendor: p.vendor, slug: p.slug })),
+    );
   }, [catalog]);
 
   const catalogEol = catalogCycles.filter((c) => c.status === "end_of_life");
@@ -260,9 +277,10 @@ function RiskDashboardPage() {
   // Fleet environment calculations
   const filteredEnvironments = useMemo(() => {
     return environments.filter((env) => {
-      const text = `${env.deployment_env} ${env.platform} ${env.version} ${env.business_owner ?? ""} ${env.target_upgrade_path}`.toLowerCase();
+      const text =
+        `${env.deployment_env} ${env.platform} ${env.version} ${env.business_owner ?? ""} ${env.target_upgrade_path}`.toLowerCase();
       const matchQuery = !query || text.includes(query.toLowerCase());
-      
+
       let matchRisk = true;
       if (riskFilter === "cisa_kev") {
         matchRisk = Boolean(env.threatIntel?.hasCisaKev);
@@ -274,11 +292,14 @@ function RiskDashboardPage() {
 
       let matchCompliance = true;
       if (complianceFilter === "pci_dss") {
-        matchCompliance = env.threatIntel?.complianceImpacts?.some((c) => c.standard === "PCI-DSS 4.0") ?? false;
+        matchCompliance =
+          env.threatIntel?.complianceImpacts?.some((c) => c.standard === "PCI-DSS 4.0") ?? false;
       } else if (complianceFilter === "nist") {
-        matchCompliance = env.threatIntel?.complianceImpacts?.some((c) => c.standard === "NIST SP 800-53") ?? false;
+        matchCompliance =
+          env.threatIntel?.complianceImpacts?.some((c) => c.standard === "NIST SP 800-53") ?? false;
       } else if (complianceFilter === "iso") {
-        matchCompliance = env.threatIntel?.complianceImpacts?.some((c) => c.standard === "ISO 27001") ?? false;
+        matchCompliance =
+          env.threatIntel?.complianceImpacts?.some((c) => c.standard === "ISO 27001") ?? false;
       }
 
       const matchStatus = statusFilter === "all" || env.migration_status === statusFilter;
@@ -288,19 +309,26 @@ function RiskDashboardPage() {
 
   // Aggregate stats
   const totalFleet = environments.length;
-  const cisaKevCount = environments.filter((e) => e.threatIntel?.hasCisaKev && !e.riskAccepted).length;
-  const criticalCount = environments.filter((e) => e.risk_level === "CRITICAL (EOL)" && !e.riskAccepted).length;
-  const highRiskCount = environments.filter((e) => e.risk_level === "HIGH" && !e.riskAccepted).length;
+  const cisaKevCount = environments.filter(
+    (e) => e.threatIntel?.hasCisaKev && !e.riskAccepted,
+  ).length;
+  const criticalCount = environments.filter(
+    (e) => e.risk_level === "CRITICAL (EOL)" && !e.riskAccepted,
+  ).length;
+  const highRiskCount = environments.filter(
+    (e) => e.risk_level === "HIGH" && !e.riskAccepted,
+  ).length;
   const lowRiskCount = environments.filter((e) => e.risk_level === "LOW" || e.riskAccepted).length;
   const activeWaiverCount = environments.filter((e) => Boolean(e.riskAccepted)).length;
   const pciDssViolations = environments.filter(
-    (e) => !e.riskAccepted && e.threatIntel?.complianceImpacts?.some((c) => c.standard === "PCI-DSS 4.0")
+    (e) =>
+      !e.riskAccepted &&
+      e.threatIntel?.complianceImpacts?.some((c) => c.standard === "PCI-DSS 4.0"),
   ).length;
 
   // Compliance percentage score
-  const complianceScore = totalFleet > 0 
-    ? Math.round(((totalFleet - criticalCount) / totalFleet) * 100) 
-    : 100;
+  const complianceScore =
+    totalFleet > 0 ? Math.round(((totalFleet - criticalCount) / totalFleet) * 100) : 100;
 
   // Handle Multi-Format File Upload (SBOM JSON or CSV)
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -312,7 +340,12 @@ function RiskDashboardPage() {
       const fileName = file.name.toLowerCase();
 
       // Check if file is JSON (CycloneDX, SPDX, Trivy, Syft)
-      if (fileName.endsWith(".json") || fileName.endsWith(".spdx") || fileName.endsWith(".cdx") || text.trim().startsWith("{")) {
+      if (
+        fileName.endsWith(".json") ||
+        fileName.endsWith(".spdx") ||
+        fileName.endsWith(".cdx") ||
+        text.trim().startsWith("{")
+      ) {
         const result = parseSbom(text, catalog, file.name.replace(/\.[^/.]+$/, ""));
         if (!result.matchedEnvironments.length) {
           toast.error("No extractable software components found in the uploaded SBOM.");
@@ -321,23 +354,45 @@ function RiskDashboardPage() {
 
         setEnvironments(result.matchedEnvironments);
         setIsSampleData(false);
-        toast.success(`Imported ${result.format} SBOM with ${result.matchedEnvironments.length} components (${result.matchedEnvironments.filter(e => e.threatIntel.hasCisaKev).length} CISA KEV alerts).`);
+        toast.success(
+          `Imported ${result.format} SBOM with ${result.matchedEnvironments.length} components (${result.matchedEnvironments.filter((e) => e.threatIntel.hasCisaKev).length} CISA KEV alerts).`,
+        );
         setActiveTab("fleet");
         return;
       }
 
       // Otherwise parse as CSV
-      const lines = text.trim().split(/\r?\n/).filter((l) => l.trim().length > 0);
+      const lines = text
+        .trim()
+        .split(/\r?\n/)
+        .filter((l) => l.trim().length > 0);
       if (lines.length < 2) {
         toast.error("CSV file is empty or missing headers.");
         return;
       }
 
-      const headers = (lines[0] ?? "").split(",").map((h) => h.trim().toLowerCase().replace(/['"]/g, ""));
+      const headers = (lines[0] ?? "")
+        .split(",")
+        .map((h) => h.trim().toLowerCase().replace(/['"]/g, ""));
       const getIndex = (keys: string[]) => headers.findIndex((h) => keys.includes(h));
 
-      const envIdx = getIndex(["deployment_env", "environment", "env", "server", "app", "workload", "asset"]);
-      const platformIdx = getIndex(["platform", "product_name", "product", "software", "name", "package"]);
+      const envIdx = getIndex([
+        "deployment_env",
+        "environment",
+        "env",
+        "server",
+        "app",
+        "workload",
+        "asset",
+      ]);
+      const platformIdx = getIndex([
+        "platform",
+        "product_name",
+        "product",
+        "software",
+        "name",
+        "package",
+      ]);
       const versionIdx = getIndex(["version", "installed_version", "ver", "release"]);
       const eolIdx = getIndex(["eol_date", "eol", "end_of_life"]);
       const ownerIdx = getIndex(["business_owner", "owner", "team", "maintainer"]);
@@ -350,14 +405,21 @@ function RiskDashboardPage() {
         const cells = (lines[i] ?? "").split(",").map((c) => c.trim().replace(/^["']|["']$/g, ""));
         const platform = (platformIdx >= 0 ? cells[platformIdx] : "Application") || "Application";
         const version = (versionIdx >= 0 ? cells[versionIdx] : "1.0") || "1.0";
-        const deployment_env = (envIdx >= 0 ? cells[envIdx] : `Environment ${i}`) || `Environment ${i}`;
+        const deployment_env =
+          (envIdx >= 0 ? cells[envIdx] : `Environment ${i}`) || `Environment ${i}`;
         let eolDate = eolIdx >= 0 && cells[eolIdx] ? cells[eolIdx] : null;
 
         // Auto-match against catalog if EOL date missing
         if (!eolDate && catalog.length > 0) {
-          const matchedProd = catalog.find((p) => p.name.toLowerCase().includes(platform.toLowerCase()) || p.slug.toLowerCase().includes(platform.toLowerCase()));
+          const matchedProd = catalog.find(
+            (p) =>
+              p.name.toLowerCase().includes(platform.toLowerCase()) ||
+              p.slug.toLowerCase().includes(platform.toLowerCase()),
+          );
           if (matchedProd) {
-            const matchedCycle = matchedProd.release_cycles.find((c) => c.cycle === version || version.startsWith(c.cycle));
+            const matchedCycle = matchedProd.release_cycles.find(
+              (c) => c.cycle === version || version.startsWith(c.cycle),
+            );
             if (matchedCycle?.eol_date) {
               eolDate = matchedCycle.eol_date;
             }
@@ -374,9 +436,14 @@ function RiskDashboardPage() {
         }
 
         const rawStatus = (statusIdx >= 0 ? cells[statusIdx] : "") ?? "";
-        let migration_status: "In Progress" | "Migration Planned" | "No Action Needed" = "Migration Planned";
+        let migration_status: "In Progress" | "Migration Planned" | "No Action Needed" =
+          "Migration Planned";
         if (rawStatus.toLowerCase().includes("progress")) migration_status = "In Progress";
-        else if (rawStatus.toLowerCase().includes("no") || rawStatus.toLowerCase().includes("healthy")) migration_status = "No Action Needed";
+        else if (
+          rawStatus.toLowerCase().includes("no") ||
+          rawStatus.toLowerCase().includes("healthy")
+        )
+          migration_status = "No Action Needed";
 
         parsed.push({
           id: `csv-${Date.now()}-${i}`,
@@ -387,11 +454,15 @@ function RiskDashboardPage() {
           lifecycle_phase: risk.phase,
           days_to_eol: risk.days_to_eol,
           risk_level: finalRiskLevel,
-          target_upgrade_path: targetIdx >= 0 && cells[targetIdx] ? cells[targetIdx] : (threatIntel.recommendedUpgrade?.targetVersion || `${platform} (Latest LTS)`),
+          target_upgrade_path:
+            targetIdx >= 0 && cells[targetIdx]
+              ? cells[targetIdx]
+              : threatIntel.recommendedUpgrade?.targetVersion || `${platform} (Latest LTS)`,
           migration_status,
-          business_owner: (ownerIdx >= 0 ? cells[ownerIdx] : "Enterprise Fleet") || "Enterprise Fleet",
+          business_owner:
+            (ownerIdx >= 0 ? cells[ownerIdx] : "Enterprise Fleet") || "Enterprise Fleet",
           sourceType: "CSV",
-          threatIntel
+          threatIntel,
         });
       }
 
@@ -409,10 +480,16 @@ function RiskDashboardPage() {
   // Load Built-in CycloneDX Sample SBOM
   const handleLoadSampleCycloneDx = () => {
     try {
-      const result = parseSbom(SAMPLE_CYCLONEDX_SBOM, catalog, "Trivy Container Scan (API Gateway)");
+      const result = parseSbom(
+        SAMPLE_CYCLONEDX_SBOM,
+        catalog,
+        "Trivy Container Scan (API Gateway)",
+      );
       setEnvironments(result.matchedEnvironments);
       setIsSampleData(false);
-      toast.success(`Loaded CycloneDX 1.5 SBOM (${result.matchedEnvironments.length} components analyzed with CISA KEV correlation).`);
+      toast.success(
+        `Loaded CycloneDX 1.5 SBOM (${result.matchedEnvironments.length} components analyzed with CISA KEV correlation).`,
+      );
       setActiveTab("fleet");
     } catch (e) {
       toast.error("Failed to load sample CycloneDX SBOM.");
@@ -425,7 +502,9 @@ function RiskDashboardPage() {
       const result = parseSbom(SAMPLE_SPDX_SBOM, catalog, "Syft Kubernetes Fleet Manifest");
       setEnvironments(result.matchedEnvironments);
       setIsSampleData(false);
-      toast.success(`Loaded SPDX 2.3 SBOM (${result.matchedEnvironments.length} components analyzed with CISA KEV correlation).`);
+      toast.success(
+        `Loaded SPDX 2.3 SBOM (${result.matchedEnvironments.length} components analyzed with CISA KEV correlation).`,
+      );
       setActiveTab("fleet");
     } catch (e) {
       toast.error("Failed to load sample SPDX SBOM.");
@@ -434,9 +513,21 @@ function RiskDashboardPage() {
 
   const handleExportCSV = () => {
     const headers = [
-      "deployment_env", "platform", "version", "source_type", "eol_date", "days_to_eol", 
-      "risk_level", "cisa_kev_active", "critical_cves", "compliance_impacts", 
-      "target_upgrade_path", "migration_status", "business_owner", "risk_waiver_active", "waiver_approver"
+      "deployment_env",
+      "platform",
+      "version",
+      "source_type",
+      "eol_date",
+      "days_to_eol",
+      "risk_level",
+      "cisa_kev_active",
+      "critical_cves",
+      "compliance_impacts",
+      "target_upgrade_path",
+      "migration_status",
+      "business_owner",
+      "risk_waiver_active",
+      "waiver_approver",
     ];
     const rows = filteredEnvironments.map((e) => [
       `"${e.deployment_env}"`,
@@ -448,19 +539,24 @@ function RiskDashboardPage() {
       `"${e.riskAccepted ? "RISK ACCEPTED (WAIVER)" : e.risk_level}"`,
       e.threatIntel?.hasCisaKev ? "YES" : "NO",
       e.threatIntel?.cveCount?.critical ?? 0,
-      `"${(e.threatIntel?.complianceImpacts || []).map(c => c.standard).join("; ")}"`,
+      `"${(e.threatIntel?.complianceImpacts || []).map((c) => c.standard).join("; ")}"`,
       `"${e.target_upgrade_path}"`,
       `"${e.migration_status}"`,
       `"${e.business_owner ?? ""}"`,
       e.riskAccepted ? "YES" : "NO",
-      `"${e.riskAccepted?.approvedBy ?? ""}"`
+      `"${e.riskAccepted?.approvedBy ?? ""}"`,
     ]);
 
-    const csvContent = "data:text/csv;charset=utf-8," + [headers.join(","), ...rows.map((r) => r.join(","))].join("\n");
+    const csvContent =
+      "data:text/csv;charset=utf-8," +
+      [headers.join(","), ...rows.map((r) => r.join(","))].join("\n");
     const encodedUri = encodeURI(csvContent);
     const link = document.createElement("a");
     link.setAttribute("href", encodedUri);
-    link.setAttribute("download", `enterprise_eol_threat_risk_${new Date().toISOString().split("T")[0]}.csv`);
+    link.setAttribute(
+      "download",
+      `enterprise_eol_threat_risk_${new Date().toISOString().split("T")[0]}.csv`,
+    );
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -473,7 +569,7 @@ function RiskDashboardPage() {
       '"Production API Gateway Node-1","Node.js","18","2025-04-30","Node.js 22 LTS","In Progress","Edge Web Core"',
       '"Enterprise Data Lake Engine","Python","3.10","2026-10-04","Python 3.12 LTS","Migration Planned","Data Platform Eng"',
       '"Identity & Single Sign-On Cluster",".NET","8.0","2026-11-10","Stay on .NET 8.0","No Action Needed","Security Systems"',
-      '"Legacy Customer Billing Portal","PHP","8.1","2025-12-31","PHP 8.3 LTS","In Progress","Finance Tech"'
+      '"Legacy Customer Billing Portal","PHP","8.1","2025-12-31","PHP 8.3 LTS","In Progress","Finance Tech"',
     ];
     const csvContent = "data:text/csv;charset=utf-8," + templateRows.join("\n");
     const encodedUri = encodeURI(csvContent);
@@ -505,14 +601,16 @@ function RiskDashboardPage() {
               approvedBy: waiverApprover,
               expiresAt: waiverExpires,
               compensatingControl: waiverControl,
-              acceptedAt: new Date().toISOString().split("T")[0]
-            }
+              acceptedAt: new Date().toISOString().split("T")[0],
+            },
           };
         }
         return env;
-      })
+      }),
     );
-    toast.success(`Formal Risk Acceptance Waiver applied for ${activeWaiverEnv.platform} in ${activeWaiverEnv.deployment_env}.`);
+    toast.success(
+      `Formal Risk Acceptance Waiver applied for ${activeWaiverEnv.platform} in ${activeWaiverEnv.deployment_env}.`,
+    );
     setActiveWaiverEnv(null);
   };
 
@@ -524,11 +622,11 @@ function RiskDashboardPage() {
           const { riskAccepted, ...rest } = env;
           return {
             ...rest,
-            migration_status: "Migration Planned"
+            migration_status: "Migration Planned",
           };
         }
         return env;
-      })
+      }),
     );
     toast.info("Risk waiver revoked. Workload returned to active audit review.");
   };
@@ -556,12 +654,12 @@ h2. Active Threat Intelligence & Vulnerability Telemetry
 ${env.threatIntel?.hasCisaKev ? "*{color:red}CRITICAL ALERT: CISA Known Exploited Vulnerability (KEV) Catalog Flagged{color}*" : "No known active in-the-wild zero-day exploits currently logged."}
 
 *Open CVEs:* ${env.threatIntel?.cveCount?.critical ?? 0} Critical, ${env.threatIntel?.cveCount?.high ?? 0} High, ${env.threatIntel?.cveCount?.medium ?? 0} Medium
-${kevList.length > 0 ? kevList.map(k => `* *${k.cveId}* (CVSS ${k.cvss}): ${k.summary}\n  - Ransomware Campaign: ${k.ransomwareUse ? "YES" : "No"}\n  - Required Mitigation: ${k.requiredAction}`).join("\n") : ""}
+${kevList.length > 0 ? kevList.map((k) => `* *${k.cveId}* (CVSS ${k.cvss}): ${k.summary}\n  - Ransomware Campaign: ${k.ransomwareUse ? "YES" : "No"}\n  - Required Mitigation: ${k.requiredAction}`).join("\n") : ""}
 
 ----
 
 h2. Regulatory & Compliance Framework Violations
-${complianceList.length > 0 ? complianceList.map(c => `* *${c.standard} (${c.section}):* ${c.title} — ${c.mandate}`).join("\n") : "None currently violated."}
+${complianceList.length > 0 ? complianceList.map((c) => `* *${c.standard} (${c.section}):* ${c.title} — ${c.mandate}`).join("\n") : "None currently violated."}
 
 ----
 
@@ -599,9 +697,9 @@ _Generated by endoflife.tech Enterprise SecOps Platform_`;
               className="hidden"
               onChange={handleFileUpload}
             />
-            <Button 
-              variant="outline" 
-              size="sm" 
+            <Button
+              variant="outline"
+              size="sm"
               onClick={() => setShowAuditReport(true)}
               className="border-primary/40 bg-primary/5 text-primary hover:bg-primary/10 font-semibold"
             >
@@ -617,7 +715,12 @@ _Generated by endoflife.tech Enterprise SecOps Platform_`;
               <Download className="mr-1.5 size-4" /> Export Risk Register
             </Button>
             {!isSampleData && (
-              <Button variant="ghost" size="sm" onClick={handleResetSampleFleet} title="Reset to sample environments">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleResetSampleFleet}
+                title="Reset to sample environments"
+              >
                 <RotateCcw className="mr-1.5 size-4" /> Reset Demo
               </Button>
             )}
@@ -638,41 +741,54 @@ _Generated by endoflife.tech Enterprise SecOps Platform_`;
                   Enterprise SecOps Ingestion &amp; Active Threat Correlation
                 </h3>
                 {isSampleData ? (
-                  <Badge variant="outline" className="border-amber-300 bg-amber-50 text-[11px] font-semibold text-amber-800 dark:border-amber-700 dark:bg-amber-950 dark:text-amber-300">
+                  <Badge
+                    variant="outline"
+                    className="border-amber-300 bg-amber-50 text-[11px] font-semibold text-amber-800 dark:border-amber-700 dark:bg-amber-950 dark:text-amber-300"
+                  >
                     Sample Fleet ({environments.length} Workloads)
                   </Badge>
                 ) : (
-                  <Badge variant="outline" className="border-emerald-300 bg-emerald-50 text-[11px] font-semibold text-emerald-800 dark:border-emerald-700 dark:bg-emerald-950 dark:text-emerald-300">
+                  <Badge
+                    variant="outline"
+                    className="border-emerald-300 bg-emerald-50 text-[11px] font-semibold text-emerald-800 dark:border-emerald-700 dark:bg-emerald-950 dark:text-emerald-300"
+                  >
                     Custom Imported Fleet ({environments.length} Workloads)
                   </Badge>
                 )}
               </div>
               <p className="mt-1.5 text-sm text-muted-foreground leading-relaxed">
-                Connect your CI/CD vulnerability scanners and CMDB inventories. Software components are mapped against verified EOL milestones, <strong>CISA Known Exploited Vulnerabilities (KEV)</strong>, open Critical/High CVEs, and compliance standards (<strong>PCI-DSS 4.0 Req 6.3.3</strong>, <strong>NIST SP 800-53 SA-22</strong>).
+                Connect your CI/CD vulnerability scanners and CMDB inventories. Software components
+                are mapped against verified EOL milestones,{" "}
+                <strong>CISA Known Exploited Vulnerabilities (KEV)</strong>, open Critical/High
+                CVEs, and compliance standards (<strong>PCI-DSS 4.0 Req 6.3.3</strong>,{" "}
+                <strong>NIST SP 800-53 SA-22</strong>).
               </p>
-              
+
               {/* Quick 1-Click SBOM Demo Buttons */}
               <div className="mt-3 flex flex-wrap items-center gap-2">
-                <span className="text-xs font-semibold text-muted-foreground">Test with 1-click sample:</span>
-                <Button 
-                  variant="outline" 
-                  size="sm" 
+                <span className="text-xs font-semibold text-muted-foreground">
+                  Test with 1-click sample:
+                </span>
+                <Button
+                  variant="outline"
+                  size="sm"
                   onClick={handleLoadSampleCycloneDx}
                   className="h-7 text-xs border-blue-300 bg-blue-50/70 hover:bg-blue-100 text-blue-900 dark:border-blue-800 dark:bg-blue-950/60 dark:text-blue-200"
                 >
-                  <FileCode2 className="mr-1 size-3.5 text-blue-600" /> CycloneDX 1.5 (Trivy Container)
+                  <FileCode2 className="mr-1 size-3.5 text-blue-600" /> CycloneDX 1.5 (Trivy
+                  Container)
                 </Button>
-                <Button 
-                  variant="outline" 
-                  size="sm" 
+                <Button
+                  variant="outline"
+                  size="sm"
                   onClick={handleLoadSampleSpdx}
                   className="h-7 text-xs border-purple-300 bg-purple-50/70 hover:bg-purple-100 text-purple-900 dark:border-purple-800 dark:bg-purple-950/60 dark:text-purple-200"
                 >
                   <FileCode2 className="mr-1 size-3.5 text-purple-600" /> SPDX 2.3 (Syft Kubernetes)
                 </Button>
-                <Button 
-                  variant="outline" 
-                  size="sm" 
+                <Button
+                  variant="outline"
+                  size="sm"
                   onClick={handleDownloadTemplate}
                   className="h-7 text-xs"
                 >
@@ -693,9 +809,13 @@ _Generated by endoflife.tech Enterprise SecOps Platform_`;
               className="h-9 text-xs font-medium"
             >
               {showHowItWorks ? (
-                <>Hide Architecture <ChevronUp className="ml-1 size-3.5" /></>
+                <>
+                  Hide Architecture <ChevronUp className="ml-1 size-3.5" />
+                </>
               ) : (
-                <>Architecture Guide <ChevronDown className="ml-1 size-3.5" /></>
+                <>
+                  Architecture Guide <ChevronDown className="ml-1 size-3.5" />
+                </>
               )}
             </Button>
           </div>
@@ -711,7 +831,8 @@ _Generated by endoflife.tech Enterprise SecOps Platform_`;
               <div>
                 <span className="font-semibold text-foreground">1. Ingest SBOMs &amp; CMDB</span>
                 <p className="mt-0.5 text-muted-foreground leading-relaxed">
-                  Upload CycloneDX/SPDX JSON from Trivy, Syft, Wiz, or ServiceNow exports to discover runtime versions.
+                  Upload CycloneDX/SPDX JSON from Trivy, Syft, Wiz, or ServiceNow exports to
+                  discover runtime versions.
                 </p>
               </div>
             </div>
@@ -722,7 +843,8 @@ _Generated by endoflife.tech Enterprise SecOps Platform_`;
               <div>
                 <span className="font-semibold text-foreground">2. CISA KEV Correlation</span>
                 <p className="mt-0.5 text-muted-foreground leading-relaxed">
-                  Correlate end-of-life dates with active in-the-wild zero-days and known exploited vulnerability catalogs.
+                  Correlate end-of-life dates with active in-the-wild zero-days and known exploited
+                  vulnerability catalogs.
                 </p>
               </div>
             </div>
@@ -733,7 +855,8 @@ _Generated by endoflife.tech Enterprise SecOps Platform_`;
               <div>
                 <span className="font-semibold text-foreground">3. GRC Audit Mapping</span>
                 <p className="mt-0.5 text-muted-foreground leading-relaxed">
-                  Flag mandatory vendor-support compliance cutoffs (PCI-DSS 4.0 Req 6.3.3 &amp; NIST 800-53 SA-22).
+                  Flag mandatory vendor-support compliance cutoffs (PCI-DSS 4.0 Req 6.3.3 &amp; NIST
+                  800-53 SA-22).
                 </p>
               </div>
             </div>
@@ -744,7 +867,8 @@ _Generated by endoflife.tech Enterprise SecOps Platform_`;
               <div>
                 <span className="font-semibold text-foreground">4. Jira &amp; Waiver Workflow</span>
                 <p className="mt-0.5 text-muted-foreground leading-relaxed">
-                  Record leadership-approved risk acceptance waivers with compensating controls or export Jira tickets.
+                  Record leadership-approved risk acceptance waivers with compensating controls or
+                  export Jira tickets.
                 </p>
               </div>
             </div>
@@ -791,7 +915,9 @@ _Generated by endoflife.tech Enterprise SecOps Platform_`;
             <div className="bg-card p-4 sm:p-5">
               <div className="flex items-center justify-between text-muted-foreground">
                 <Server className="size-4" />
-                <span className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">Fleet Assets</span>
+                <span className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
+                  Fleet Assets
+                </span>
               </div>
               <p className="mt-3 font-display text-2xl sm:text-3xl font-semibold">{totalFleet}</p>
               <div className="mt-1 flex items-center gap-1.5 text-xs font-medium text-emerald-600 dark:text-emerald-400">
@@ -803,43 +929,70 @@ _Generated by endoflife.tech Enterprise SecOps Platform_`;
             <div className="bg-card p-4 sm:p-5">
               <div className="flex items-center justify-between text-rose-600 dark:text-rose-400">
                 <Flame className="size-4" />
-                <Badge variant="destructive" className="bg-rose-600 hover:bg-rose-700 text-[10px] uppercase font-bold">
+                <Badge
+                  variant="destructive"
+                  className="bg-rose-600 hover:bg-rose-700 text-[10px] uppercase font-bold"
+                >
                   P1 Urgent
                 </Badge>
               </div>
-              <p className="mt-3 font-display text-2xl sm:text-3xl font-semibold text-rose-600 dark:text-rose-400">{cisaKevCount}</p>
-              <p className="mt-1 text-xs font-medium text-muted-foreground">Active CISA KEV Exploitations</p>
+              <p className="mt-3 font-display text-2xl sm:text-3xl font-semibold text-rose-600 dark:text-rose-400">
+                {cisaKevCount}
+              </p>
+              <p className="mt-1 text-xs font-medium text-muted-foreground">
+                Active CISA KEV Exploitations
+              </p>
             </div>
 
             <div className="bg-card p-4 sm:p-5">
               <div className="flex items-center justify-between text-destructive">
                 <AlertTriangle className="size-4" />
-                <Badge variant="destructive" className="text-[10px] uppercase font-bold">Action Needed</Badge>
+                <Badge variant="destructive" className="text-[10px] uppercase font-bold">
+                  Action Needed
+                </Badge>
               </div>
-              <p className="mt-3 font-display text-2xl sm:text-3xl font-semibold text-destructive">{criticalCount}</p>
-              <p className="mt-1 text-xs font-medium text-muted-foreground">Critical (EOL Reached)</p>
+              <p className="mt-3 font-display text-2xl sm:text-3xl font-semibold text-destructive">
+                {criticalCount}
+              </p>
+              <p className="mt-1 text-xs font-medium text-muted-foreground">
+                Critical (EOL Reached)
+              </p>
             </div>
 
             <div className="bg-card p-4 sm:p-5">
               <div className="flex items-center justify-between text-amber-500">
                 <Clock3 className="size-4" />
-                <Badge variant="outline" className="border-amber-300 bg-amber-50 text-[10px] text-amber-700 dark:border-amber-800 dark:bg-amber-950/50 dark:text-amber-300 uppercase font-bold">
+                <Badge
+                  variant="outline"
+                  className="border-amber-300 bg-amber-50 text-[10px] text-amber-700 dark:border-amber-800 dark:bg-amber-950/50 dark:text-amber-300 uppercase font-bold"
+                >
                   PCI-DSS Risk
                 </Badge>
               </div>
-              <p className="mt-3 font-display text-2xl sm:text-3xl font-semibold text-amber-600 dark:text-amber-400">{pciDssViolations}</p>
-              <p className="mt-1 text-xs font-medium text-muted-foreground">PCI 4.0 Req 6.3.3 Gaps</p>
+              <p className="mt-3 font-display text-2xl sm:text-3xl font-semibold text-amber-600 dark:text-amber-400">
+                {pciDssViolations}
+              </p>
+              <p className="mt-1 text-xs font-medium text-muted-foreground">
+                PCI 4.0 Req 6.3.3 Gaps
+              </p>
             </div>
 
             <div className="bg-card p-4 sm:p-5 col-span-2 lg:col-span-1">
               <div className="flex items-center justify-between text-blue-600 dark:text-blue-400">
                 <Shield className="size-4" />
-                <Badge variant="outline" className="border-blue-300 bg-blue-50 text-[10px] text-blue-700 dark:border-blue-800 dark:bg-blue-950/50 dark:text-blue-300 uppercase font-bold">
+                <Badge
+                  variant="outline"
+                  className="border-blue-300 bg-blue-50 text-[10px] text-blue-700 dark:border-blue-800 dark:bg-blue-950/50 dark:text-blue-300 uppercase font-bold"
+                >
                   Exceptions
                 </Badge>
               </div>
-              <p className="mt-3 font-display text-2xl sm:text-3xl font-semibold text-blue-600 dark:text-blue-400">{activeWaiverCount}</p>
-              <p className="mt-1 text-xs font-medium text-muted-foreground">Approved Risk Waivers</p>
+              <p className="mt-3 font-display text-2xl sm:text-3xl font-semibold text-blue-600 dark:text-blue-400">
+                {activeWaiverCount}
+              </p>
+              <p className="mt-1 text-xs font-medium text-muted-foreground">
+                Approved Risk Waivers
+              </p>
             </div>
           </section>
 
@@ -858,7 +1011,10 @@ _Generated by endoflife.tech Enterprise SecOps Platform_`;
                   onChange={(e) => setQuery(e.target.value)}
                   placeholder="Search workload name, platform, version, owner, or CVE..."
                 />
-                <Button type="submit" className="h-10 px-4 gap-1.5 font-medium cursor-pointer shrink-0">
+                <Button
+                  type="submit"
+                  className="h-10 px-4 gap-1.5 font-medium cursor-pointer shrink-0"
+                >
                   <Search className="size-4" />
                   <span>Search</span>
                 </Button>
@@ -903,7 +1059,10 @@ _Generated by endoflife.tech Enterprise SecOps Platform_`;
                   </SelectContent>
                 </Select>
 
-                {(query || riskFilter !== "all" || complianceFilter !== "all" || statusFilter !== "all") && (
+                {(query ||
+                  riskFilter !== "all" ||
+                  complianceFilter !== "all" ||
+                  statusFilter !== "all") && (
                   <Button
                     type="button"
                     variant="outline"
@@ -925,19 +1084,28 @@ _Generated by endoflife.tech Enterprise SecOps Platform_`;
           {/* Results Summary */}
           <div className="mt-5 flex flex-wrap items-center justify-between gap-2">
             <div className="flex items-center gap-2">
-              <p className="text-sm font-semibold">{filteredEnvironments.length} enterprise workloads analyzed</p>
+              <p className="text-sm font-semibold">
+                {filteredEnvironments.length} enterprise workloads analyzed
+              </p>
               {isSampleData ? (
-                <Badge variant="outline" className="border-amber-300 bg-amber-50 text-[10px] font-semibold text-amber-800 dark:border-amber-700 dark:bg-amber-950 dark:text-amber-300">
+                <Badge
+                  variant="outline"
+                  className="border-amber-300 bg-amber-50 text-[10px] font-semibold text-amber-800 dark:border-amber-700 dark:bg-amber-950 dark:text-amber-300"
+                >
                   Simulated SecOps Fleet
                 </Badge>
               ) : (
-                <Badge variant="outline" className="border-emerald-300 bg-emerald-50 text-[10px] font-semibold text-emerald-800 dark:border-emerald-700 dark:bg-emerald-950 dark:text-emerald-300">
+                <Badge
+                  variant="outline"
+                  className="border-emerald-300 bg-emerald-50 text-[10px] font-semibold text-emerald-800 dark:border-emerald-700 dark:bg-emerald-950 dark:text-emerald-300"
+                >
                   Custom Fleet
                 </Badge>
               )}
             </div>
             <p className="text-xs text-muted-foreground">
-              Correlated with CISA KEV exploit intelligence, PCI-DSS 4.0 mandates, and verified upstream schedules
+              Correlated with CISA KEV exploit intelligence, PCI-DSS 4.0 mandates, and verified
+              upstream schedules
             </p>
           </div>
 
@@ -966,8 +1134,8 @@ _Generated by endoflife.tech Enterprise SecOps Platform_`;
                   const cveCount = env.threatIntel?.cveCount;
 
                   return (
-                    <tr 
-                      key={env.id} 
+                    <tr
+                      key={env.id}
                       className={`transition-colors hover:bg-muted/40 ${
                         hasKev && !isWaiver ? "bg-rose-50/25 dark:bg-rose-950/15" : ""
                       }`}
@@ -981,7 +1149,10 @@ _Generated by endoflife.tech Enterprise SecOps Platform_`;
                           </span>
                         </div>
                         <div className="text-xs text-muted-foreground mt-0.5">
-                          Owner: <span className="text-foreground/80 font-medium">{env.business_owner ?? "Unassigned"}</span>
+                          Owner:{" "}
+                          <span className="text-foreground/80 font-medium">
+                            {env.business_owner ?? "Unassigned"}
+                          </span>
                         </div>
                       </td>
 
@@ -1001,17 +1172,31 @@ _Generated by endoflife.tech Enterprise SecOps Platform_`;
                               <Tooltip>
                                 <TooltipTrigger asChild>
                                   <span className="inline-flex items-center gap-1 rounded-full border border-rose-300 bg-rose-50 px-2 py-0.5 text-[11px] font-bold text-rose-700 dark:border-rose-800 dark:bg-rose-950/80 dark:text-rose-300 cursor-help">
-                                    <Flame className="size-3 text-rose-600 animate-pulse" /> CISA KEV: Active Exploit
+                                    <Flame className="size-3 text-rose-600 animate-pulse" /> CISA
+                                    KEV: Active Exploit
                                   </span>
                                 </TooltipTrigger>
-                                <TooltipContent side="top" className="max-w-sm text-xs bg-white text-zinc-900 border border-border shadow-md p-3">
-                                  <p className="font-bold text-rose-600 mb-1">CISA Known Exploited Vulnerability</p>
-                                  <p className="text-zinc-600 leading-snug">
-                                    This software version has unpatched CVEs listed on CISA's official Known Exploited Vulnerabilities catalog with in-the-wild weaponized exploit campaigns.
+                                <TooltipContent
+                                  side="top"
+                                  className="max-w-sm text-xs bg-white text-zinc-900 border border-border shadow-md p-3"
+                                >
+                                  <p className="font-bold text-rose-600 mb-1">
+                                    CISA Known Exploited Vulnerability
                                   </p>
-                                  {env.threatIntel.knownExploitedCves.map(c => (
-                                    <div key={c.cveId} className="mt-1.5 pt-1 border-t border-border/60">
-                                      <span className="font-mono font-bold">{c.cveId} (CVSS {c.cvss})</span>: {c.summary}
+                                  <p className="text-zinc-600 leading-snug">
+                                    This software version has unpatched CVEs listed on CISA's
+                                    official Known Exploited Vulnerabilities catalog with
+                                    in-the-wild weaponized exploit campaigns.
+                                  </p>
+                                  {env.threatIntel.knownExploitedCves.map((c) => (
+                                    <div
+                                      key={c.cveId}
+                                      className="mt-1.5 pt-1 border-t border-border/60"
+                                    >
+                                      <span className="font-mono font-bold">
+                                        {c.cveId} (CVSS {c.cvss})
+                                      </span>
+                                      : {c.summary}
                                     </div>
                                   ))}
                                 </TooltipContent>
@@ -1042,7 +1227,8 @@ _Generated by endoflife.tech Enterprise SecOps Platform_`;
 
                       {/* Compliance Impact */}
                       <td className="px-4 py-4">
-                        {env.threatIntel?.complianceImpacts && env.threatIntel.complianceImpacts.length > 0 ? (
+                        {env.threatIntel?.complianceImpacts &&
+                        env.threatIntel.complianceImpacts.length > 0 ? (
                           <div className="flex flex-wrap gap-1 max-w-[190px]">
                             {env.threatIntel.complianceImpacts.slice(0, 2).map((comp) => (
                               <TooltipProvider key={comp.standard} delayDuration={150}>
@@ -1052,27 +1238,44 @@ _Generated by endoflife.tech Enterprise SecOps Platform_`;
                                       {comp.standard}
                                     </span>
                                   </TooltipTrigger>
-                                  <TooltipContent side="top" className="max-w-xs text-xs bg-white text-zinc-900 border border-border shadow-md p-2.5">
-                                    <p className="font-bold text-zinc-950">{comp.standard} ({comp.section})</p>
+                                  <TooltipContent
+                                    side="top"
+                                    className="max-w-xs text-xs bg-white text-zinc-900 border border-border shadow-md p-2.5"
+                                  >
+                                    <p className="font-bold text-zinc-950">
+                                      {comp.standard} ({comp.section})
+                                    </p>
                                     <p className="font-medium text-zinc-800 mt-0.5">{comp.title}</p>
-                                    <p className="mt-1 text-zinc-600 leading-snug">{comp.mandate}</p>
+                                    <p className="mt-1 text-zinc-600 leading-snug">
+                                      {comp.mandate}
+                                    </p>
                                   </TooltipContent>
                                 </Tooltip>
                               </TooltipProvider>
                             ))}
                           </div>
                         ) : (
-                          <span className="text-xs text-emerald-600 dark:text-emerald-400 font-medium">Compliant</span>
+                          <span className="text-xs text-emerald-600 dark:text-emerald-400 font-medium">
+                            Compliant
+                          </span>
                         )}
                       </td>
 
                       {/* EOL Cutoff / Window */}
                       <td className="px-4 py-4">
                         <div className="text-xs font-medium">{formatDate(env.eol_date)}</div>
-                        <div className={`text-[11px] font-mono ${
-                          isEol ? "text-destructive font-bold" : isHigh ? "text-amber-600 dark:text-amber-400 font-semibold" : "text-muted-foreground"
-                        }`}>
-                          {env.days_to_eol < 0 ? `${Math.abs(env.days_to_eol)}d overdue` : `${env.days_to_eol}d remaining`}
+                        <div
+                          className={`text-[11px] font-mono ${
+                            isEol
+                              ? "text-destructive font-bold"
+                              : isHigh
+                                ? "text-amber-600 dark:text-amber-400 font-semibold"
+                                : "text-muted-foreground"
+                          }`}
+                        >
+                          {env.days_to_eol < 0
+                            ? `${Math.abs(env.days_to_eol)}d overdue`
+                            : `${env.days_to_eol}d remaining`}
                         </div>
                       </td>
 
@@ -1090,11 +1293,20 @@ _Generated by endoflife.tech Enterprise SecOps Platform_`;
                                     <Shield className="size-3" /> {bridge.programName}
                                   </div>
                                 </TooltipTrigger>
-                                <TooltipContent side="top" className="max-w-xs text-xs bg-white text-zinc-900 border border-border shadow-md p-2.5">
+                                <TooltipContent
+                                  side="top"
+                                  className="max-w-xs text-xs bg-white text-zinc-900 border border-border shadow-md p-2.5"
+                                >
                                   <p className="font-bold text-zinc-950">{bridge.provider}</p>
-                                  <p className="font-semibold text-blue-600">{bridge.programName} (Until {bridge.supportedUntil})</p>
-                                  <p className="mt-1 text-zinc-600 leading-snug">{bridge.coverageSummary}</p>
-                                  <p className="mt-1 text-zinc-500 font-mono text-[10px]">Cost model: {bridge.costModel}</p>
+                                  <p className="font-semibold text-blue-600">
+                                    {bridge.programName} (Until {bridge.supportedUntil})
+                                  </p>
+                                  <p className="mt-1 text-zinc-600 leading-snug">
+                                    {bridge.coverageSummary}
+                                  </p>
+                                  <p className="mt-1 text-zinc-500 font-mono text-[10px]">
+                                    Cost model: {bridge.costModel}
+                                  </p>
                                 </TooltipContent>
                               </Tooltip>
                             </TooltipProvider>
@@ -1113,20 +1325,42 @@ _Generated by endoflife.tech Enterprise SecOps Platform_`;
                                     <ShieldCheck className="size-3" /> WAIVER ACTIVE
                                   </span>
                                 </TooltipTrigger>
-                                <TooltipContent side="top" className="max-w-xs text-xs bg-white text-zinc-900 border border-border shadow-md p-2.5">
-                                  <p className="font-bold text-zinc-950">Approved Risk Acceptance Waiver</p>
-                                  <p className="text-zinc-700 mt-0.5">Approved by: <span className="font-medium">{env.riskAccepted?.approvedBy}</span></p>
-                                  <p className="text-zinc-700">Expires: <span className="font-medium">{env.riskAccepted?.expiresAt}</span></p>
-                                  <p className="text-zinc-600 mt-1 italic">"{env.riskAccepted?.compensatingControl}"</p>
+                                <TooltipContent
+                                  side="top"
+                                  className="max-w-xs text-xs bg-white text-zinc-900 border border-border shadow-md p-2.5"
+                                >
+                                  <p className="font-bold text-zinc-950">
+                                    Approved Risk Acceptance Waiver
+                                  </p>
+                                  <p className="text-zinc-700 mt-0.5">
+                                    Approved by:{" "}
+                                    <span className="font-medium">
+                                      {env.riskAccepted?.approvedBy}
+                                    </span>
+                                  </p>
+                                  <p className="text-zinc-700">
+                                    Expires:{" "}
+                                    <span className="font-medium">
+                                      {env.riskAccepted?.expiresAt}
+                                    </span>
+                                  </p>
+                                  <p className="text-zinc-600 mt-1 italic">
+                                    "{env.riskAccepted?.compensatingControl}"
+                                  </p>
                                 </TooltipContent>
                               </Tooltip>
                             </TooltipProvider>
                           ) : hasKev ? (
-                            <Badge variant="destructive" className="bg-rose-600 text-[11px] font-bold">
+                            <Badge
+                              variant="destructive"
+                              className="bg-rose-600 text-[11px] font-bold"
+                            >
                               CRITICAL (KEV)
                             </Badge>
                           ) : isEol ? (
-                            <Badge variant="destructive" className="text-[11px] font-bold">CRITICAL (EOL)</Badge>
+                            <Badge variant="destructive" className="text-[11px] font-bold">
+                              CRITICAL (EOL)
+                            </Badge>
                           ) : isHigh ? (
                             <span className="inline-flex items-center rounded-full border border-amber-300 bg-amber-50 px-2.5 py-0.5 text-[11px] font-semibold text-amber-800 dark:border-amber-700 dark:bg-amber-950 dark:text-amber-300">
                               HIGH
@@ -1138,13 +1372,15 @@ _Generated by endoflife.tech Enterprise SecOps Platform_`;
                           )}
 
                           <div className="text-[11px]">
-                            <span className={`inline-flex items-center rounded px-1.5 py-0.5 text-[10px] font-medium ${
-                              env.migration_status === "In Progress"
-                                ? "bg-blue-100 text-blue-800 dark:bg-blue-950 dark:text-blue-300"
-                                : env.migration_status === "Migration Planned"
-                                ? "bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300"
-                                : "bg-muted text-muted-foreground"
-                            }`}>
+                            <span
+                              className={`inline-flex items-center rounded px-1.5 py-0.5 text-[10px] font-medium ${
+                                env.migration_status === "In Progress"
+                                  ? "bg-blue-100 text-blue-800 dark:bg-blue-950 dark:text-blue-300"
+                                  : env.migration_status === "Migration Planned"
+                                    ? "bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300"
+                                    : "bg-muted text-muted-foreground"
+                              }`}
+                            >
                               {env.migration_status}
                             </span>
                           </div>
@@ -1180,7 +1416,9 @@ _Generated by endoflife.tech Enterprise SecOps Platform_`;
                               size="sm"
                               onClick={() => {
                                 setActiveWaiverEnv(env);
-                                setWaiverControl(`Compensating WAF rules (OWASP CRS) deployed; isolated in private VPC security group for ${env.platform}.`);
+                                setWaiverControl(
+                                  `Compensating WAF rules (OWASP CRS) deployed; isolated in private VPC security group for ${env.platform}.`,
+                                );
                               }}
                               title="Grant formal Risk Acceptance / Exception Waiver"
                               className="h-8 px-2 text-xs"
@@ -1209,7 +1447,9 @@ _Generated by endoflife.tech Enterprise SecOps Platform_`;
               <div className="p-12 text-center">
                 <FileSpreadsheet className="mx-auto size-8 text-muted-foreground opacity-50" />
                 <p className="mt-3 font-semibold">No matching workloads found</p>
-                <p className="mt-1 text-sm text-muted-foreground">Try clearing filters or importing a CycloneDX / SPDX SBOM manifest.</p>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  Try clearing filters or importing a CycloneDX / SPDX SBOM manifest.
+                </p>
               </div>
             )}
           </div>
@@ -1219,9 +1459,24 @@ _Generated by endoflife.tech Enterprise SecOps Platform_`;
           {/* Catalog Priority Watchlist View */}
           <section className="grid gap-px overflow-hidden rounded-lg border border-border bg-border sm:grid-cols-3">
             {[
-              { icon: AlertTriangle, value: catalogEol.length, label: "EOL Catalog Cycles", tone: "text-destructive" },
-              { icon: Clock3, value: catalogSoon.length, label: "Action Needed Cycles", tone: "text-warning" },
-              { icon: CheckCircle2, value: catalogSupported.length, label: "Supported Cycles", tone: "text-success" }
+              {
+                icon: AlertTriangle,
+                value: catalogEol.length,
+                label: "EOL Catalog Cycles",
+                tone: "text-destructive",
+              },
+              {
+                icon: Clock3,
+                value: catalogSoon.length,
+                label: "Action Needed Cycles",
+                tone: "text-warning",
+              },
+              {
+                icon: CheckCircle2,
+                value: catalogSupported.length,
+                label: "Supported Cycles",
+                tone: "text-success",
+              },
             ].map(({ icon: Icon, value, label, tone }) => (
               <div className="bg-card p-5" key={label}>
                 <Icon className={`size-5 ${tone}`} />
@@ -1235,7 +1490,9 @@ _Generated by endoflife.tech Enterprise SecOps Platform_`;
             <div className="mb-3 flex items-end justify-between">
               <div>
                 <h2 className="font-display text-xl font-semibold">Priority Watchlist</h2>
-                <p className="mt-1 text-sm text-muted-foreground">Release cycles across the software catalog requiring immediate attention.</p>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  Release cycles across the software catalog requiring immediate attention.
+                </p>
               </div>
             </div>
             <div className="overflow-hidden rounded-lg border border-border bg-card">
@@ -1266,7 +1523,10 @@ _Generated by endoflife.tech Enterprise SecOps Platform_`;
       )}
 
       {/* 1. Formal Risk Acceptance / Waiver Modal */}
-      <Dialog open={Boolean(activeWaiverEnv)} onOpenChange={(open) => !open && setActiveWaiverEnv(null)}>
+      <Dialog
+        open={Boolean(activeWaiverEnv)}
+        onOpenChange={(open) => !open && setActiveWaiverEnv(null)}
+      >
         <DialogContent className="sm:max-w-lg">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2 text-lg">
@@ -1274,13 +1534,19 @@ _Generated by endoflife.tech Enterprise SecOps Platform_`;
               Formal Risk Acceptance Waiver
             </DialogTitle>
             <DialogDescription>
-              Grant a formal compliance exception and risk acceptance waiver for <strong>{activeWaiverEnv?.platform} {activeWaiverEnv?.version}</strong> deployed in <strong>{activeWaiverEnv?.deployment_env}</strong>.
+              Grant a formal compliance exception and risk acceptance waiver for{" "}
+              <strong>
+                {activeWaiverEnv?.platform} {activeWaiverEnv?.version}
+              </strong>{" "}
+              deployed in <strong>{activeWaiverEnv?.deployment_env}</strong>.
             </DialogDescription>
           </DialogHeader>
 
           <div className="space-y-4 py-2 text-sm">
             <div>
-              <label className="text-xs font-semibold text-foreground">Authorized Approver (CISO / SecOps Lead)</label>
+              <label className="text-xs font-semibold text-foreground">
+                Authorized Approver (CISO / SecOps Lead)
+              </label>
               <Input
                 className="mt-1"
                 value={waiverApprover}
@@ -1290,7 +1556,9 @@ _Generated by endoflife.tech Enterprise SecOps Platform_`;
             </div>
 
             <div>
-              <label className="text-xs font-semibold text-foreground">Waiver Expiration Date</label>
+              <label className="text-xs font-semibold text-foreground">
+                Waiver Expiration Date
+              </label>
               <Input
                 type="date"
                 className="mt-1"
@@ -1298,12 +1566,15 @@ _Generated by endoflife.tech Enterprise SecOps Platform_`;
                 onChange={(e) => setWaiverExpires(e.target.value)}
               />
               <p className="mt-1 text-[11px] text-muted-foreground">
-                Auditors (PCI QSA, SOC 2, ISO) require all risk acceptance waivers to have a finite lifespan not exceeding 12 months.
+                Auditors (PCI QSA, SOC 2, ISO) require all risk acceptance waivers to have a finite
+                lifespan not exceeding 12 months.
               </p>
             </div>
 
             <div>
-              <label className="text-xs font-semibold text-foreground">Mandatory Compensating Controls</label>
+              <label className="text-xs font-semibold text-foreground">
+                Mandatory Compensating Controls
+              </label>
               <Textarea
                 className="mt-1 min-h-[90px]"
                 value={waiverControl}
@@ -1313,7 +1584,9 @@ _Generated by endoflife.tech Enterprise SecOps Platform_`;
             </div>
 
             <div className="rounded-md border border-amber-300 bg-amber-50 p-3 text-xs text-amber-900 dark:border-amber-800 dark:bg-amber-950 dark:text-amber-200 leading-relaxed">
-              <strong>GRC Audit Note:</strong> Approving this waiver documents an authorized exception under PCI-DSS 4.0 Appendix B and NIST SP 800-53 SA-22. It will appear on your formal Executive Audit Report.
+              <strong>GRC Audit Note:</strong> Approving this waiver documents an authorized
+              exception under PCI-DSS 4.0 Appendix B and NIST SP 800-53 SA-22. It will appear on
+              your formal Executive Audit Report.
             </div>
           </div>
 
@@ -1329,7 +1602,10 @@ _Generated by endoflife.tech Enterprise SecOps Platform_`;
       </Dialog>
 
       {/* 2. Jira / ServiceNow Ticket Creation Modal */}
-      <Dialog open={Boolean(activeJiraEnv)} onOpenChange={(open) => !open && setActiveJiraEnv(null)}>
+      <Dialog
+        open={Boolean(activeJiraEnv)}
+        onOpenChange={(open) => !open && setActiveJiraEnv(null)}
+      >
         <DialogContent className="sm:max-w-2xl max-h-[85vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2 text-lg">
@@ -1337,7 +1613,8 @@ _Generated by endoflife.tech Enterprise SecOps Platform_`;
               Export Jira / ServiceNow Remediation Issue
             </DialogTitle>
             <DialogDescription>
-              Copy this pre-formatted enterprise ticket template directly into Jira, Linear, or ServiceNow with complete threat telemetry.
+              Copy this pre-formatted enterprise ticket template directly into Jira, Linear, or
+              ServiceNow with complete threat telemetry.
             </DialogDescription>
           </DialogHeader>
 
@@ -1348,7 +1625,9 @@ _Generated by endoflife.tech Enterprise SecOps Platform_`;
           </div>
 
           <DialogFooter className="flex items-center justify-between sm:justify-between">
-            <span className="text-xs text-muted-foreground">Includes CISA KEV tags, CVE scores &amp; LTS target</span>
+            <span className="text-xs text-muted-foreground">
+              Includes CISA KEV tags, CVE scores &amp; LTS target
+            </span>
             <div className="flex gap-2">
               <Button variant="outline" onClick={() => setActiveJiraEnv(null)}>
                 Close
@@ -1370,7 +1649,10 @@ _Generated by endoflife.tech Enterprise SecOps Platform_`;
       </Dialog>
 
       {/* 3. Threat Intelligence & CVE Details Modal */}
-      <Dialog open={Boolean(activeThreatDetailEnv)} onOpenChange={(open) => !open && setActiveThreatDetailEnv(null)}>
+      <Dialog
+        open={Boolean(activeThreatDetailEnv)}
+        onOpenChange={(open) => !open && setActiveThreatDetailEnv(null)}
+      >
         <DialogContent className="sm:max-w-xl max-h-[85vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2 text-lg">
@@ -1378,7 +1660,11 @@ _Generated by endoflife.tech Enterprise SecOps Platform_`;
               Threat Intelligence &amp; Vulnerability Profile
             </DialogTitle>
             <DialogDescription>
-              Deep CVE telemetry for <strong>{activeThreatDetailEnv?.platform} {activeThreatDetailEnv?.version}</strong> in <strong>{activeThreatDetailEnv?.deployment_env}</strong>.
+              Deep CVE telemetry for{" "}
+              <strong>
+                {activeThreatDetailEnv?.platform} {activeThreatDetailEnv?.version}
+              </strong>{" "}
+              in <strong>{activeThreatDetailEnv?.deployment_env}</strong>.
             </DialogDescription>
           </DialogHeader>
 
@@ -1390,18 +1676,26 @@ _Generated by endoflife.tech Enterprise SecOps Platform_`;
                   CISA Known Exploited Vulnerability (KEV) Flagged
                 </div>
                 <p className="mt-1 text-xs text-rose-800 dark:text-rose-300 leading-relaxed">
-                  The Cybersecurity and Infrastructure Security Agency (CISA) has confirmed active exploitation in the wild against this version. Federal agencies and enterprise SecOps are mandated to remediate or isolate immediately.
+                  The Cybersecurity and Infrastructure Security Agency (CISA) has confirmed active
+                  exploitation in the wild against this version. Federal agencies and enterprise
+                  SecOps are mandated to remediate or isolate immediately.
                 </p>
                 <div className="mt-3 space-y-2">
                   {activeThreatDetailEnv.threatIntel.knownExploitedCves.map((cve) => (
-                    <div key={cve.cveId} className="rounded border border-rose-200 bg-white/80 p-2.5 text-xs text-zinc-900 dark:border-rose-800 dark:bg-zinc-900 dark:text-zinc-100">
+                    <div
+                      key={cve.cveId}
+                      className="rounded border border-rose-200 bg-white/80 p-2.5 text-xs text-zinc-900 dark:border-rose-800 dark:bg-zinc-900 dark:text-zinc-100"
+                    >
                       <div className="flex items-center justify-between">
                         <span className="font-mono font-bold text-rose-600">{cve.cveId}</span>
                         <span className="font-semibold text-rose-700">CVSS {cve.cvss}</span>
                       </div>
                       <p className="mt-1 text-muted-foreground leading-normal">{cve.summary}</p>
                       <div className="mt-2 flex items-center justify-between text-[11px] text-zinc-600 dark:text-zinc-400">
-                        <span>Ransomware Campaign: <strong>{cve.ransomwareUse ? "Confirmed" : "None Detected"}</strong></span>
+                        <span>
+                          Ransomware Campaign:{" "}
+                          <strong>{cve.ransomwareUse ? "Confirmed" : "None Detected"}</strong>
+                        </span>
                         <span>Added to KEV: {cve.dateAddedToKev}</span>
                       </div>
                     </div>
@@ -1411,7 +1705,9 @@ _Generated by endoflife.tech Enterprise SecOps Platform_`;
             ) : (
               <div className="rounded-lg border border-emerald-300 bg-emerald-50 p-3 text-emerald-950 dark:border-emerald-900 dark:bg-emerald-950/60 dark:text-emerald-200 flex items-center gap-2">
                 <ShieldCheck className="size-4 text-emerald-600" />
-                <span>No active zero-day exploits or CISA KEV listings registered for this branch.</span>
+                <span>
+                  No active zero-day exploits or CISA KEV listings registered for this branch.
+                </span>
               </div>
             )}
 
@@ -1419,27 +1715,42 @@ _Generated by endoflife.tech Enterprise SecOps Platform_`;
             <div className="grid grid-cols-3 gap-3">
               <div className="rounded-lg border border-border bg-card p-3 text-center">
                 <span className="text-xs text-muted-foreground">Critical CVEs</span>
-                <p className="text-xl font-bold text-rose-600">{activeThreatDetailEnv?.threatIntel?.cveCount?.critical ?? 0}</p>
+                <p className="text-xl font-bold text-rose-600">
+                  {activeThreatDetailEnv?.threatIntel?.cveCount?.critical ?? 0}
+                </p>
               </div>
               <div className="rounded-lg border border-border bg-card p-3 text-center">
                 <span className="text-xs text-muted-foreground">High CVEs</span>
-                <p className="text-xl font-bold text-amber-600">{activeThreatDetailEnv?.threatIntel?.cveCount?.high ?? 0}</p>
+                <p className="text-xl font-bold text-amber-600">
+                  {activeThreatDetailEnv?.threatIntel?.cveCount?.high ?? 0}
+                </p>
               </div>
               <div className="rounded-lg border border-border bg-card p-3 text-center">
                 <span className="text-xs text-muted-foreground">Medium CVEs</span>
-                <p className="text-xl font-bold text-muted-foreground">{activeThreatDetailEnv?.threatIntel?.cveCount?.medium ?? 0}</p>
+                <p className="text-xl font-bold text-muted-foreground">
+                  {activeThreatDetailEnv?.threatIntel?.cveCount?.medium ?? 0}
+                </p>
               </div>
             </div>
 
             {/* Compliance Impacts */}
             <div>
-              <h4 className="font-semibold text-foreground text-xs uppercase tracking-wider">Applicable Compliance Frameworks</h4>
+              <h4 className="font-semibold text-foreground text-xs uppercase tracking-wider">
+                Applicable Compliance Frameworks
+              </h4>
               <div className="mt-2 space-y-2">
                 {(activeThreatDetailEnv?.threatIntel?.complianceImpacts || []).map((c) => (
-                  <div key={c.standard} className="rounded-lg border border-border bg-muted/30 p-2.5 text-xs">
+                  <div
+                    key={c.standard}
+                    className="rounded-lg border border-border bg-muted/30 p-2.5 text-xs"
+                  >
                     <div className="flex items-center justify-between font-semibold text-foreground">
-                      <span>{c.standard} ({c.section})</span>
-                      <span className="text-[10px] text-destructive uppercase font-bold">{c.auditRisk} Risk</span>
+                      <span>
+                        {c.standard} ({c.section})
+                      </span>
+                      <span className="text-[10px] text-destructive uppercase font-bold">
+                        {c.auditRisk} Risk
+                      </span>
                     </div>
                     <p className="mt-1 text-muted-foreground leading-relaxed">{c.mandate}</p>
                   </div>
@@ -1465,12 +1776,22 @@ _Generated by endoflife.tech Enterprise SecOps Platform_`;
                 <FileCheck2 className="size-6 text-primary" />
                 <span>Executive EOL &amp; Software Supply Chain Audit Report</span>
               </div>
-              <Badge variant="outline" className="border-emerald-300 bg-emerald-50 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300">
+              <Badge
+                variant="outline"
+                className="border-emerald-300 bg-emerald-50 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300"
+              >
                 Audit Ready
               </Badge>
             </DialogTitle>
             <DialogDescription>
-              Prepared for GRC Auditors (PCI QSA, SOC 2 Type II, ISO 27001 Lead Auditor). Generated on {new Date().toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}.
+              Prepared for GRC Auditors (PCI QSA, SOC 2 Type II, ISO 27001 Lead Auditor). Generated
+              on{" "}
+              {new Date().toLocaleDateString("en-US", {
+                year: "numeric",
+                month: "long",
+                day: "numeric",
+              })}
+              .
             </DialogDescription>
           </DialogHeader>
 
@@ -1478,31 +1799,45 @@ _Generated by endoflife.tech Enterprise SecOps Platform_`;
             {/* Audit Executive Summary Grid */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
               <div className="rounded-xl border border-border bg-card p-4 text-center">
-                <span className="text-xs text-muted-foreground font-semibold">Fleet Compliance Score</span>
+                <span className="text-xs text-muted-foreground font-semibold">
+                  Fleet Compliance Score
+                </span>
                 <p className="text-3xl font-bold text-emerald-600 mt-1">{complianceScore}%</p>
               </div>
               <div className="rounded-xl border border-border bg-card p-4 text-center">
-                <span className="text-xs text-muted-foreground font-semibold">Total Fleet Workloads</span>
+                <span className="text-xs text-muted-foreground font-semibold">
+                  Total Fleet Workloads
+                </span>
                 <p className="text-3xl font-bold text-foreground mt-1">{totalFleet}</p>
               </div>
               <div className="rounded-xl border border-border bg-card p-4 text-center">
-                <span className="text-xs text-muted-foreground font-semibold">Active KEV Exploits</span>
+                <span className="text-xs text-muted-foreground font-semibold">
+                  Active KEV Exploits
+                </span>
                 <p className="text-3xl font-bold text-rose-600 mt-1">{cisaKevCount}</p>
               </div>
               <div className="rounded-xl border border-border bg-card p-4 text-center">
-                <span className="text-xs text-muted-foreground font-semibold">Approved Risk Waivers</span>
+                <span className="text-xs text-muted-foreground font-semibold">
+                  Approved Risk Waivers
+                </span>
                 <p className="text-3xl font-bold text-blue-600 mt-1">{activeWaiverCount}</p>
               </div>
             </div>
 
             {/* Framework Evaluation Breakdown */}
             <div className="rounded-xl border border-border bg-card p-5">
-              <h4 className="font-display font-semibold text-base">Regulatory Framework Assessment</h4>
+              <h4 className="font-display font-semibold text-base">
+                Regulatory Framework Assessment
+              </h4>
               <div className="mt-3 space-y-3 text-xs">
                 <div className="flex items-center justify-between p-2.5 rounded-lg border border-border bg-muted/40">
                   <div>
-                    <span className="font-bold text-foreground">PCI-DSS 4.0 (Requirement 6.3.3)</span>
-                    <p className="text-muted-foreground mt-0.5">Mandates all software system components be actively supported by vendors.</p>
+                    <span className="font-bold text-foreground">
+                      PCI-DSS 4.0 (Requirement 6.3.3)
+                    </span>
+                    <p className="text-muted-foreground mt-0.5">
+                      Mandates all software system components be actively supported by vendors.
+                    </p>
                   </div>
                   <Badge variant={pciDssViolations === 0 ? "outline" : "destructive"}>
                     {pciDssViolations === 0 ? "PASSED" : `${pciDssViolations} Deficiencies`}
@@ -1511,8 +1846,12 @@ _Generated by endoflife.tech Enterprise SecOps Platform_`;
 
                 <div className="flex items-center justify-between p-2.5 rounded-lg border border-border bg-muted/40">
                   <div>
-                    <span className="font-bold text-foreground">NIST SP 800-53 (Control SA-22 &amp; SI-2)</span>
-                    <p className="text-muted-foreground mt-0.5">Mandates replacement of software components when support expires.</p>
+                    <span className="font-bold text-foreground">
+                      NIST SP 800-53 (Control SA-22 &amp; SI-2)
+                    </span>
+                    <p className="text-muted-foreground mt-0.5">
+                      Mandates replacement of software components when support expires.
+                    </p>
                   </div>
                   <Badge variant={criticalCount === 0 ? "outline" : "destructive"}>
                     {criticalCount === 0 ? "PASSED" : `${criticalCount} Non-Compliant`}
@@ -1522,7 +1861,9 @@ _Generated by endoflife.tech Enterprise SecOps Platform_`;
                 <div className="flex items-center justify-between p-2.5 rounded-lg border border-border bg-muted/40">
                   <div>
                     <span className="font-bold text-foreground">ISO 27001 (Control A.8.8)</span>
-                    <p className="text-muted-foreground mt-0.5">Management of technical vulnerabilities and exposure mitigation.</p>
+                    <p className="text-muted-foreground mt-0.5">
+                      Management of technical vulnerabilities and exposure mitigation.
+                    </p>
                   </div>
                   <Badge variant={cisaKevCount === 0 ? "outline" : "destructive"}>
                     {cisaKevCount === 0 ? "PASSED" : `${cisaKevCount} High Exploits`}
@@ -1534,13 +1875,18 @@ _Generated by endoflife.tech Enterprise SecOps Platform_`;
             {/* Formal Risk Acceptance Register Table */}
             <div className="rounded-xl border border-border bg-card p-5">
               <div className="flex items-center justify-between mb-3">
-                <h4 className="font-display font-semibold text-base">Formal Risk Acceptance Register (Waivers)</h4>
-                <span className="text-xs text-muted-foreground">{activeWaiverCount} Approved Exceptions</span>
+                <h4 className="font-display font-semibold text-base">
+                  Formal Risk Acceptance Register (Waivers)
+                </h4>
+                <span className="text-xs text-muted-foreground">
+                  {activeWaiverCount} Approved Exceptions
+                </span>
               </div>
 
               {activeWaiverCount === 0 ? (
                 <p className="text-xs text-muted-foreground italic">
-                  No active risk waivers recorded. All non-compliant components require active engineering remediation.
+                  No active risk waivers recorded. All non-compliant components require active
+                  engineering remediation.
                 </p>
               ) : (
                 <div className="overflow-x-auto">
@@ -1555,15 +1901,27 @@ _Generated by endoflife.tech Enterprise SecOps Platform_`;
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-border">
-                      {environments.filter(e => e.riskAccepted).map(e => (
-                        <tr key={e.id}>
-                          <td className="p-2 font-semibold text-foreground">{e.deployment_env}</td>
-                          <td className="p-2">{e.platform} {e.version}</td>
-                          <td className="p-2 text-muted-foreground">{e.riskAccepted?.approvedBy}</td>
-                          <td className="p-2 font-mono text-emerald-600">{e.riskAccepted?.expiresAt}</td>
-                          <td className="p-2 text-muted-foreground italic max-w-xs">{e.riskAccepted?.compensatingControl}</td>
-                        </tr>
-                      ))}
+                      {environments
+                        .filter((e) => e.riskAccepted)
+                        .map((e) => (
+                          <tr key={e.id}>
+                            <td className="p-2 font-semibold text-foreground">
+                              {e.deployment_env}
+                            </td>
+                            <td className="p-2">
+                              {e.platform} {e.version}
+                            </td>
+                            <td className="p-2 text-muted-foreground">
+                              {e.riskAccepted?.approvedBy}
+                            </td>
+                            <td className="p-2 font-mono text-emerald-600">
+                              {e.riskAccepted?.expiresAt}
+                            </td>
+                            <td className="p-2 text-muted-foreground italic max-w-xs">
+                              {e.riskAccepted?.compensatingControl}
+                            </td>
+                          </tr>
+                        ))}
                     </tbody>
                   </table>
                 </div>
@@ -1572,24 +1930,29 @@ _Generated by endoflife.tech Enterprise SecOps Platform_`;
 
             {/* 30/60/90 Day Exposure Horizon */}
             <div className="rounded-xl border border-border bg-card p-5">
-              <h4 className="font-display font-semibold text-base mb-2">Upcoming 30 / 60 / 90-Day Exposure Forecast</h4>
+              <h4 className="font-display font-semibold text-base mb-2">
+                Upcoming 30 / 60 / 90-Day Exposure Forecast
+              </h4>
               <div className="grid grid-cols-3 gap-3 text-center text-xs">
                 <div className="rounded-lg border border-border bg-muted/40 p-3">
                   <span className="text-muted-foreground">&lt; 30 Days to EOL</span>
                   <p className="text-xl font-bold text-rose-600 mt-1">
-                    {environments.filter(e => e.days_to_eol >= 0 && e.days_to_eol <= 30).length} Workloads
+                    {environments.filter((e) => e.days_to_eol >= 0 && e.days_to_eol <= 30).length}{" "}
+                    Workloads
                   </p>
                 </div>
                 <div className="rounded-lg border border-border bg-muted/40 p-3">
                   <span className="text-muted-foreground">&lt; 60 Days to EOL</span>
                   <p className="text-xl font-bold text-amber-600 mt-1">
-                    {environments.filter(e => e.days_to_eol > 30 && e.days_to_eol <= 60).length} Workloads
+                    {environments.filter((e) => e.days_to_eol > 30 && e.days_to_eol <= 60).length}{" "}
+                    Workloads
                   </p>
                 </div>
                 <div className="rounded-lg border border-border bg-muted/40 p-3">
                   <span className="text-muted-foreground">&lt; 90 Days to EOL</span>
                   <p className="text-xl font-bold text-foreground mt-1">
-                    {environments.filter(e => e.days_to_eol > 60 && e.days_to_eol <= 90).length} Workloads
+                    {environments.filter((e) => e.days_to_eol > 60 && e.days_to_eol <= 90).length}{" "}
+                    Workloads
                   </p>
                 </div>
               </div>
@@ -1597,7 +1960,9 @@ _Generated by endoflife.tech Enterprise SecOps Platform_`;
           </div>
 
           <DialogFooter className="flex items-center justify-between sm:justify-between border-t border-border pt-3">
-            <span className="text-xs text-muted-foreground">Certified compliance audit snapshot</span>
+            <span className="text-xs text-muted-foreground">
+              Certified compliance audit snapshot
+            </span>
             <div className="flex gap-2">
               <Button variant="outline" onClick={() => setShowAuditReport(false)}>
                 Close
@@ -1619,7 +1984,8 @@ _Generated by endoflife.tech Enterprise SecOps Platform_`;
               Scanner Connectors &amp; CI/CD Ingestion Guides
             </DialogTitle>
             <DialogDescription>
-              Export software inventories directly from your enterprise scanners into endoflife.tech.
+              Export software inventories directly from your enterprise scanners into
+              endoflife.tech.
             </DialogDescription>
           </DialogHeader>
 
@@ -1632,16 +1998,20 @@ _Generated by endoflife.tech Enterprise SecOps Platform_`;
 
             <TabsContent value="cli" className="space-y-3 pt-3 text-xs leading-relaxed">
               <p className="text-muted-foreground">
-                Run our official lightweight CLI in GitHub Actions, GitLab CI, or Jenkins to automatically fail PRs when an unsupported or EOL runtime is introduced:
+                Run our official lightweight CLI in GitHub Actions, GitLab CI, or Jenkins to
+                automatically fail PRs when an unsupported or EOL runtime is introduced:
               </p>
               <div className="rounded-md bg-muted p-3 font-mono">
-                # Audit any CycloneDX or SPDX SBOM file in your pipeline<br />
+                # Audit any CycloneDX or SPDX SBOM file in your pipeline
+                <br />
                 npx endoflife-check ./sbom.json
               </div>
               <div className="rounded-md border border-border p-3 space-y-1">
-                <span className="font-semibold text-foreground">GitHub Actions Workflow Snippet:</span>
+                <span className="font-semibold text-foreground">
+                  GitHub Actions Workflow Snippet:
+                </span>
                 <pre className="font-mono text-[11px] text-muted-foreground overflow-x-auto">
-{`- name: Audit EOL & KEV Risks
+                  {`- name: Audit EOL & KEV Risks
   run: |
     trivy fs --format cyclonedx --output sbom.json .
     npx endoflife-check ./sbom.json`}
@@ -1651,7 +2021,8 @@ _Generated by endoflife.tech Enterprise SecOps Platform_`;
 
             <TabsContent value="scanners" className="space-y-3 pt-3 text-xs leading-relaxed">
               <p className="text-muted-foreground">
-                Generate CycloneDX or SPDX SBOMs using popular open-source container and filesystem scanners:
+                Generate CycloneDX or SPDX SBOMs using popular open-source container and filesystem
+                scanners:
               </p>
               <div className="space-y-2">
                 <div className="rounded-md border border-border p-3">
@@ -1674,17 +2045,24 @@ _Generated by endoflife.tech Enterprise SecOps Platform_`;
                 Export inventory tables from enterprise asset discovery and CMDB solutions:
               </p>
               <ul className="list-disc pl-4 space-y-1.5 text-muted-foreground">
-                <li><strong>AWS Systems Manager (SSM) Inventory:</strong> Export installed software packages via AWS CLI as JSON or CSV.</li>
-                <li><strong>Wiz / Qualys / Rapid7:</strong> Go to Vulnerability Management &rarr; Asset Inventory &rarr; Export as CycloneDX SBOM.</li>
-                <li><strong>ServiceNow CMDB:</strong> Query the <code>cmdb_ci_appl</code> or <code>cmdb_ci_spkg</code> tables via REST Table API and upload the resulting JSON.</li>
+                <li>
+                  <strong>AWS Systems Manager (SSM) Inventory:</strong> Export installed software
+                  packages via AWS CLI as JSON or CSV.
+                </li>
+                <li>
+                  <strong>Wiz / Qualys / Rapid7:</strong> Go to Vulnerability Management &rarr;
+                  Asset Inventory &rarr; Export as CycloneDX SBOM.
+                </li>
+                <li>
+                  <strong>ServiceNow CMDB:</strong> Query the <code>cmdb_ci_appl</code> or{" "}
+                  <code>cmdb_ci_spkg</code> tables via REST Table API and upload the resulting JSON.
+                </li>
               </ul>
             </TabsContent>
           </Tabs>
 
           <DialogFooter>
-            <Button onClick={() => setShowConnectorsModal(false)}>
-              Got it
-            </Button>
+            <Button onClick={() => setShowConnectorsModal(false)}>Got it</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

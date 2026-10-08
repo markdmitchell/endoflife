@@ -2,28 +2,53 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { ArrowRight, Boxes, CalendarClock, Flame, Search, ShieldCheck } from "lucide-react";
 import { useMemo, useState } from "react";
-import { 
-  getCatalog, 
-  getCatalogStats, 
-  getCachedCatalogStats, 
-  DEFAULT_CATALOG_STATS, 
-  formatCategoryName, 
-  type LifecycleStatus 
+import {
+  getCatalog,
+  getCatalogStats,
+  getCachedCatalogStats,
+  DEFAULT_CATALOG_STATS,
+  formatCategoryName,
+  type LifecycleStatus,
 } from "@/lib/catalog";
 import { getThreatIntel } from "@/lib/threat-intel";
 import { PageHeader, StatusBadge } from "@/components/app-shell";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 export const Route = createFileRoute("/")({
   staticData: { sitemap: true },
-  head: () => ({ meta: [{ title: "endoflife.tech - Product Lifecycle Intelligence" }, { name: "description", content: "Search software releases, support windows, and end-of-life dates." }, { property: "og:title", content: "endoflife.tech - Product Lifecycle Intelligence" }, { property: "og:description", content: "Search software releases, support windows, and end-of-life dates." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary_large_image" }] }),
+  head: () => ({
+    meta: [
+      { title: "endoflife.tech - Product Lifecycle Intelligence" },
+      {
+        name: "description",
+        content: "Search software releases, support windows, and end-of-life dates.",
+      },
+      { property: "og:title", content: "endoflife.tech - Product Lifecycle Intelligence" },
+      {
+        property: "og:description",
+        content: "Search software releases, support windows, and end-of-life dates.",
+      },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
+    ],
+  }),
   component: CatalogPage,
 });
 
 function CatalogPage() {
-  const { data = [], isLoading, error } = useQuery({
+  const {
+    data = [],
+    isLoading,
+    error,
+  } = useQuery({
     queryKey: ["catalog"],
     queryFn: getCatalog,
     staleTime: 1000 * 60 * 30,
@@ -42,20 +67,26 @@ function CatalogPage() {
   const [hasSearched, setHasSearched] = useState(false);
 
   const categories = useMemo(
-    () => [...new Set(data.map((p) => p.category))].sort((a, b) => formatCategoryName(a).localeCompare(formatCategoryName(b))),
-    [data]
+    () =>
+      [...new Set(data.map((p) => p.category))].sort((a, b) =>
+        formatCategoryName(a).localeCompare(formatCategoryName(b)),
+      ),
+    [data],
   );
 
   const filtered = useMemo(() => {
     if (!hasSearched) return [];
     return data.filter((p) => {
-      const text = `${p.name} ${p.vendor} ${p.category} ${formatCategoryName(p.category)} ${p.slug}`.toLowerCase();
+      const text =
+        `${p.name} ${p.vendor} ${p.category} ${formatCategoryName(p.category)} ${p.slug}`.toLowerCase();
       const cycles = Array.isArray(p.release_cycles) ? p.release_cycles : [];
       const statuses = cycles.map((r) => r.status);
-      
+
       let matchStatus = true;
       if (status === "cisa_kev") {
-        matchStatus = cycles.some((c) => getThreatIntel(p.name, c.cycle, c.status === "end_of_life").hasCisaKev);
+        matchStatus = cycles.some(
+          (c) => getThreatIntel(p.name, c.cycle, c.status === "end_of_life").hasCisaKev,
+        );
       } else if (status === "pci_dss") {
         matchStatus = statuses.includes("end_of_life");
       } else if (status !== "all") {
@@ -137,7 +168,9 @@ function CatalogPage() {
           <div className="font-display text-3xl font-semibold text-foreground">
             {provenanceCount.toLocaleString()}
           </div>
-          <p className="mt-1 text-xs font-medium text-muted-foreground">Verified Provenance Records</p>
+          <p className="mt-1 text-xs font-medium text-muted-foreground">
+            Verified Provenance Records
+          </p>
         </div>
       </section>
 
@@ -224,7 +257,8 @@ function CatalogPage() {
       {!hasSearched ? (
         <div className="rounded-xl border border-dashed border-border bg-card/40 p-10 text-center my-2 shadow-2xs">
           <p className="mx-auto max-w-md text-sm text-muted-foreground">
-            Enter a product or vendor above to look up support lifecycles, or click below to view the full product index.
+            Enter a product or vendor above to look up support lifecycles, or click below to view
+            the full product index.
           </p>
           <div className="mt-4 flex items-center justify-center gap-3">
             <Button
@@ -263,11 +297,13 @@ function CatalogPage() {
             {filtered.map((product, i) => {
               const cycles = Array.isArray(product.release_cycles)
                 ? [...product.release_cycles].sort((a, b) =>
-                    (b.release_date ?? "").localeCompare(a.release_date ?? "")
+                    (b.release_date ?? "").localeCompare(a.release_date ?? ""),
                   )
                 : [];
               const top = cycles[0];
-              const hasKev = cycles.some((c) => getThreatIntel(product.name, c.cycle, c.status === "end_of_life").hasCisaKev);
+              const hasKev = cycles.some(
+                (c) => getThreatIntel(product.name, c.cycle, c.status === "end_of_life").hasCisaKev,
+              );
               const hasEol = cycles.some((c) => c.status === "end_of_life");
 
               return (
@@ -305,7 +341,9 @@ function CatalogPage() {
                     <p className="text-[11px] font-semibold uppercase text-muted-foreground">
                       Current cycle
                     </p>
-                    <p className="mt-1 text-sm font-medium font-mono">{top?.cycle ?? "Not indexed"}</p>
+                    <p className="mt-1 text-sm font-medium font-mono">
+                      {top?.cycle ?? "Not indexed"}
+                    </p>
                   </div>
                   <div>
                     {top ? (

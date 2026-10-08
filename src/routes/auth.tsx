@@ -37,7 +37,9 @@ function Auth() {
     let mounted = true;
     async function checkAuth() {
       try {
-        const { data: { session } } = await supabase.auth.getSession();
+        const {
+          data: { session },
+        } = await supabase.auth.getSession();
         if (mounted) {
           setCurrentUserEmail(session?.user?.email ?? null);
           setIsCheckingAuth(false);
@@ -49,7 +51,9 @@ function Auth() {
 
     void checkAuth();
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
       if (mounted) {
         setCurrentUserEmail(session?.user?.email ?? null);
       }
@@ -207,12 +211,7 @@ function Auth() {
           <span className="h-px flex-1 bg-border" />
         </div>
 
-        <Button
-          type="button"
-          variant="outline"
-          className="w-full cursor-pointer"
-          onClick={google}
-        >
+        <Button type="button" variant="outline" className="w-full cursor-pointer" onClick={google}>
           Continue with Google
         </Button>
 

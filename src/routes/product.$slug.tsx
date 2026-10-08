@@ -1,6 +1,20 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { ArrowLeft, ArrowRight, Check, Copy, ExternalLink, Flame, HelpCircle, Shield, ShieldAlert, ShieldCheck, Sparkles, Terminal, Ticket } from "lucide-react";
+import {
+  ArrowLeft,
+  ArrowRight,
+  Check,
+  Copy,
+  ExternalLink,
+  Flame,
+  HelpCircle,
+  Shield,
+  ShieldAlert,
+  ShieldCheck,
+  Sparkles,
+  Terminal,
+  Ticket,
+} from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import {
@@ -14,12 +28,7 @@ import { getThreatIntel } from "@/lib/threat-intel";
 import { PageHeader } from "@/components/app-shell";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 function displayName(slug?: string) {
   if (!slug) return "Product";
@@ -123,15 +132,15 @@ function TableStatusBadge({ status }: { status: LifecycleStatus | string }) {
     status === "end_of_life"
       ? "end_of_life"
       : status === "approaching_eol"
-      ? "approaching_eol"
-      : "supported";
+        ? "approaching_eol"
+        : "supported";
 
   const label =
     norm === "end_of_life"
       ? "End of Life (EOL)"
       : norm === "approaching_eol"
-      ? "Action Needed"
-      : "Supported";
+        ? "Action Needed"
+        : "Supported";
 
   const info = STATUS_EXPLANATIONS[norm];
 
@@ -146,7 +155,10 @@ function TableStatusBadge({ status }: { status: LifecycleStatus | string }) {
             {label}
           </span>
         </TooltipTrigger>
-        <TooltipContent side="top" className="max-w-xs text-xs bg-white text-zinc-900 border border-border shadow-md p-2.5">
+        <TooltipContent
+          side="top"
+          className="max-w-xs text-xs bg-white text-zinc-900 border border-border shadow-md p-2.5"
+        >
           <p className="font-semibold text-zinc-950">{info.title}</p>
           <p className="mt-0.5 text-zinc-600 leading-snug">{info.description}</p>
         </TooltipContent>
@@ -157,7 +169,10 @@ function TableStatusBadge({ status }: { status: LifecycleStatus | string }) {
 
 export const Route = createFileRoute("/product/$slug")({
   staticData: { sitemap: true },
-  head: (ctx) => headMeta(ctx?.params?.slug ?? (ctx as any)?.match?.params?.slug),
+  head: (ctx) =>
+    headMeta(
+      ctx?.params?.slug ?? (ctx as { match?: { params?: { slug?: string } } })?.match?.params?.slug,
+    ),
   component: ProductPage,
 });
 
@@ -171,7 +186,9 @@ function ProductPage() {
     queryFn: () => (slug ? getProduct(slug) : null),
     enabled: Boolean(slug),
     initialData: () => {
-      const catalog = queryClient.getQueryData<any[]>(["catalog"]);
+      const catalog = queryClient.getQueryData<Array<{ slug: string; release_cycles?: unknown[] }>>(
+        ["catalog"],
+      );
       if (Array.isArray(catalog)) {
         const found = catalog.find((p) => p.slug === slug);
         if (found && Array.isArray(found.release_cycles) && found.release_cycles.length > 0) {
@@ -184,12 +201,19 @@ function ProductPage() {
 
   const [copied, setCopied] = useState(false);
 
-  if (isLoading && !data) return <div className="py-20 text-center text-sm text-muted-foreground">Loading product record…</div>;
+  if (isLoading && !data)
+    return (
+      <div className="py-20 text-center text-sm text-muted-foreground">Loading product record…</div>
+    );
 
   if (error || !data)
     return (
       <div>
-        <PageHeader eyebrow="Not found" title="Product unavailable" description="This product may have moved or is not indexed." />
+        <PageHeader
+          eyebrow="Not found"
+          title="Product unavailable"
+          description="This product may have moved or is not indexed."
+        />
         <Button asChild variant="outline">
           <Link to="/">
             <ArrowLeft className="mr-1.5 size-4" />
@@ -200,11 +224,15 @@ function ProductPage() {
     );
 
   const rawCycles = Array.isArray(data.release_cycles) ? data.release_cycles : [];
-  const cycles = [...rawCycles].sort((a, b) => (b.release_date ?? "").localeCompare(a.release_date ?? ""));
+  const cycles = [...rawCycles].sort((a, b) =>
+    (b.release_date ?? "").localeCompare(a.release_date ?? ""),
+  );
   const tags = parseTags(data.description, data.category, slug);
   const verifyCmd = getVerificationCommand(slug, data.name);
-  const sourceName = data.provenance?.source_name ?? data.data_sources?.name ?? "endoflife.date API v1";
-  const sourceUrl = data.provenance?.source_url ?? data.data_sources?.source_url ?? (data.homepage_url || null);
+  const sourceName =
+    data.provenance?.source_name ?? data.data_sources?.name ?? "endoflife.date API v1";
+  const sourceUrl =
+    data.provenance?.source_url ?? data.data_sources?.source_url ?? (data.homepage_url || null);
   const license = data.provenance?.license ?? data.data_sources?.license ?? "CC0 1.0 Universal";
   const confidenceScore = data.provenance?.confidence_score ?? 1;
 
@@ -232,10 +260,13 @@ function ProductPage() {
             <span className="text-xl">📦</span>
             <h1 className="text-xl font-bold tracking-tight text-foreground">
               {data.name}{" "}
-              <span className="font-mono text-sm font-normal text-muted-foreground">({data.slug})</span>
+              <span className="font-mono text-sm font-normal text-muted-foreground">
+                ({data.slug})
+              </span>
             </h1>
             <span className="text-sm text-muted-foreground">
-              — Vendor: <strong className="text-foreground">{data.vendor || "N/A"}</strong> | Category:{" "}
+              — Vendor: <strong className="text-foreground">{data.vendor || "N/A"}</strong> |
+              Category:{" "}
               <span className="rounded bg-muted px-2 py-0.5 text-xs font-semibold text-foreground">
                 {formatCategoryName(data.category)}
               </span>
@@ -267,15 +298,18 @@ function ProductPage() {
               <div className="mt-4 rounded-lg border border-border bg-muted/40 p-3.5">
                 <div className="flex items-center justify-between text-[11px] font-mono italic text-muted-foreground">
                   <span className="flex items-center gap-1.5">
-                    <Terminal className="size-3 text-primary" />
-                    # Version Verification Command
+                    <Terminal className="size-3 text-primary" /># Version Verification Command
                   </span>
                   <button
                     onClick={handleCopyCommand}
                     className="flex items-center gap-1 text-[10px] text-muted-foreground transition-colors hover:text-foreground cursor-pointer"
                     title="Copy command"
                   >
-                    {copied ? <Check className="size-3 text-emerald-500" /> : <Copy className="size-3" />}
+                    {copied ? (
+                      <Check className="size-3 text-emerald-500" />
+                    ) : (
+                      <Copy className="size-3" />
+                    )}
                     <span>{copied ? "Copied" : "Copy"}</span>
                   </button>
                 </div>
@@ -331,10 +365,12 @@ function ProductPage() {
             role="alert"
             className="mt-4 rounded-lg border border-amber-300 bg-amber-50 p-3.5 text-xs text-amber-900 dark:border-amber-800 dark:bg-amber-950/40 dark:text-amber-200"
           >
-            <strong className="font-semibold">Unverified lifecycle data.</strong>{" "}
-            The release and end-of-life dates for this product have not yet been confirmed against vendor
-            lifecycle documentation and should not be used for compliance or remediation decisions.
-            {data.provenance?.notes ? <span className="mt-1 block opacity-80">{data.provenance.notes}</span> : null}
+            <strong className="font-semibold">Unverified lifecycle data.</strong> The release and
+            end-of-life dates for this product have not yet been confirmed against vendor lifecycle
+            documentation and should not be used for compliance or remediation decisions.
+            {data.provenance?.notes ? (
+              <span className="mt-1 block opacity-80">{data.provenance.notes}</span>
+            ) : null}
           </div>
         )}
       </section>
@@ -342,8 +378,12 @@ function ProductPage() {
       {/* Enterprise SecOps & Compliance Telemetry Panel */}
       {(() => {
         const top = cycles[0];
-        const intel = getThreatIntel(data.name, top?.cycle ?? "latest", top?.status === "end_of_life");
-        const hasEolCycles = cycles.some(c => c.status === "end_of_life");
+        const intel = getThreatIntel(
+          data.name,
+          top?.cycle ?? "latest",
+          top?.status === "end_of_life",
+        );
+        const hasEolCycles = cycles.some((c) => c.status === "end_of_life");
         const bridge = intel.commercialBridge;
         const kevList = intel.knownExploitedCves || [];
 
@@ -362,12 +402,18 @@ function ProductPage() {
                     <Flame className="size-3 animate-pulse" /> CISA KEV: Active Zero-Day Campaign
                   </Badge>
                 ) : (
-                  <Badge variant="outline" className="border-emerald-300 bg-emerald-50 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 text-xs font-medium gap-1">
+                  <Badge
+                    variant="outline"
+                    className="border-emerald-300 bg-emerald-50 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 text-xs font-medium gap-1"
+                  >
                     <ShieldCheck className="size-3" /> No Active KEVs Flagged
                   </Badge>
                 )}
                 {hasEolCycles && (
-                  <Badge variant="outline" className="border-amber-300 bg-amber-50 text-amber-800 dark:border-amber-800 dark:bg-amber-950 dark:text-amber-300 text-xs font-semibold">
+                  <Badge
+                    variant="outline"
+                    className="border-amber-300 bg-amber-50 text-amber-800 dark:border-amber-800 dark:bg-amber-950 dark:text-amber-300 text-xs font-semibold"
+                  >
                     PCI-DSS 4.0 Scope
                   </Badge>
                 )}
@@ -388,21 +434,29 @@ function ProductPage() {
                         {kevList.length} Active CISA KEV Vulnerabilities
                       </p>
                       <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
-                        Weaponized in-the-wild exploitation confirmed by CISA. P1 emergency remediation cutoff applies.
+                        Weaponized in-the-wild exploitation confirmed by CISA. P1 emergency
+                        remediation cutoff applies.
                       </p>
                     </div>
                   ) : (
                     <div>
-                      <p className="text-sm font-semibold text-foreground">Standard Vulnerability Surface</p>
+                      <p className="text-sm font-semibold text-foreground">
+                        Standard Vulnerability Surface
+                      </p>
                       <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
-                        No active weaponized CISA catalog exploits registered against current baseline.
+                        No active weaponized CISA catalog exploits registered against current
+                        baseline.
                       </p>
                     </div>
                   )}
                   <div className="mt-3 flex items-center gap-2 text-xs font-mono">
-                    <span className="font-semibold text-rose-600">{intel.cveCount.critical} Critical</span>
+                    <span className="font-semibold text-rose-600">
+                      {intel.cveCount.critical} Critical
+                    </span>
                     <span>·</span>
-                    <span className="font-medium text-amber-600">{intel.cveCount.high} High CVEs</span>
+                    <span className="font-medium text-amber-600">
+                      {intel.cveCount.high} High CVEs
+                    </span>
                   </div>
                 </div>
               </div>
@@ -419,7 +473,8 @@ function ProductPage() {
                       PCI 4.0
                     </span>
                     <span className="text-muted-foreground leading-snug">
-                      <strong>Req 6.3.3:</strong> System software components must be vendor-supported.
+                      <strong>Req 6.3.3:</strong> System software components must be
+                      vendor-supported.
                     </span>
                   </div>
                   <div className="flex items-start gap-1.5">
@@ -427,7 +482,8 @@ function ProductPage() {
                       NIST
                     </span>
                     <span className="text-muted-foreground leading-snug">
-                      <strong>SA-22 / SI-2:</strong> Flaw remediation &amp; unsupported component tracking.
+                      <strong>SA-22 / SI-2:</strong> Flaw remediation &amp; unsupported component
+                      tracking.
                     </span>
                   </div>
                   <div className="flex items-start gap-1.5">
@@ -516,20 +572,39 @@ function ProductPage() {
                               <HelpCircle className="size-3.5" />
                             </span>
                           </TooltipTrigger>
-                          <TooltipContent side="top" className="max-w-xs bg-white text-zinc-900 border border-border shadow-md p-3 text-xs">
-                            <p className="font-semibold mb-1.5 text-zinc-950">Lifecycle Status Definitions</p>
+                          <TooltipContent
+                            side="top"
+                            className="max-w-xs bg-white text-zinc-900 border border-border shadow-md p-3 text-xs"
+                          >
+                            <p className="font-semibold mb-1.5 text-zinc-950">
+                              Lifecycle Status Definitions
+                            </p>
                             <ul className="space-y-2 text-zinc-700">
                               <li className="flex items-start gap-2">
-                                <span className="status-badge status-supported text-[9px] px-1.5 py-0.5 shrink-0">Supported</span>
-                                <span className="leading-snug">&gt; 365 days to EOL or unannounced. Regular vendor updates continue.</span>
+                                <span className="status-badge status-supported text-[9px] px-1.5 py-0.5 shrink-0">
+                                  Supported
+                                </span>
+                                <span className="leading-snug">
+                                  &gt; 365 days to EOL or unannounced. Regular vendor updates
+                                  continue.
+                                </span>
                               </li>
                               <li className="flex items-start gap-2">
-                                <span className="status-badge status-approaching_eol text-[9px] px-1.5 py-0.5 shrink-0">Action Needed</span>
-                                <span className="leading-snug">&lt; 365 days to EOL or in extended support. Plan upgrade/migration.</span>
+                                <span className="status-badge status-approaching_eol text-[9px] px-1.5 py-0.5 shrink-0">
+                                  Action Needed
+                                </span>
+                                <span className="leading-snug">
+                                  &lt; 365 days to EOL or in extended support. Plan
+                                  upgrade/migration.
+                                </span>
                               </li>
                               <li className="flex items-start gap-2">
-                                <span className="status-badge status-end_of_life text-[9px] px-1.5 py-0.5 shrink-0">End of Life</span>
-                                <span className="leading-snug">Official vendor support and security updates have ceased.</span>
+                                <span className="status-badge status-end_of_life text-[9px] px-1.5 py-0.5 shrink-0">
+                                  End of Life
+                                </span>
+                                <span className="leading-snug">
+                                  Official vendor support and security updates have ceased.
+                                </span>
                               </li>
                             </ul>
                           </TooltipContent>
@@ -623,18 +698,20 @@ function PythonEolGuide() {
       <h2 className="font-display text-lg font-semibold">Understanding Python EOL dates</h2>
       <div className="mt-3 space-y-3 text-sm leading-6 text-muted-foreground">
         <p>
-          Each Python 3.x feature release (3.9, 3.10, 3.11, 3.12, 3.13, and so on) is supported for roughly five
-          years from its initial release. For about the first two years a branch receives full bugfix releases; after
-          that it moves into a security-only phase where fixes ship as source-only security releases.
+          Each Python 3.x feature release (3.9, 3.10, 3.11, 3.12, 3.13, and so on) is supported for
+          roughly five years from its initial release. For about the first two years a branch
+          receives full bugfix releases; after that it moves into a security-only phase where fixes
+          ship as source-only security releases.
         </p>
         <p>
-          When a branch reaches its end of life (EOL), it stops receiving all updates — including security patches.
-          Running an EOL Python version means newly disclosed vulnerabilities in the interpreter and standard library
-          will never be fixed, which is a common compliance and audit finding.
+          When a branch reaches its end of life (EOL), it stops receiving all updates — including
+          security patches. Running an EOL Python version means newly disclosed vulnerabilities in
+          the interpreter and standard library will never be fixed, which is a common compliance and
+          audit finding.
         </p>
         <p>
-          Use the release table above to check the exact EOL date for each Python version, and plan upgrades so
-          production systems stay on a branch that still receives security support.
+          Use the release table above to check the exact EOL date for each Python version, and plan
+          upgrades so production systems stay on a branch that still receives security support.
         </p>
       </div>
     </div>

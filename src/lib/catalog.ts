@@ -46,7 +46,10 @@ export async function getCatalogStats(): Promise<CatalogStats> {
     const [prodRes, cycRes, provRes] = await Promise.all([
       supabase.from("products").select("*", { count: "exact", head: true }),
       supabase.from("release_cycles").select("*", { count: "exact", head: true }),
-      supabase.from("provenance_records").select("*", { count: "exact", head: true }).gte("confidence_score", 0.5),
+      supabase
+        .from("provenance_records")
+        .select("*", { count: "exact", head: true })
+        .gte("confidence_score", 0.5),
     ]);
 
     const cached = getCachedCatalogStats();
@@ -80,15 +83,15 @@ export async function getCatalog() {
     supabase.from("products").select("*, release_cycles(*)").order("name").range(4000, 4999),
   ]);
 
-  const all: any[] = [];
+  const all: Array<Record<string, unknown>> = [];
   for (const b of batches) {
-    if (b.data) all.push(...b.data);
+    if (b.data) all.push(...(b.data as Array<Record<string, unknown>>));
   }
 
   const seen = new Set<number>();
   const deduped = all.filter((p) => {
-    if (!p || seen.has(p.id)) return false;
-    seen.add(p.id);
+    if (!p || seen.has(p.id as number)) return false;
+    seen.add(p.id as number);
     return true;
   });
 
@@ -98,20 +101,21 @@ export async function getCatalog() {
     const bCount = Array.isArray(b.release_cycles) ? b.release_cycles.length : 0;
     if (aCount > 0 && bCount === 0) return -1;
     if (aCount === 0 && bCount > 0) return 1;
-    return a.name.localeCompare(b.name);
+    return ((a.name as string) || "").localeCompare((b.name as string) || "");
   });
 
   return deduped;
 }
 
 export async function getProduct(slug: string) {
-  let { data, error } = await supabase
+  const { data: initialData, error } = await supabase
     .from("products")
     .select("*, release_cycles(*), data_sources(*)")
     .eq("slug", slug)
     .maybeSingle();
 
   if (error) throw error;
+  let data = initialData;
 
   // If product not found or has 0 release cycles, check known aliases or canonical products by name
   if (!data || !data.release_cycles || data.release_cycles.length === 0) {
@@ -146,7 +150,9 @@ export async function getProduct(slug: string) {
         .neq("id", data.id)
         .limit(5);
 
-      const withCycles = (namedMatch || []).find((p) => p.release_cycles && p.release_cycles.length > 0);
+      const withCycles = (namedMatch || []).find(
+        (p) => p.release_cycles && p.release_cycles.length > 0,
+      );
       if (withCycles) {
         data = withCycles;
       }
@@ -208,7 +214,11 @@ export async function getSources() {
   }
 }
 
-export async function getProvenance(options?: { source?: string; entityType?: string; limit?: number }) {
+export async function getProvenance(options?: {
+  source?: string;
+  entityType?: string;
+  limit?: number;
+}) {
   let query = supabase.from("provenance_records").select("*");
   if (options?.source && options.source !== "all") {
     query = query.eq("source_name", options.source);
@@ -259,21 +269,27 @@ export const STATUS_EXPLANATIONS = {
   supported: {
     title: "Supported",
     short: "Supported",
-    description: "Active vendor maintenance. Regular patches and updates continue (> 365 days to EOL or unannounced).",
+    description:
+      "Active vendor maintenance. Regular patches and updates continue (> 365 days to EOL or unannounced).",
   },
   approaching_eol: {
     title: "Action Needed",
     short: "Action Needed",
-    description: "Approaching End of Life within 12 months (< 365 days) or in extended support. Plan migration or upgrade.",
+    description:
+      "Approaching End of Life within 12 months (< 365 days) or in extended support. Plan migration or upgrade.",
   },
   end_of_life: {
     title: "End of Life (EOL)",
     short: "End of Life",
-    description: "Official vendor support and security updates have ceased (EOL date has passed). Poses vulnerability and compliance risks.",
+    description:
+      "Official vendor support and security updates have ceased (EOL date has passed). Poses vulnerability and compliance risks.",
   },
 } as const;
 
-export function resolveCycleStatus(cycle: { status?: LifecycleStatus | string | null; eol_date?: string | null }): LifecycleStatus {
+export function resolveCycleStatus(cycle: {
+  status?: LifecycleStatus | string | null;
+  eol_date?: string | null;
+}): LifecycleStatus {
   if (cycle.eol_date) {
     const trimmed = cycle.eol_date.trim();
     const dateStr = trimmed.includes("T") ? trimmed : `${trimmed}T00:00:00`;
@@ -303,11 +319,19 @@ export function formatDate(value: string | null) {
     const dateStr = trimmed.includes("T") ? trimmed : `${trimmed}T00:00:00`;
     const d = new Date(dateStr);
     if (!isNaN(d.getTime())) {
-      return new Intl.DateTimeFormat("en", { month: "short", day: "numeric", year: "numeric" }).format(d);
+      return new Intl.DateTimeFormat("en", {
+        month: "short",
+        day: "numeric",
+        year: "numeric",
+      }).format(d);
     }
     const fallback = new Date(trimmed);
     if (!isNaN(fallback.getTime())) {
-      return new Intl.DateTimeFormat("en", { month: "short", day: "numeric", year: "numeric" }).format(fallback);
+      return new Intl.DateTimeFormat("en", {
+        month: "short",
+        day: "numeric",
+        year: "numeric",
+      }).format(fallback);
     }
     return trimmed;
   } catch {

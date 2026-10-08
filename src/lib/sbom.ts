@@ -84,9 +84,9 @@ function normalizeSbomName(raw: string): string {
 export function parseSbom(
   rawText: string,
   catalog: CatalogProduct[],
-  defaultEnvironmentName?: string
+  defaultEnvironmentName?: string,
 ): SbomParseResult {
-  let json: any;
+  let json: Record<string, unknown>;
   try {
     json = JSON.parse(rawText);
   } catch (e) {
@@ -97,7 +97,7 @@ export function parseSbom(
     format: "Unknown",
     totalComponentsFound: 0,
     matchedEnvironments: [],
-    unmatchedComponents: []
+    unmatchedComponents: [],
   };
 
   const extracted: Array<{ name: string; version: string; description?: string }> = [];
@@ -116,7 +116,7 @@ export function parseSbom(
         extracted.push({
           name: c.name,
           version: String(c.version).trim(),
-          description: c.description
+          description: c.description,
         });
       }
     }
@@ -135,7 +135,7 @@ export function parseSbom(
         extracted.push({
           name: p.name,
           version: String(ver).trim(),
-          description: p.description
+          description: p.description,
         });
       }
     }
@@ -153,7 +153,7 @@ export function parseSbom(
         if (p.Name && p.Version) {
           extracted.push({
             name: p.Name,
-            version: String(p.Version).trim()
+            version: String(p.Version).trim(),
           });
         }
       }
@@ -169,13 +169,13 @@ export function parseSbom(
       if (a.name && a.version) {
         extracted.push({
           name: a.name,
-          version: String(a.version).trim()
+          version: String(a.version).trim(),
         });
       }
     }
   } else {
     throw new Error(
-      "Unrecognized inventory format. Please provide a valid CycloneDX, SPDX, Trivy, or Syft JSON document."
+      "Unrecognized inventory format. Please provide a valid CycloneDX, SPDX, Trivy, or Syft JSON document.",
     );
   }
 
@@ -188,7 +188,7 @@ export function parseSbom(
     const ver = item.version;
 
     // Search catalog
-    let matchedProduct = catalog.find((p) => {
+    const matchedProduct = catalog.find((p) => {
       const pSlug = p.slug.toLowerCase();
       const pName = p.name.toLowerCase();
       return (
@@ -205,7 +205,9 @@ export function parseSbom(
 
     if (matchedProduct) {
       // Find matching cycle
-      const cycles = Array.isArray(matchedProduct.release_cycles) ? matchedProduct.release_cycles : [];
+      const cycles = Array.isArray(matchedProduct.release_cycles)
+        ? matchedProduct.release_cycles
+        : [];
       const matchedCycle = cycles.find((c) => {
         return (
           ver === c.cycle ||
@@ -230,13 +232,25 @@ export function parseSbom(
     const isEol = risk.risk_level === "CRITICAL (EOL)";
     const threatIntel = getThreatIntel(matchedProduct?.name || cleanName, ver, isEol);
 
+    // If neither catalog product nor active threat intel matches, record as unmatched component
+    if (
+      !matchedProduct &&
+      !threatIntel.hasCisaKev &&
+      threatIntel.knownExploitedCves.length === 0 &&
+      !threatIntel.commercialBridge
+    ) {
+      result.unmatchedComponents.push({ name: item.name, version: item.version });
+      continue;
+    }
+
     // If KEV exists, escalate high to critical
     let finalRiskLevel = risk.risk_level;
     if (threatIntel.hasCisaKev) {
       finalRiskLevel = "CRITICAL (EOL)";
     }
 
-    let migration_status: "In Progress" | "Migration Planned" | "No Action Needed" = "No Action Needed";
+    let migration_status: "In Progress" | "Migration Planned" | "No Action Needed" =
+      "No Action Needed";
     if (finalRiskLevel === "CRITICAL (EOL)") {
       migration_status = "Migration Planned";
     } else if (finalRiskLevel === "HIGH") {
@@ -257,7 +271,7 @@ export function parseSbom(
       migration_status,
       business_owner: "SecOps / DevSecOps Pipeline",
       sourceType: result.format,
-      threatIntel
+      threatIntel,
     });
   }
 
@@ -277,14 +291,14 @@ export const SAMPLE_CYCLONEDX_SBOM = JSON.stringify(
         {
           vendor: "Aquasecurity",
           name: "Trivy",
-          version: "0.55.0"
-        }
+          version: "0.55.0",
+        },
       ],
       component: {
         name: "api-gateway-service:production-v3.2",
         type: "container",
-        version: "v3.2"
-      }
+        version: "v3.2",
+      },
     },
     components: [
       {
@@ -292,61 +306,61 @@ export const SAMPLE_CYCLONEDX_SBOM = JSON.stringify(
         version: "18.19.0",
         purl: "pkg:generic/nodejs@18.19.0",
         type: "framework",
-        description: "Node.js JavaScript Runtime Environment"
+        description: "Node.js JavaScript Runtime Environment",
       },
       {
         name: "python",
         version: "3.10.12",
         purl: "pkg:generic/python@3.10.12",
         type: "application",
-        description: "Python Programming Language"
+        description: "Python Programming Language",
       },
       {
         name: "php",
         version: "8.1.28",
         purl: "pkg:generic/php@8.1.28",
         type: "application",
-        description: "PHP Hypertext Preprocessor"
+        description: "PHP Hypertext Preprocessor",
       },
       {
         name: "openssl",
         version: "1.1.1u",
         purl: "pkg:generic/openssl@1.1.1u",
         type: "library",
-        description: "Cryptography and SSL/TLS Toolkit"
+        description: "Cryptography and SSL/TLS Toolkit",
       },
       {
         name: "ubuntu",
         version: "20.04",
         purl: "pkg:generic/ubuntu@20.04",
         type: "operating-system",
-        description: "Ubuntu Linux Base Operating System"
+        description: "Ubuntu Linux Base Operating System",
       },
       {
         name: "postgresql",
         version: "12.18",
         purl: "pkg:generic/postgresql@12.18",
         type: "database",
-        description: "PostgreSQL Database Engine"
+        description: "PostgreSQL Database Engine",
       },
       {
         name: "redis",
         version: "7.2.4",
         purl: "pkg:generic/redis@7.2.4",
         type: "database",
-        description: "Redis In-Memory Key-Value Store"
+        description: "Redis In-Memory Key-Value Store",
       },
       {
         name: "nginx",
         version: "1.26.1",
         purl: "pkg:generic/nginx@1.26.1",
         type: "application",
-        description: "High Performance Web Server and Reverse Proxy"
-      }
-    ]
+        description: "High Performance Web Server and Reverse Proxy",
+      },
+    ],
   },
   null,
-  2
+  2,
 );
 
 // Built-in Sample SPDX SBOM for 1-Click Interactive Demo Testing
@@ -358,7 +372,7 @@ export const SAMPLE_SPDX_SBOM = JSON.stringify(
     name: "cloud-native-k8s-platform",
     creationInfo: {
       creators: ["Tool: Syft-v1.14.0", "Organization: Enterprise SecOps AppSec"],
-      created: "2026-09-23T15:00:00Z"
+      created: "2026-09-23T15:00:00Z",
     },
     packages: [
       {
@@ -366,31 +380,31 @@ export const SAMPLE_SPDX_SBOM = JSON.stringify(
         SPDXID: "SPDXRef-Package-k8s",
         versionInfo: "1.25.16",
         downloadLocation: "NOASSERTION",
-        filesAnalyzed: false
+        filesAnalyzed: false,
       },
       {
         name: "nodejs",
         SPDXID: "SPDXRef-Package-node",
         versionInfo: "20.15.0",
         downloadLocation: "NOASSERTION",
-        filesAnalyzed: false
+        filesAnalyzed: false,
       },
       {
         name: "rhel",
         SPDXID: "SPDXRef-Package-rhel",
         versionInfo: "7.9",
         downloadLocation: "NOASSERTION",
-        filesAnalyzed: false
+        filesAnalyzed: false,
       },
       {
         name: "python",
         SPDXID: "SPDXRef-Package-py",
         versionInfo: "3.12.3",
         downloadLocation: "NOASSERTION",
-        filesAnalyzed: false
-      }
-    ]
+        filesAnalyzed: false,
+      },
+    ],
   },
   null,
-  2
+  2,
 );

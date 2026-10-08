@@ -1,24 +1,24 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
-import { 
-  AlertTriangle, 
-  CheckCircle2, 
-  Database, 
-  Download, 
-  FileSpreadsheet, 
-  FileUp, 
-  Globe, 
-  Layers, 
-  Loader2, 
+import {
+  AlertTriangle,
+  CheckCircle2,
+  Database,
+  Download,
+  FileSpreadsheet,
+  FileUp,
+  Globe,
+  Layers,
+  Loader2,
   LogOut,
-  Plus, 
-  RefreshCw, 
-  Server, 
-  ShieldAlert, 
-  ShieldCheck, 
-  Sparkles, 
-  Upload, 
-  Zap 
+  Plus,
+  RefreshCw,
+  Server,
+  ShieldAlert,
+  ShieldCheck,
+  Sparkles,
+  Upload,
+  Zap,
 } from "lucide-react";
 import { toast } from "sonner";
 import { PageHeader } from "@/components/app-shell";
@@ -35,20 +35,26 @@ export const Route = createFileRoute("/admin")({
     meta: [
       { name: "robots", content: "noindex" },
       { title: "Administration — endoflife.tech" },
-      { name: "description", content: "Manage lifecycle sources, records, and enterprise synchronization." },
+      {
+        name: "description",
+        content: "Manage lifecycle sources, records, and enterprise synchronization.",
+      },
       { property: "og:title", content: "Administration — endoflife.tech" },
-      { property: "og:description", content: "Manage lifecycle sources, records, and enterprise synchronization." },
+      {
+        property: "og:description",
+        content: "Manage lifecycle sources, records, and enterprise synchronization.",
+      },
       { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary" }
-    ]
+      { name: "twitter:card", content: "summary" },
+    ],
   }),
-  component: AdminPage
+  component: AdminPage,
 });
 
 const DESIGNATED_ADMIN_EMAILS = [
   "fragglemark@gmail.com",
   "markdmitchell@outlook.com",
-  "jbshenberger@gmail.com"
+  "jbshenberger@gmail.com",
 ];
 
 function AdminPage() {
@@ -60,7 +66,7 @@ function AdminPage() {
   const [stats, setStats] = useState<{ products: number; cycles: number; provenance: number }>({
     products: DEFAULT_CATALOG_STATS.products,
     cycles: DEFAULT_CATALOG_STATS.cycles,
-    provenance: DEFAULT_CATALOG_STATS.provenance
+    provenance: DEFAULT_CATALOG_STATS.provenance,
   });
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -72,7 +78,7 @@ function AdminPage() {
     cycle: "1.0",
     eolDate: "",
     sourceName: "Enterprise Architecture Notice",
-    sourceUrl: ""
+    sourceUrl: "",
   });
 
   useEffect(() => {
@@ -80,7 +86,9 @@ function AdminPage() {
 
     async function evaluateAccess() {
       try {
-        const { data: { session } } = await supabase.auth.getSession();
+        const {
+          data: { session },
+        } = await supabase.auth.getSession();
         const user = session?.user;
         if (!user) {
           if (mounted) setAccess("signedout");
@@ -114,7 +122,7 @@ function AdminPage() {
         if (!isAdmin) {
           const { data: allowed } = await supabase.rpc("has_role", {
             _user_id: user.id,
-            _role: "admin"
+            _role: "admin",
           });
           isAdmin = Boolean(allowed);
         }
@@ -130,7 +138,9 @@ function AdminPage() {
 
     void evaluateAccess();
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
       if (session?.user) {
         void evaluateAccess();
       } else {
@@ -144,7 +154,7 @@ function AdminPage() {
           setStats({
             products: s.products ?? DEFAULT_CATALOG_STATS.products,
             cycles: s.cycles ?? DEFAULT_CATALOG_STATS.cycles,
-            provenance: s.provenance ?? DEFAULT_CATALOG_STATS.provenance
+            provenance: s.provenance ?? DEFAULT_CATALOG_STATS.provenance,
           });
         }
       })
@@ -166,12 +176,28 @@ function AdminPage() {
     try {
       const response = await fetch(`https://endoflife.date/api/v1/products/${cleanSlug}`);
       if (!response.ok) throw new Error(`Product not found or upstream error for '${cleanSlug}'.`);
-      const payload = (await response.json()) as { result?: { name?: string; label?: string; category?: string; releases?: Array<{ name: string; releaseDate?: string | null; eolFrom?: string | null; latest?: { name?: string; date?: string | null } }> } };
+      const payload = (await response.json()) as {
+        result?: {
+          name?: string;
+          label?: string;
+          category?: string;
+          releases?: Array<{
+            name: string;
+            releaseDate?: string | null;
+            eolFrom?: string | null;
+            latest?: { name?: string; date?: string | null };
+          }>;
+        };
+      };
       const raw = payload.result;
       if (!raw) throw new Error("Unexpected payload structure from lifecycle authority.");
 
       const releases = raw.releases ?? [];
-      const { data: source } = await supabase.from("data_sources").select("id").eq("name", "endoflife.date API v1").maybeSingle();
+      const { data: source } = await supabase
+        .from("data_sources")
+        .select("id")
+        .eq("name", "endoflife.date API v1")
+        .maybeSingle();
 
       const { data: product, error: prodErr } = await supabase
         .from("products")
@@ -182,14 +208,15 @@ function AdminPage() {
             category: raw.category ?? "software",
             vendor: "Community",
             source_id: source?.id ?? null,
-            updated_at: new Date().toISOString()
+            updated_at: new Date().toISOString(),
           },
-          { onConflict: "slug" }
+          { onConflict: "slug" },
         )
         .select("id")
         .single();
 
-      if (prodErr || !product) throw new Error(prodErr?.message ?? "Failed to save product in database.");
+      if (prodErr || !product)
+        throw new Error(prodErr?.message ?? "Failed to save product in database.");
 
       for (const rel of releases) {
         const eol = rel.eolFrom ?? null;
@@ -205,13 +232,15 @@ function AdminPage() {
             support_end: eol,
             latest_version: rel.latest?.name ?? null,
             latest_release_date: rel.latest?.date ?? null,
-            status
+            status,
           },
-          { onConflict: "product_id,cycle" }
+          { onConflict: "product_id,cycle" },
         );
       }
 
-      toast.success(`${raw.label ?? raw.name ?? cleanSlug}: ${releases.length} release cycles synchronized.`);
+      toast.success(
+        `${raw.label ?? raw.name ?? cleanSlug}: ${releases.length} release cycles synchronized.`,
+      );
       const s = await getCatalogStats();
       if (s) setStats({ products: s.products, cycles: s.cycles, provenance: s.provenance });
     } catch (e) {
@@ -224,20 +253,54 @@ function AdminPage() {
   const handleSyncSuites = async () => {
     setBusyAction("suites");
     const suiteConfigs = [
-      { slug: "jira", name: "Atlassian Jira Software", vendor: "Atlassian", category: "Business applications" },
-      { slug: "confluence", name: "Atlassian Confluence", vendor: "Atlassian", category: "Business applications" },
-      { slug: "bitbucket", name: "Atlassian Bitbucket", vendor: "Atlassian", category: "DevOps & CI/CD" },
-      { slug: "splunk", name: "Splunk Enterprise", vendor: "Splunk / Cisco", category: "Monitoring & Analytics" },
+      {
+        slug: "jira",
+        name: "Atlassian Jira Software",
+        vendor: "Atlassian",
+        category: "Business applications",
+      },
+      {
+        slug: "confluence",
+        name: "Atlassian Confluence",
+        vendor: "Atlassian",
+        category: "Business applications",
+      },
+      {
+        slug: "bitbucket",
+        name: "Atlassian Bitbucket",
+        vendor: "Atlassian",
+        category: "DevOps & CI/CD",
+      },
+      {
+        slug: "splunk",
+        name: "Splunk Enterprise",
+        vendor: "Splunk / Cisco",
+        category: "Monitoring & Analytics",
+      },
       { slug: "cisco-ios", name: "Cisco IOS", vendor: "Cisco", category: "Networking & Security" },
-      { slug: "cisco-nx-os", name: "Cisco NX-OS", vendor: "Cisco", category: "Networking & Security" },
-      { slug: "cisco-asa", name: "Cisco ASA Software", vendor: "Cisco", category: "Networking & Security" }
+      {
+        slug: "cisco-nx-os",
+        name: "Cisco NX-OS",
+        vendor: "Cisco",
+        category: "Networking & Security",
+      },
+      {
+        slug: "cisco-asa",
+        name: "Cisco ASA Software",
+        vendor: "Cisco",
+        category: "Networking & Security",
+      },
     ];
 
     let updatedProducts = 0;
     let updatedCycles = 0;
 
     try {
-      const { data: source } = await supabase.from("data_sources").select("id").eq("name", "endoflife.date API v1").maybeSingle();
+      const { data: source } = await supabase
+        .from("data_sources")
+        .select("id")
+        .eq("name", "endoflife.date API v1")
+        .maybeSingle();
 
       for (const item of suiteConfigs) {
         try {
@@ -257,9 +320,9 @@ function AdminPage() {
                 category: raw.category ?? item.category,
                 vendor: item.vendor,
                 source_id: source?.id ?? null,
-                updated_at: new Date().toISOString()
+                updated_at: new Date().toISOString(),
               },
-              { onConflict: "slug" }
+              { onConflict: "slug" },
             )
             .select("id")
             .single();
@@ -280,9 +343,9 @@ function AdminPage() {
                 support_end: eol,
                 latest_version: rel.latest?.name ?? null,
                 latest_release_date: rel.latest?.date ?? null,
-                status
+                status,
               },
-              { onConflict: "product_id,cycle" }
+              { onConflict: "product_id,cycle" },
             );
           }
 
@@ -293,7 +356,9 @@ function AdminPage() {
         }
       }
 
-      toast.success(`Enterprise Suites Ingested: ${updatedProducts} products, ${updatedCycles} release cycles updated.`);
+      toast.success(
+        `Enterprise Suites Ingested: ${updatedProducts} products, ${updatedCycles} release cycles updated.`,
+      );
       const s = await getCatalogStats();
       if (s) setStats({ products: s.products, cycles: s.cycles, provenance: s.provenance });
     } catch (e) {
@@ -313,7 +378,11 @@ function AdminPage() {
       const prioritySlugs = allSlugs.slice(0, 15);
       let updatedProducts = 0;
       let updatedCycles = 0;
-      const { data: source } = await supabase.from("data_sources").select("id").eq("name", "endoflife.date API v1").maybeSingle();
+      const { data: source } = await supabase
+        .from("data_sources")
+        .select("id")
+        .eq("name", "endoflife.date API v1")
+        .maybeSingle();
 
       for (const slugItem of prioritySlugs) {
         try {
@@ -332,9 +401,9 @@ function AdminPage() {
                 name: raw.label ?? raw.name ?? slugItem,
                 category: raw.category ?? "software",
                 source_id: source?.id ?? null,
-                updated_at: new Date().toISOString()
+                updated_at: new Date().toISOString(),
               },
-              { onConflict: "slug" }
+              { onConflict: "slug" },
             )
             .select("id")
             .single();
@@ -343,8 +412,11 @@ function AdminPage() {
             updatedProducts++;
             for (const rel of releases) {
               const eol = rel.eolFrom ?? null;
-              const days = eol ? Math.ceil((new Date(eol).getTime() - Date.now()) / 86400000) : 9999;
-              const status = days < 0 ? "end_of_life" : days < 365 ? "approaching_eol" : "supported";
+              const days = eol
+                ? Math.ceil((new Date(eol).getTime() - Date.now()) / 86400000)
+                : 9999;
+              const status =
+                days < 0 ? "end_of_life" : days < 365 ? "approaching_eol" : "supported";
               await supabase.from("release_cycles").upsert(
                 {
                   product_id: product.id,
@@ -354,9 +426,9 @@ function AdminPage() {
                   support_end: eol,
                   latest_version: rel.latest?.name ?? null,
                   latest_release_date: rel.latest?.date ?? null,
-                  status
+                  status,
                 },
-                { onConflict: "product_id,cycle" }
+                { onConflict: "product_id,cycle" },
               );
             }
             updatedCycles += releases.length;
@@ -366,7 +438,9 @@ function AdminPage() {
         }
       }
 
-      toast.success(`Bulk Ingestion Complete: Refreshed ${updatedProducts} priority products and ${updatedCycles} release cycles.`);
+      toast.success(
+        `Bulk Ingestion Complete: Refreshed ${updatedProducts} priority products and ${updatedCycles} release cycles.`,
+      );
       const s = await getCatalogStats();
       if (s) setStats({ products: s.products, cycles: s.cycles, provenance: s.provenance });
     } catch (e) {
@@ -383,16 +457,28 @@ function AdminPage() {
 
     try {
       const text = await file.text();
-      const lines = text.trim().split(/\r?\n/).filter((l) => l.trim().length > 0);
+      const lines = text
+        .trim()
+        .split(/\r?\n/)
+        .filter((l) => l.trim().length > 0);
       if (lines.length < 2) {
         toast.error("CSV file is empty or missing header row.");
         return;
       }
 
-      const headers = (lines[0] ?? "").split(",").map((h) => h.trim().toLowerCase().replace(/['"]/g, ""));
+      const headers = (lines[0] ?? "")
+        .split(",")
+        .map((h) => h.trim().toLowerCase().replace(/['"]/g, ""));
       const getIndex = (keys: string[]) => headers.findIndex((h) => keys.includes(h));
 
-      const envIdx = getIndex(["deployment_env", "environment", "env", "server", "app", "workload"]);
+      const envIdx = getIndex([
+        "deployment_env",
+        "environment",
+        "env",
+        "server",
+        "app",
+        "workload",
+      ]);
       const platformIdx = getIndex(["platform", "product_name", "product", "software", "name"]);
       const versionIdx = getIndex(["version", "installed_version", "ver", "release"]);
       const eolIdx = getIndex(["eol_date", "eol", "end_of_life"]);
@@ -402,14 +488,22 @@ function AdminPage() {
       const rows = [];
       for (let i = 1; i < lines.length; i++) {
         const cells = (lines[i] ?? "").split(",").map((c) => c.trim().replace(/^["']|["']$/g, ""));
-        const environment = (envIdx >= 0 && cells[envIdx] ? cells[envIdx] : `Host-${i}`) || `Host-${i}`;
-        const product_name = (platformIdx >= 0 && cells[platformIdx] ? cells[platformIdx] : "Application") || "Application";
-        const installed_version = (versionIdx >= 0 && cells[versionIdx] ? cells[versionIdx] : "1.0") || "1.0";
+        const environment =
+          (envIdx >= 0 && cells[envIdx] ? cells[envIdx] : `Host-${i}`) || `Host-${i}`;
+        const product_name =
+          (platformIdx >= 0 && cells[platformIdx] ? cells[platformIdx] : "Application") ||
+          "Application";
+        const installed_version =
+          (versionIdx >= 0 && cells[versionIdx] ? cells[versionIdx] : "1.0") || "1.0";
         const eol_date = eolIdx >= 0 && cells[eolIdx] ? cells[eolIdx] : null;
-        const business_owner = (ownerIdx >= 0 && cells[ownerIdx] ? cells[ownerIdx] : "Unassigned") || "Unassigned";
-        const migration_status = (statusIdx >= 0 && cells[statusIdx] ? cells[statusIdx] : "Not started") || "Not started";
+        const business_owner =
+          (ownerIdx >= 0 && cells[ownerIdx] ? cells[ownerIdx] : "Unassigned") || "Unassigned";
+        const migration_status =
+          (statusIdx >= 0 && cells[statusIdx] ? cells[statusIdx] : "Not started") || "Not started";
 
-        const days = eol_date ? Math.ceil((new Date(eol_date).getTime() - Date.now()) / 86400000) : 9999;
+        const days = eol_date
+          ? Math.ceil((new Date(eol_date).getTime() - Date.now()) / 86400000)
+          : 9999;
         const risk_status: "end_of_life" | "approaching_eol" | "supported" =
           days < 0 ? "end_of_life" : days < 365 ? "approaching_eol" : "supported";
 
@@ -421,7 +515,7 @@ function AdminPage() {
           business_owner,
           migration_status,
           risk_status,
-          owner_id: currentUserId ?? ""
+          owner_id: currentUserId ?? "",
         });
       }
 
@@ -443,7 +537,7 @@ function AdminPage() {
       '"Production API Gateway Node-1","Node.js","18","2025-04-30","Edge Web Core","In Progress"',
       '"Enterprise Data Lake Engine","Python","3.10","2026-10-04","Data Platform Eng","Migration Planned"',
       '"Identity & Single Sign-On Cluster",".NET","8.0","2026-11-10","Security Systems","No Action Needed"',
-      '"Legacy Customer Billing Portal","PHP","8.1","2025-12-31","Finance Tech","In Progress"'
+      '"Legacy Customer Billing Portal","PHP","8.1","2025-12-31","Finance Tech","In Progress"',
     ];
     const encodedUri = encodeURI("data:text/csv;charset=utf-8," + rows.join("\n"));
     const link = document.createElement("a");
@@ -468,9 +562,9 @@ function AdminPage() {
             vendor: custom.vendor,
             category: custom.category,
             description: "Custom lifecycle record",
-            updated_at: new Date().toISOString()
+            updated_at: new Date().toISOString(),
           },
-          { onConflict: "slug" }
+          { onConflict: "slug" },
         )
         .select("id")
         .single();
@@ -488,9 +582,9 @@ function AdminPage() {
             cycle: custom.cycle,
             eol_date: custom.eolDate,
             support_end: custom.eolDate,
-            status
+            status,
           },
-          { onConflict: "product_id,cycle" }
+          { onConflict: "product_id,cycle" },
         )
         .select("id")
         .single();
@@ -503,7 +597,7 @@ function AdminPage() {
         source_name: custom.sourceName,
         source_url: custom.sourceUrl || null,
         confidence_score: 1,
-        notes: "Administrator supplied lifecycle record"
+        notes: "Administrator supplied lifecycle record",
       });
 
       toast.success(`Registered custom lifecycle record for ${custom.name}`);
@@ -515,7 +609,7 @@ function AdminPage() {
         cycle: "1.0",
         eolDate: "",
         sourceName: "Enterprise Architecture Notice",
-        sourceUrl: ""
+        sourceUrl: "",
       });
       const s = await getCatalogStats();
       if (s) setStats({ products: s.products, cycles: s.cycles, provenance: s.provenance });
@@ -540,8 +634,8 @@ function AdminPage() {
             {access === "loading"
               ? "Verifying administrator permissions…"
               : access === "signedout"
-              ? "Sign in required"
-              : "Administrator access required"}
+                ? "Sign in required"
+                : "Administrator access required"}
           </h2>
           <p className="mt-2 text-sm text-muted-foreground leading-relaxed">
             {access === "denied"
@@ -616,31 +710,48 @@ function AdminPage() {
         <div className="bg-card p-5">
           <div className="flex items-center justify-between text-muted-foreground">
             <Server className="size-4" />
-            <Badge variant="outline" className="text-[10px] uppercase font-bold">Postgres DB</Badge>
+            <Badge variant="outline" className="text-[10px] uppercase font-bold">
+              Postgres DB
+            </Badge>
           </div>
-          <p className="mt-3 font-display text-2xl font-semibold">{(stats?.products ?? DEFAULT_CATALOG_STATS.products).toLocaleString()}</p>
+          <p className="mt-3 font-display text-2xl font-semibold">
+            {(stats?.products ?? DEFAULT_CATALOG_STATS.products).toLocaleString()}
+          </p>
           <p className="text-xs text-muted-foreground">Enterprise Products</p>
         </div>
         <div className="bg-card p-5">
           <div className="flex items-center justify-between text-muted-foreground">
             <Layers className="size-4" />
-            <Badge variant="outline" className="text-[10px] uppercase font-bold">100% Tracked</Badge>
+            <Badge variant="outline" className="text-[10px] uppercase font-bold">
+              100% Tracked
+            </Badge>
           </div>
-          <p className="mt-3 font-display text-2xl font-semibold">{(stats?.cycles ?? DEFAULT_CATALOG_STATS.cycles).toLocaleString()}</p>
+          <p className="mt-3 font-display text-2xl font-semibold">
+            {(stats?.cycles ?? DEFAULT_CATALOG_STATS.cycles).toLocaleString()}
+          </p>
           <p className="text-xs text-muted-foreground">Release Cycles</p>
         </div>
         <div className="bg-card p-5">
           <div className="flex items-center justify-between text-muted-foreground">
             <ShieldCheck className="size-4" />
-            <Badge variant="outline" className="text-[10px] uppercase font-bold">Audit Lineage</Badge>
+            <Badge variant="outline" className="text-[10px] uppercase font-bold">
+              Audit Lineage
+            </Badge>
           </div>
-          <p className="mt-3 font-display text-2xl font-semibold">{(stats?.provenance ?? DEFAULT_CATALOG_STATS.provenance).toLocaleString()}</p>
+          <p className="mt-3 font-display text-2xl font-semibold">
+            {(stats?.provenance ?? DEFAULT_CATALOG_STATS.provenance).toLocaleString()}
+          </p>
           <p className="text-xs text-muted-foreground">Verified Provenance Records</p>
         </div>
         <div className="bg-card p-5">
           <div className="flex items-center justify-between text-muted-foreground">
             <Globe className="size-4" />
-            <Badge variant="outline" className="border-emerald-300 bg-emerald-50 text-[10px] text-emerald-800 dark:border-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 uppercase font-bold">Live</Badge>
+            <Badge
+              variant="outline"
+              className="border-emerald-300 bg-emerald-50 text-[10px] text-emerald-800 dark:border-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 uppercase font-bold"
+            >
+              Live
+            </Badge>
           </div>
           <p className="mt-3 font-display text-2xl font-semibold">41</p>
           <p className="text-xs text-muted-foreground">Upstream Source Authorities</p>
@@ -661,7 +772,8 @@ function AdminPage() {
               </h2>
             </div>
             <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-              Ingest Atlassian (Jira, Confluence), OpenText / Micro Focus (ALM, Content Suite, Vertica), IBM, SAP, Cisco, ServiceNow, and Splunk.
+              Ingest Atlassian (Jira, Confluence), OpenText / Micro Focus (ALM, Content Suite,
+              Vertica), IBM, SAP, Cisco, ServiceNow, and Splunk.
             </p>
 
             <div className="mt-6 space-y-3">
@@ -696,7 +808,8 @@ function AdminPage() {
 
             <div className="mt-7 rounded-lg border border-border/80 bg-muted/30 p-4">
               <Label htmlFor="slug" className="text-xs font-semibold text-foreground">
-                Sync Specific Product Slug (e.g. &apos;python&apos;, &apos;ubuntu&apos;, &apos;kubernetes&apos;)
+                Sync Specific Product Slug (e.g. &apos;python&apos;, &apos;ubuntu&apos;,
+                &apos;kubernetes&apos;)
               </Label>
               <div className="mt-2.5 flex gap-2">
                 <Input
@@ -723,7 +836,15 @@ function AdminPage() {
 
               <div className="mt-3 flex flex-wrap items-center gap-1.5">
                 <span className="text-[11px] text-muted-foreground">Quick pick:</span>
-                {["kubernetes", "python", "ubuntu", "jira", "confluence", "splunk", "cisco-ios"].map((item) => (
+                {[
+                  "kubernetes",
+                  "python",
+                  "ubuntu",
+                  "jira",
+                  "confluence",
+                  "splunk",
+                  "cisco-ios",
+                ].map((item) => (
                   <button
                     key={item}
                     type="button"
@@ -755,7 +876,8 @@ function AdminPage() {
               </h2>
             </div>
             <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-              Upload a CSV file with enterprise runtime environment inventory records to audit deployments against verified EOL milestones.
+              Upload a CSV file with enterprise runtime environment inventory records to audit
+              deployments against verified EOL milestones.
             </p>
 
             <div className="mt-6 space-y-4">
@@ -790,9 +912,7 @@ function AdminPage() {
                         </>
                       )}
                     </Button>
-                    <p className="mt-2 text-xs text-muted-foreground">
-                      200MB per file • CSV
-                    </p>
+                    <p className="mt-2 text-xs text-muted-foreground">200MB per file • CSV</p>
                   </div>
                 </div>
               </div>
@@ -832,7 +952,8 @@ function AdminPage() {
           <div>
             <h2 className="font-display text-xl font-semibold">Register Custom Lifecycle Record</h2>
             <p className="mt-1 text-sm text-muted-foreground">
-              Add proprietary internal enterprise platforms or unlisted vendor milestones directly to the shared catalog with verified audit lineage.
+              Add proprietary internal enterprise platforms or unlisted vendor milestones directly
+              to the shared catalog with verified audit lineage.
             </p>
           </div>
         </div>

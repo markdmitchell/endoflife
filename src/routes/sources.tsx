@@ -6,7 +6,13 @@ import { PageHeader } from "@/components/app-shell";
 import { getSources, getCachedSources } from "@/lib/catalog";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 
 export const Route = createFileRoute("/sources")({
@@ -14,18 +20,30 @@ export const Route = createFileRoute("/sources")({
   head: () => ({
     meta: [
       { title: "Integrated Data Sources Registry — endoflife.tech" },
-      { name: "description", content: "Comprehensive directory of all 41 primary APIs, vendor portals, standards (TEA / ECMA-428 CLE), and aggregators powering the database." },
+      {
+        name: "description",
+        content:
+          "Comprehensive directory of all 41 primary APIs, vendor portals, standards (TEA / ECMA-428 CLE), and aggregators powering the database.",
+      },
       { property: "og:title", content: "Integrated Data Sources Registry — endoflife.tech" },
-      { property: "og:description", content: "Comprehensive directory of all 41 primary APIs, vendor portals, standards (TEA / ECMA-428 CLE), and aggregators powering the database." },
+      {
+        property: "og:description",
+        content:
+          "Comprehensive directory of all 41 primary APIs, vendor portals, standards (TEA / ECMA-428 CLE), and aggregators powering the database.",
+      },
       { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary_large_image" }
-    ]
+      { name: "twitter:card", content: "summary_large_image" },
+    ],
   }),
-  component: SourcesPage
+  component: SourcesPage,
 });
 
 function SourcesPage() {
-  const { data = [], isLoading, error } = useQuery({
+  const {
+    data = [],
+    isLoading,
+    error,
+  } = useQuery({
     queryKey: ["sources"],
     queryFn: getSources,
     initialData: getCachedSources,
@@ -41,7 +59,8 @@ function SourcesPage() {
 
   const filtered = useMemo(() => {
     return data.filter((s) => {
-      const text = `${s.name} ${s.category} ${s.description} ${s.source_url ?? ""} ${s.license ?? ""}`.toLowerCase();
+      const text =
+        `${s.name} ${s.category} ${s.description} ${s.source_url ?? ""} ${s.license ?? ""}`.toLowerCase();
       const matchQuery = !query || text.includes(query.toLowerCase());
       const matchCategory = categoryFilter === "all" || s.category === categoryFilter;
       return matchQuery && matchCategory;
@@ -61,17 +80,27 @@ function SourcesPage() {
         <div className="bg-card p-5">
           <Database className="mb-5 size-4 text-muted-foreground" />
           <div className="font-display text-3xl font-semibold">{data.length || 41} Feeds</div>
-          <p className="mt-1 text-xs font-medium text-muted-foreground">Integrated Primary Data Sources</p>
+          <p className="mt-1 text-xs font-medium text-muted-foreground">
+            Integrated Primary Data Sources
+          </p>
         </div>
         <div className="bg-card p-5">
           <Layers className="mb-5 size-4 text-muted-foreground" />
-          <div className="font-display text-3xl font-semibold">{categories.length || 12} Categories</div>
-          <p className="mt-1 text-xs font-medium text-muted-foreground">Taxonomy Disciplines Tracked</p>
+          <div className="font-display text-3xl font-semibold">
+            {categories.length || 12} Categories
+          </div>
+          <p className="mt-1 text-xs font-medium text-muted-foreground">
+            Taxonomy Disciplines Tracked
+          </p>
         </div>
         <div className="bg-card p-5">
           <ShieldCheck className="mb-5 size-4 text-emerald-600 dark:text-emerald-400" />
-          <div className="font-display text-3xl font-semibold text-emerald-600 dark:text-emerald-400">100%</div>
-          <p className="mt-1 text-xs font-medium text-muted-foreground">Public &amp; Vendor Verified</p>
+          <div className="font-display text-3xl font-semibold text-emerald-600 dark:text-emerald-400">
+            100%
+          </div>
+          <p className="mt-1 text-xs font-medium text-muted-foreground">
+            Public &amp; Vendor Verified
+          </p>
         </div>
       </section>
 
@@ -131,7 +160,9 @@ function SourcesPage() {
       {/* Results Counter */}
       <div className="mt-5 flex items-center justify-between">
         <p className="text-sm font-semibold">{filtered.length} data sources displayed</p>
-        <p className="text-xs text-muted-foreground">Structured tabular registry of all integrated upstream intelligence feeds</p>
+        <p className="text-xs text-muted-foreground">
+          Structured tabular registry of all integrated upstream intelligence feeds
+        </p>
       </div>
 
       {isLoading && (
@@ -192,8 +223,19 @@ function SourcesPage() {
                 </td>
                 <td className="px-4 py-4 align-top text-right">
                   {s.source_url && (
-                    <Button asChild variant="ghost" size="icon" className="size-8" title={`Open ${s.name}`}>
-                      <a href={s.source_url} target="_blank" rel="noopener noreferrer" aria-label={`Open ${s.name}`}>
+                    <Button
+                      asChild
+                      variant="ghost"
+                      size="icon"
+                      className="size-8"
+                      title={`Open ${s.name}`}
+                    >
+                      <a
+                        href={s.source_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        aria-label={`Open ${s.name}`}
+                      >
                         <ExternalLink className="size-4 text-muted-foreground hover:text-primary" />
                       </a>
                     </Button>
@@ -207,7 +249,9 @@ function SourcesPage() {
         {!isLoading && !filtered.length && (
           <div className="p-12 text-center">
             <p className="font-semibold">No matching data sources</p>
-            <p className="mt-1 text-sm text-muted-foreground">Try selecting a different category or clearing search terms.</p>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Try selecting a different category or clearing search terms.
+            </p>
           </div>
         )}
       </div>

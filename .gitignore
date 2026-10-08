@@ -35,7 +35,6 @@ scratch/
 db/
 endoflife/
 services/
-tests/
 __pycache__/
 *.pyc
 

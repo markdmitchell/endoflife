@@ -1,12 +1,27 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
-import { ArrowRight, CheckCircle2, Github, Mail, MessageSquare, Send, ShieldCheck, Sparkles } from "lucide-react";
+import {
+  ArrowRight,
+  CheckCircle2,
+  Github,
+  Mail,
+  MessageSquare,
+  Send,
+  ShieldCheck,
+  Sparkles,
+} from "lucide-react";
 import { toast } from "sonner";
 import { PageHeader } from "@/components/app-shell";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 
 export const Route = createFileRoute("/contact")({
@@ -14,9 +29,17 @@ export const Route = createFileRoute("/contact")({
   head: () => ({
     meta: [
       { title: "Contact Us — endoflife.tech" },
-      { name: "description", content: "Get in touch with the endoflife.tech team to suggest products, report lifecycle corrections, or discuss enterprise integration." },
+      {
+        name: "description",
+        content:
+          "Get in touch with the endoflife.tech team to suggest products, report lifecycle corrections, or discuss enterprise integration.",
+      },
       { property: "og:title", content: "Contact Us — endoflife.tech" },
-      { property: "og:description", content: "Get in touch with the endoflife.tech team to suggest products, report lifecycle corrections, or discuss enterprise integration." },
+      {
+        property: "og:description",
+        content:
+          "Get in touch with the endoflife.tech team to suggest products, report lifecycle corrections, or discuss enterprise integration.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
@@ -65,9 +88,12 @@ function ContactPage() {
               <div className="mx-auto grid size-14 place-items-center rounded-2xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
                 <CheckCircle2 className="size-8" />
               </div>
-              <h3 className="mt-5 font-display text-2xl font-semibold text-foreground">Message Received</h3>
+              <h3 className="mt-5 font-display text-2xl font-semibold text-foreground">
+                Message Received
+              </h3>
               <p className="mx-auto mt-2 max-w-md text-sm text-muted-foreground leading-relaxed">
-                Thank you for reaching out, <strong>{name}</strong>. Our team reviews all inquiries, data corrections, and product suggestions diligently.
+                Thank you for reaching out, <strong>{name}</strong>. Our team reviews all inquiries,
+                data corrections, and product suggestions diligently.
               </p>
               <div className="mt-8 flex justify-center gap-3">
                 <Button
@@ -87,7 +113,9 @@ function ContactPage() {
           ) : (
             <form onSubmit={handleSubmit} className="space-y-5">
               <div>
-                <h3 className="font-display text-xl font-semibold text-foreground">Send us a message</h3>
+                <h3 className="font-display text-xl font-semibold text-foreground">
+                  Send us a message
+                </h3>
                 <p className="mt-1 text-xs text-muted-foreground">
                   All submissions are monitored by the platform maintainers.
                 </p>
@@ -125,8 +153,12 @@ function ContactPage() {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="suggestion">Suggest a New Product / Technology</SelectItem>
-                    <SelectItem value="provenance">Report EOL Date / Provenance Correction</SelectItem>
-                    <SelectItem value="enterprise">Enterprise Support / Custom Ingestion</SelectItem>
+                    <SelectItem value="provenance">
+                      Report EOL Date / Provenance Correction
+                    </SelectItem>
+                    <SelectItem value="enterprise">
+                      Enterprise Support / Custom Ingestion
+                    </SelectItem>
                     <SelectItem value="partnership">Vendor Partnership / Authority Feed</SelectItem>
                     <SelectItem value="general">General Feedback or Inquiry</SelectItem>
                   </SelectContent>
@@ -171,13 +203,16 @@ function ContactPage() {
               <span>Direct Channels</span>
             </div>
             <p className="mt-2 text-xs leading-relaxed text-muted-foreground">
-              We welcome contributions, corrections, and inquiries from defense teams, system administrators, and open source engineers worldwide.
+              We welcome contributions, corrections, and inquiries from defense teams, system
+              administrators, and open source engineers worldwide.
             </p>
 
             <div className="mt-5 space-y-3">
               <div className="rounded-lg border border-border bg-muted/40 p-3">
                 <div className="text-xs font-semibold text-foreground">Open Source Repository</div>
-                <p className="mt-1 text-[11px] text-muted-foreground">Submit issues, feature requests, and upstream data tickets directly on GitHub.</p>
+                <p className="mt-1 text-[11px] text-muted-foreground">
+                  Submit issues, feature requests, and upstream data tickets directly on GitHub.
+                </p>
                 <a
                   href="https://github.com/markdmitchell/endoflife"
                   target="_blank"
@@ -191,7 +226,9 @@ function ContactPage() {
 
               <div className="rounded-lg border border-border bg-muted/40 p-3">
                 <div className="text-xs font-semibold text-foreground">Meet the Maintainers</div>
-                <p className="mt-1 text-[11px] text-muted-foreground">Learn more about the origins, mission, and creators behind endoflife.tech.</p>
+                <p className="mt-1 text-[11px] text-muted-foreground">
+                  Learn more about the origins, mission, and creators behind endoflife.tech.
+                </p>
                 <Link
                   to="/about"
                   className="mt-2.5 inline-flex items-center gap-1.5 text-xs font-semibold text-primary hover:underline"

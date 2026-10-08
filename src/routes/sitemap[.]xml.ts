@@ -44,7 +44,7 @@ export const Route = createFileRoute("/sitemap.xml")({
             },
           });
           const pageSize = 1000;
-          for (let offset = 0; ; ) {
+          for (let offset = 0; ;) {
             const { data, error } = await supabase
               .from("products")
               .select("slug")

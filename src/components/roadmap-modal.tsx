@@ -1,5 +1,14 @@
 import { useState, type ReactNode } from "react";
-import { Compass, Calendar, CheckCircle2, CircleDashed, Clock, Sparkles, Tag, ArrowRight } from "lucide-react";
+import {
+  Compass,
+  Calendar,
+  CheckCircle2,
+  CircleDashed,
+  Clock,
+  Sparkles,
+  Tag,
+  ArrowRight,
+} from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -73,7 +82,9 @@ export function RoadmapModal({
         <div className="max-h-[calc(88vh-8rem)] space-y-6 overflow-y-auto px-6 py-6">
           <div className="rounded-lg border border-primary/20 bg-primary/5 p-3.5 text-xs leading-relaxed text-muted-foreground">
             <span className="font-semibold text-foreground">Community-Driven Direction: </span>
-            Our roadmap is prioritized by enterprise platform engineers, security compliance leads, and DevSecOps practitioners. Have a feature request or need a specific vendor sync? Reach out on LinkedIn via the authors section.
+            Our roadmap is prioritized by enterprise platform engineers, security compliance leads,
+            and DevSecOps practitioners. Have a feature request or need a specific vendor sync?
+            Reach out on LinkedIn via the authors section.
           </div>
 
           {ROADMAP_PHASES.map((phase) => {
@@ -93,9 +104,7 @@ export function RoadmapModal({
                       {phase.phase}
                     </span>
                     <span className="text-muted-foreground">·</span>
-                    <span className="text-sm font-semibold text-foreground">
-                      {phase.theme}
-                    </span>
+                    <span className="text-sm font-semibold text-foreground">{phase.theme}</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <span className="flex items-center gap-1 text-xs text-muted-foreground">
