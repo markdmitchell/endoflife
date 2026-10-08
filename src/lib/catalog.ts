@@ -1,4 +1,13 @@
 import { supabase } from "@/integrations/supabase/client";
+import type { Tables } from "@/integrations/supabase/types";
+
+export type CatalogProduct = Pick<Tables<"products">, "id" | "name" | "slug"> &
+  Partial<Omit<Tables<"products">, "id" | "name" | "slug">> & {
+    release_cycles: Array<
+      Pick<Tables<"release_cycles">, "cycle"> &
+        Partial<Omit<Tables<"release_cycles">, "cycle">> & { latest_release?: string }
+    >;
+  };
 
 export type LifecycleStatus = "supported" | "approaching_eol" | "end_of_life";
 
@@ -83,9 +92,9 @@ export async function getCatalog() {
     supabase.from("products").select("*, release_cycles(*)").order("name").range(4000, 4999),
   ]);
 
-  const all: Array<Record<string, unknown>> = [];
+  const all: NonNullable<(typeof batches)[number]["data"]> = [];
   for (const b of batches) {
-    if (b.data) all.push(...(b.data as Array<Record<string, unknown>>));
+    if (b.data) all.push(...b.data);
   }
 
   const seen = new Set<number>();

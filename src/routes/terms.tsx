@@ -6,13 +6,13 @@ export const Route = createFileRoute("/terms")({
   staticData: { sitemap: true },
   head: () => ({
     meta: [
-      { title: "Terms of Service — endoflife.tech" },
+      { title: "Terms of Service | endoflife.tech" },
       {
         name: "description",
         content:
           "Terms of Service governing the use of endoflife.tech platform, catalog data, APIs, and services.",
       },
-      { property: "og:title", content: "Terms of Service — endoflife.tech" },
+      { property: "og:title", content: "Terms of Service | endoflife.tech" },
       {
         property: "og:description",
         content:

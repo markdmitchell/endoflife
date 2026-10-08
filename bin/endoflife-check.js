@@ -22,7 +22,7 @@ const args = process.argv.slice(2);
 
 if (args.includes("--help") || args.length === 0) {
   console.log(`
-\x1b[1m\x1b[32mendoflife-check\x1b[0m — Software Lifecycle & Active Threat Intelligence Gate
+\x1b[1m\x1b[32mendoflife-check\x1b[0m: Software Lifecycle & Active Threat Intelligence Gate
 
 \x1b[1mUSAGE:\x1b[0m
   npx endoflife-check <path-to-sbom.json> [options]
