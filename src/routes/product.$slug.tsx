@@ -43,8 +43,8 @@ function headMeta(slug?: string) {
   const name = displayName(safeSlug);
   const title =
     safeSlug === "python"
-      ? "Python EOL Dates & Support Lifecycle — endoflife.tech"
-      : `${name} lifecycle — endoflife.tech`;
+      ? "Python EOL Dates & Support Lifecycle | endoflife.tech"
+      : `${name} lifecycle | endoflife.tech`;
   const description =
     safeSlug === "python"
       ? "Python end-of-life (EOL) dates and support status for every 3.x release. See which Python versions still receive security fixes and when each branch reaches end of life."
@@ -265,7 +265,7 @@ function ProductPage() {
               </span>
             </h1>
             <span className="text-sm text-muted-foreground">
-              — Vendor: <strong className="text-foreground">{data.vendor || "N/A"}</strong> |
+              Vendor: <strong className="text-foreground">{data.vendor || "N/A"}</strong> |
               Category:{" "}
               <span className="rounded bg-muted px-2 py-0.5 text-xs font-semibold text-foreground">
                 {formatCategoryName(data.category)}
@@ -676,7 +676,7 @@ function ProductPage() {
                         <TableStatusBadge status={c.status || "supported"} />
                       </td>
                       <td className="px-4 py-3.5 font-mono text-xs text-foreground">
-                        {c.latest_version ?? "—"}
+                        {c.latest_version ?? "N/A"}
                       </td>
                     </tr>
                   );
@@ -704,7 +704,7 @@ function PythonEolGuide() {
           ship as source-only security releases.
         </p>
         <p>
-          When a branch reaches its end of life (EOL), it stops receiving all updates — including
+          When a branch reaches its end of life (EOL), it stops receiving all updates, including
           security patches. Running an EOL Python version means newly disclosed vulnerabilities in
           the interpreter and standard library will never be fixed, which is a common compliance and
           audit finding.

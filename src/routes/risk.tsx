@@ -69,13 +69,13 @@ export const Route = createFileRoute("/risk")({
   staticData: { sitemap: true },
   head: () => ({
     meta: [
-      { title: "Enterprise SecOps & EOL Risk Dashboard — endoflife.tech" },
+      { title: "Enterprise SecOps & EOL Risk Dashboard | endoflife.tech" },
       {
         name: "description",
         content:
           "Ingest CycloneDX/SPDX SBOMs, correlate EOL runtimes with CISA KEV exploits, track PCI-DSS 4.0 compliance, and manage risk waivers.",
       },
-      { property: "og:title", content: "Enterprise SecOps & EOL Risk Dashboard — endoflife.tech" },
+      { property: "og:title", content: "Enterprise SecOps & EOL Risk Dashboard | endoflife.tech" },
       {
         property: "og:description",
         content:
@@ -659,7 +659,7 @@ ${kevList.length > 0 ? kevList.map((k) => `* *${k.cveId}* (CVSS ${k.cvss}): ${k.
 ----
 
 h2. Regulatory & Compliance Framework Violations
-${complianceList.length > 0 ? complianceList.map((c) => `* *${c.standard} (${c.section}):* ${c.title} — ${c.mandate}`).join("\n") : "None currently violated."}
+${complianceList.length > 0 ? complianceList.map((c) => `* *${c.standard} (${c.section}):* ${c.title}: ${c.mandate}`).join("\n") : "None currently violated."}
 
 ----
 

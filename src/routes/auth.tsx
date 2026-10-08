@@ -12,9 +12,9 @@ export const Route = createFileRoute("/auth")({
   staticData: { sitemap: false },
   head: () => ({
     meta: [
-      { title: "Sign in — endoflife.tech" },
+      { title: "Sign in | endoflife.tech" },
       { name: "description", content: "Sign in to manage lifecycle data and inventory." },
-      { property: "og:title", content: "Sign in — endoflife.tech" },
+      { property: "og:title", content: "Sign in | endoflife.tech" },
       { property: "og:description", content: "Sign in to manage lifecycle data and inventory." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },

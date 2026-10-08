@@ -28,13 +28,13 @@ export const Route = createFileRoute("/contact")({
   staticData: { sitemap: true },
   head: () => ({
     meta: [
-      { title: "Contact Us — endoflife.tech" },
+      { title: "Contact Us | endoflife.tech" },
       {
         name: "description",
         content:
           "Get in touch with the endoflife.tech team to suggest products, report lifecycle corrections, or discuss enterprise integration.",
       },
-      { property: "og:title", content: "Contact Us — endoflife.tech" },
+      { property: "og:title", content: "Contact Us | endoflife.tech" },
       {
         property: "og:description",
         content:

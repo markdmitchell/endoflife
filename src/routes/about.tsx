@@ -17,17 +17,17 @@ export const Route = createFileRoute("/about")({
   staticData: { sitemap: true },
   head: () => ({
     meta: [
-      { title: "About Us — endoflife.tech" },
+      { title: "About Us | endoflife.tech" },
       {
         name: "description",
         content:
-          "Learn about the mission, origins, and team behind endoflife.tech — the authoritative product lifecycle intelligence platform.",
+          "Learn about the mission, origins, and team behind endoflife.tech, the authoritative product lifecycle intelligence platform.",
       },
-      { property: "og:title", content: "About Us — endoflife.tech" },
+      { property: "og:title", content: "About Us | endoflife.tech" },
       {
         property: "og:description",
         content:
-          "Learn about the mission, origins, and team behind endoflife.tech — the authoritative product lifecycle intelligence platform.",
+          "Learn about the mission, origins, and team behind endoflife.tech, the authoritative product lifecycle intelligence platform.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -66,7 +66,7 @@ function AboutPage() {
             Gathering reliable, timely dates across thousands of packages was an unrelenting
             challenge. High-security government and clinical environments frequently operate on{" "}
             <strong>Extended Support agreements</strong> or{" "}
-            <strong>Long-Term Servicing Channels (LTSC)</strong> — dates that are rarely found in
+            <strong>Long-Term Servicing Channels (LTSC)</strong>. Their support dates are rarely found in
             standard consumer documentation and instead remain scattered across vendor support
             portals, obscure PDF bulletins, and private lifecycle matrices.
           </p>

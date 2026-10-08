@@ -24,13 +24,13 @@ export const Route = createFileRoute("/provenance")({
   staticData: { sitemap: true },
   head: () => ({
     meta: [
-      { title: "Data Provenance & Audit Inspector — endoflife.tech" },
+      { title: "Data Provenance & Audit Inspector | endoflife.tech" },
       {
         name: "description",
         content:
           "Inspect source lineage, original verification URLs, exact collection timestamps, licensing, and confidence for all catalog decisions.",
       },
-      { property: "og:title", content: "Data Provenance & Audit Inspector — endoflife.tech" },
+      { property: "og:title", content: "Data Provenance & Audit Inspector | endoflife.tech" },
       {
         property: "og:description",
         content:
@@ -338,7 +338,7 @@ function ProvenancePage() {
                           {formatAuditTimestamp(r.fetched_at)}
                         </div>
                         <div className="text-[11px] text-muted-foreground">
-                          ISO: {r.fetched_at?.split(".")[0]?.replace("T", " ") ?? "—"}
+                          ISO: {r.fetched_at?.split(".")[0]?.replace("T", " ") ?? "N/A"}
                         </div>
                       </td>
                       <td className="px-4 py-4 align-top">
