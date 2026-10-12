@@ -26,6 +26,12 @@ describe("endoflife-check CLI Gate", () => {
     expect(res.stdout).toContain("SUPPORTED FORMATS");
   });
 
+  it("prints version and exits with 0 on --version", async () => {
+    const res = await runCli(["--version"]);
+    expect(res.code).toBe(0);
+    expect(res.stdout).toContain("endoflife-check v1.2.0");
+  });
+
   it("fails with exit code 1 when no file argument is passed", async () => {
     const res = await runCli([]);
     expect(res.code).toBe(1);

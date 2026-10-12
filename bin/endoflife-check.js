@@ -20,6 +20,11 @@ import path from "node:path";
 
 const args = process.argv.slice(2);
 
+if (args.includes("--version") || args.includes("-v")) {
+  console.log("endoflife-check v1.2.0");
+  process.exit(0);
+}
+
 if (args.includes("--help") || args.length === 0) {
   console.log(`
 \x1b[1m\x1b[32mendoflife-check\x1b[0m — Software Lifecycle & Active Threat Intelligence Gate
