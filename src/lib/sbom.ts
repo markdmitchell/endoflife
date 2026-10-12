@@ -38,6 +38,30 @@ export interface SbomParseResult {
   unmatchedComponents: Array<{ name: string; version: string }>;
 }
 
+interface ScannerPackage {
+  name?: string;
+  version?: string | number;
+  versionInfo?: string | number;
+  description?: string;
+  Name?: string;
+  Version?: string | number;
+}
+
+interface ScannerDocument {
+  bomFormat?: string;
+  specVersion?: string;
+  metadata?: { component?: { name?: string } };
+  components?: ScannerPackage[];
+  spdxVersion?: string;
+  name?: string;
+  packages?: ScannerPackage[];
+  SchemaVersion?: number;
+  ArtifactName?: string;
+  Results?: Array<{ Packages?: ScannerPackage[] }>;
+  artifacts?: ScannerPackage[];
+  source?: { target?: string };
+}
+
 function calculateRisk(eolDate: string | null): {
   risk_level: "CRITICAL (EOL)" | "HIGH" | "LOW";
   days_to_eol: number;
@@ -86,7 +110,7 @@ export function parseSbom(
   catalog: CatalogProduct[],
   defaultEnvironmentName?: string,
 ): SbomParseResult {
-  let json: Record<string, unknown>;
+  let json: ScannerDocument;
   try {
     json = JSON.parse(rawText);
   } catch (e) {
@@ -100,7 +124,7 @@ export function parseSbom(
     unmatchedComponents: [],
   };
 
-  const extracted: Array<{ name: string; version: string; description?: string }> = [];
+  const extracted: Array<{ name: string; version: string; description?: string | undefined }> = [];
   let envName = defaultEnvironmentName || "Container / Workload Fleet";
 
   // 1. Detect CycloneDX (JSON)
@@ -224,7 +248,7 @@ export function parseSbom(
       // Upgrade path to next supported LTS
       const supportedCycles = cycles.filter((c) => c.status === "supported");
       if (supportedCycles.length > 0) {
-        targetUpgrade = `${matchedProduct.name} ${supportedCycles[0].cycle} LTS`;
+        targetUpgrade = `${matchedProduct.name} ${supportedCycles[0]?.cycle} LTS`;
       }
     }
 

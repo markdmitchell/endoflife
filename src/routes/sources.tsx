@@ -19,13 +19,13 @@ export const Route = createFileRoute("/sources")({
   staticData: { sitemap: true },
   head: () => ({
     meta: [
-      { title: "Integrated Data Sources Registry — endoflife.tech" },
+      { title: "Integrated Data Sources Registry | endoflife.tech" },
       {
         name: "description",
         content:
           "Comprehensive directory of all 41 primary APIs, vendor portals, standards (TEA / ECMA-428 CLE), and aggregators powering the database.",
       },
-      { property: "og:title", content: "Integrated Data Sources Registry — endoflife.tech" },
+      { property: "og:title", content: "Integrated Data Sources Registry | endoflife.tech" },
       {
         property: "og:description",
         content:

@@ -4,7 +4,7 @@ All notable changes to **[endoflife.tech](https://endoflife.tech)** are document
 
 ---
 
-## [v1.2.0] — October 2026
+## [v1.2.0]: October 2026
 
 ### 🛡️ Enterprise SecOps, AppSec, GRC & Fleet Risk Engine
 - **Machine-Readable SBOM & Inventory Ingestion (`/risk`)**:
@@ -45,7 +45,7 @@ All notable changes to **[endoflife.tech](https://endoflife.tech)** are document
 
 ---
 
-## [v1.0.0] — September 21, 2026
+## [v1.0.0]: September 21, 2026
 
 ### 🚀 General Availability Launch
 - **Enterprise Suite & Vendor Sync**: Added live synchronization modules for Atlassian, Cisco, IBM, OpenText, SAP, ServiceNow, and Splunk catalogs.
@@ -56,7 +56,7 @@ All notable changes to **[endoflife.tech](https://endoflife.tech)** are document
 
 ---
 
-## [v0.9.0b] — September 2026
+## [v0.9.0b]: September 2026
 
 ### ☁️ Cloud Integration & Architecture Overhaul
 - **Supabase Database Architecture**: Migrated core storage to managed PostgreSQL with Row Level Security (RLS) policies and optimized RPC query functions.
@@ -66,7 +66,7 @@ All notable changes to **[endoflife.tech](https://endoflife.tech)** are document
 
 ---
 
-## [v0.5.0] — August 2026
+## [v0.5.0]: August 2026
 
 ### 📦 First Public GitHub Release
 - **GitHub Community Publication**: Published the official codebase and repository to GitHub for public collaboration.
@@ -76,7 +76,7 @@ All notable changes to **[endoflife.tech](https://endoflife.tech)** are document
 
 ---
 
-## [v0.1.0b] — August 2026
+## [v0.1.0b]: August 2026
 
 ### 🌱 Initial Prototype & Foundations
 - **Core Lifecycle Data Model**: Relational schemas for products, release cycles, and support windows.

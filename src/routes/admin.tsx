@@ -34,12 +34,12 @@ export const Route = createFileRoute("/admin")({
   head: () => ({
     meta: [
       { name: "robots", content: "noindex" },
-      { title: "Administration — endoflife.tech" },
+      { title: "Administration | endoflife.tech" },
       {
         name: "description",
         content: "Manage lifecycle sources, records, and enterprise synchronization.",
       },
-      { property: "og:title", content: "Administration — endoflife.tech" },
+      { property: "og:title", content: "Administration | endoflife.tech" },
       {
         property: "og:description",
         content: "Manage lifecycle sources, records, and enterprise synchronization.",

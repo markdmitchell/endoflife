@@ -6,13 +6,13 @@ export const Route = createFileRoute("/privacy")({
   staticData: { sitemap: true },
   head: () => ({
     meta: [
-      { title: "Privacy Policy — endoflife.tech" },
+      { title: "Privacy Policy | endoflife.tech" },
       {
         name: "description",
         content:
           "Privacy Policy for endoflife.tech. Transparent data protection, minimal telemetry, and zero sale of personal information.",
       },
-      { property: "og:title", content: "Privacy Policy — endoflife.tech" },
+      { property: "og:title", content: "Privacy Policy | endoflife.tech" },
       {
         property: "og:description",
         content:
