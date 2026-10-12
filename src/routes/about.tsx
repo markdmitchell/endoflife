@@ -66,9 +66,9 @@ function AboutPage() {
             Gathering reliable, timely dates across thousands of packages was an unrelenting
             challenge. High-security government and clinical environments frequently operate on{" "}
             <strong>Extended Support agreements</strong> or{" "}
-            <strong>Long-Term Servicing Channels (LTSC)</strong>. Their support dates are rarely found in
-            standard consumer documentation and instead remain scattered across vendor support
-            portals, obscure PDF bulletins, and private lifecycle matrices.
+            <strong>Long-Term Servicing Channels (LTSC)</strong>. Their support dates are rarely
+            found in standard consumer documentation and instead remain scattered across vendor
+            support portals, obscure PDF bulletins, and private lifecycle matrices.
           </p>
           <p>
             Colleague <strong>James Shenberger</strong> built early automation to help manage the

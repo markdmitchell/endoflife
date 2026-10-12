@@ -187,9 +187,7 @@ function ProductPage() {
     queryFn: () => (slug ? getProduct(slug) : null),
     enabled: Boolean(slug),
     initialData: () => {
-      const catalog = queryClient.getQueryData<Awaited<ReturnType<typeof getCatalog>>>(
-        ["catalog"],
-      );
+      const catalog = queryClient.getQueryData<Awaited<ReturnType<typeof getCatalog>>>(["catalog"]);
       if (Array.isArray(catalog)) {
         const found = catalog.find((p) => p.slug === slug);
         if (found && Array.isArray(found.release_cycles) && found.release_cycles.length > 0) {
