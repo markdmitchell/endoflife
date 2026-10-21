@@ -45,9 +45,9 @@ export async function handleRemediation(request: Request) {
   const iterator = call.result.fullStream[Symbol.asyncIterator]();
   // The SDK initiates the upstream request when iteration starts. Wait only for headers/first event, not the answer.
   let first;
-  try { first = await iterator.next(); }
+  try { first = await iterator.next(); await call.gateway.waitForRunId(); }
   catch { return fail(upstreamError?.message ?? "Lovable AI could not start this request.", upstreamError?.status ?? (request.signal.aborted ? 499 : 502)); }
-  if (upstreamError) return fail(upstreamError.message, upstreamError.status);
+  if (upstreamError) { await iterator.return?.(); return fail(upstreamError.message, upstreamError.status); }
   const encoder = new TextEncoder();
   let outputSeen = false;
   const body = new ReadableStream<Uint8Array>({
@@ -71,5 +71,8 @@ export async function handleRemediation(request: Request) {
     },
     async cancel() { await iterator.return?.(); },
   });
-  return new Response(body, { headers: { "Content-Type": "application/x-ndjson", "Cache-Control": "no-cache, no-store, no-transform" } });
+  const headers = new Headers({ "Content-Type": "application/x-ndjson", "Cache-Control": "no-cache, no-store, no-transform" });
+  const runId = call.gateway.getRunId();
+  if (runId) headers.set("X-Lovable-AIG-Run-ID", runId);
+  return new Response(body, { headers });
 }
