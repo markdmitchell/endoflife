@@ -1,5 +1,5 @@
 # AI remediation priorities
 
-- [ ] Add an authenticated AI Gateway analysis of the uploaded risk inventory.
-- [ ] Add data minimization, streaming progress, Stop, and export controls.
-- [ ] Verify signed-in upload and analysis, input rules, and gateway errors.
+- [x] Add an authenticated AI Gateway analysis of the uploaded risk inventory.
+- [x] Add data minimization, streaming progress, Stop, and export controls.
+- [x] Verify signed-in upload and analysis, input rules, and gateway errors.
