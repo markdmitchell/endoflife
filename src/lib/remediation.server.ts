@@ -45,7 +45,7 @@ export async function handleRemediation(request: Request) {
   const iterator = call.result.fullStream[Symbol.asyncIterator]();
   // The SDK initiates the upstream request when iteration starts. Wait only for headers/first event, not the answer.
   let first;
-  try { first = await iterator.next(); await call.gateway.waitForRunId(); }
+  try { first = await iterator.next(); await call.responseInspected; }
   catch { return fail(upstreamError?.message ?? "Lovable AI could not start this request.", upstreamError?.status ?? (request.signal.aborted ? 499 : 502)); }
   if (upstreamError) { await iterator.return?.(); return fail(upstreamError.message, upstreamError.status); }
   const encoder = new TextEncoder();

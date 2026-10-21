@@ -14,14 +14,18 @@ export function createResponsesCall(
   instructions?: string,
 ) {
   const runIdFetch = createLovableAiGatewayRunIdFetch(getLovableAiGatewayRunId(request));
+  let inspected = () => {};
+  const responseInspected = new Promise<void>(resolve => { inspected = resolve; });
   const provider = createOpenAI({
     baseURL: `${config.baseURL.replace(/\/+$/, "").replace(/\/v1$/, "")}/v1`,
     apiKey: config.apiKey,
     headers: { "Lovable-API-Key": config.apiKey, "X-Lovable-AIG-SDK": "vercel-ai-sdk" },
     fetch: async (input, init) => {
-      const response = await runIdFetch.fetch(input, init);
-      await config.inspectResponse?.(response);
-      return response;
+      try {
+        const response = await runIdFetch.fetch(input, init);
+        await config.inspectResponse?.(response);
+        return response;
+      } finally { inspected(); }
     },
   });
   const reasoning = config.model !== "openai/chat-latest";
@@ -47,6 +51,7 @@ export function createResponsesCall(
     },
   });
   return {
+    responseInspected,
     gateway: runIdFetch,
     result,
     response: () =>
