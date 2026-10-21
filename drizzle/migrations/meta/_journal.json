@@ -22,6 +22,13 @@
       "when": 1790035800000,
       "tag": "0002_restore_public_rpc_functions",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1792625910934,
+      "tag": "0003_ai_gateway_access_state",
+      "breakpoints": true
     }
   ]
 }

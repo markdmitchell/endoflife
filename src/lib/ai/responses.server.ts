@@ -1,0 +1,60 @@
+import { createOpenAI } from "@ai-sdk/openai";
+import { streamText, type ModelMessage } from "ai";
+
+import {
+  createLovableAiGatewayRunIdFetch,
+  getLovableAiGatewayRunId,
+  withLovableAiGatewayRunIdHeader,
+} from "./run-id.server.ts";
+
+export function createResponsesCall(
+  request: Request,
+  config: { baseURL: string; apiKey: string; model: string; inspectResponse?: (response: Response) => Promise<void> },
+  messages: ModelMessage[],
+  instructions?: string,
+) {
+  const runIdFetch = createLovableAiGatewayRunIdFetch(getLovableAiGatewayRunId(request));
+  let inspected = () => {};
+  const responseInspected = new Promise<void>(resolve => { inspected = resolve; });
+  const provider = createOpenAI({
+    baseURL: `${config.baseURL.replace(/\/+$/, "").replace(/\/v1$/, "")}/v1`,
+    apiKey: config.apiKey,
+    headers: { "Lovable-API-Key": config.apiKey, "X-Lovable-AIG-SDK": "vercel-ai-sdk" },
+    fetch: async (input, init) => {
+      try {
+        const response = await runIdFetch.fetch(input, init);
+        await config.inspectResponse?.(response);
+        return response;
+      } finally { inspected(); }
+    },
+  });
+  const reasoning = config.model !== "openai/chat-latest";
+  const result = streamText({
+    model: provider.responses(config.model),
+    // AI SDK 6 lacks `instructions`: rename this key to `system` there.
+    ...(instructions ? { instructions } : {}),
+    maxRetries: 0,
+    messages,
+    abortSignal: request.signal,
+    providerOptions: {
+      openai: {
+        store: false,
+        ...(reasoning
+          ? {
+              forceReasoning: true,
+              reasoningEffort: "medium",
+              reasoningSummary: "auto",
+              include: ["reasoning.encrypted_content"],
+            }
+          : {}),
+      },
+    },
+  });
+  return {
+    responseInspected,
+    gateway: runIdFetch,
+    result,
+    response: () =>
+      withLovableAiGatewayRunIdHeader(result.toUIMessageStreamResponse({ sendReasoning: true }), runIdFetch),
+  };
+}

@@ -8,3 +8,8 @@
 > Commits you push to the connected branch sync back to Lovable and show up in
 > the editor, so keep the branch in a working state.
 <!-- LOVABLE:END -->
+
+## AI remediation
+- Keep AI remediation on the existing Risk inventory screen and project asset labels locally; send only the explicitly selected analysis fields to minimize enterprise data disclosure.
+- Use authenticated streaming server routes for AI remediation and server-only AI SDK Responses helpers; this keeps secrets off the browser and supports explicit cancellation.
+- Persist AI provider access denials in the service-only circuit breaker table; stateless workers cannot safely retain terminal denial state in memory.

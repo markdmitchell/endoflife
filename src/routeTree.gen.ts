@@ -20,6 +20,7 @@ import { Route as RiskRouteImport } from './routes/risk'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as SourcesRouteImport } from './routes/sources'
 import { Route as TermsRouteImport } from './routes/terms'
+import { Route as ApiRemediationRouteImport } from './routes/api/remediation'
 import { Route as ProductSlugRouteImport } from './routes/product.$slug'
 
 const IndexRoute = IndexRouteImport.update({
@@ -77,6 +78,11 @@ const TermsRoute = TermsRouteImport.update({
   path: '/terms',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiRemediationRoute = ApiRemediationRouteImport.update({
+  id: '/api/remediation',
+  path: '/api/remediation',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ProductSlugRoute = ProductSlugRouteImport.update({
   id: '/product/$slug',
   path: '/product/$slug',
@@ -95,6 +101,7 @@ export interface FileRoutesByFullPath {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/sources': typeof SourcesRoute
   '/terms': typeof TermsRoute
+  '/api/remediation': typeof ApiRemediationRoute
   '/product/$slug': typeof ProductSlugRoute
 }
 export interface FileRoutesByTo {
@@ -109,6 +116,7 @@ export interface FileRoutesByTo {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/sources': typeof SourcesRoute
   '/terms': typeof TermsRoute
+  '/api/remediation': typeof ApiRemediationRoute
   '/product/$slug': typeof ProductSlugRoute
 }
 export interface FileRoutesById {
@@ -124,6 +132,7 @@ export interface FileRoutesById {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/sources': typeof SourcesRoute
   '/terms': typeof TermsRoute
+  '/api/remediation': typeof ApiRemediationRoute
   '/product/$slug': typeof ProductSlugRoute
 }
 export interface FileRouteTypes {
@@ -140,6 +149,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/sources'
     | '/terms'
+    | '/api/remediation'
     | '/product/$slug'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -154,6 +164,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/sources'
     | '/terms'
+    | '/api/remediation'
     | '/product/$slug'
   id:
     | '__root__'
@@ -168,6 +179,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/sources'
     | '/terms'
+    | '/api/remediation'
     | '/product/$slug'
   fileRoutesById: FileRoutesById
 }
@@ -183,6 +195,7 @@ export interface RootRouteChildren {
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   SourcesRoute: typeof SourcesRoute
   TermsRoute: typeof TermsRoute
+  ApiRemediationRoute: typeof ApiRemediationRoute
   ProductSlugRoute: typeof ProductSlugRoute
 }
 
@@ -265,6 +278,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TermsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/remediation': {
+      id: '/api/remediation'
+      path: '/api/remediation'
+      fullPath: '/api/remediation'
+      preLoaderRoute: typeof ApiRemediationRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/product/$slug': {
       id: '/product/$slug'
       path: '/product/$slug'
@@ -287,6 +307,7 @@ const rootRouteChildren: RootRouteChildren = {
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   SourcesRoute: SourcesRoute,
   TermsRoute: TermsRoute,
+  ApiRemediationRoute: ApiRemediationRoute,
   ProductSlugRoute: ProductSlugRoute,
 }
 export const routeTree = rootRouteImport
