@@ -221,6 +221,27 @@ export type Database = {
         }
         Relationships: []
       }
+      inventory_action_status: {
+        Row: {
+          asset_key: string
+          owner_id: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          asset_key: string
+          owner_id?: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          asset_key?: string
+          owner_id?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       products: {
         Row: {
           category: string
