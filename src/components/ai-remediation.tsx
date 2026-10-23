@@ -7,8 +7,9 @@ import { Textarea } from "@/components/ui/textarea";
 import { supabase } from "@/integrations/supabase/client";
 import { prepareRemediationAssets } from "@/lib/remediation";
 import type { SbomParsedEnvironment } from "@/lib/sbom";
+import { actionStatus, type ActionRecords } from "@/lib/action-tracking";
 
-export function AiRemediation({ environments, isSampleData }: { environments: SbomParsedEnvironment[]; isSampleData: boolean }) {
+export function AiRemediation({ environments, isSampleData, actionRecords = {} }: { environments: SbomParsedEnvironment[]; isSampleData: boolean; actionRecords?: ActionRecords }) {
   const [context, setContext] = useState("");
   const [includeNames, setIncludeNames] = useState(false);
   const [consent, setConsent] = useState(false);
@@ -31,7 +32,10 @@ export function AiRemediation({ environments, isSampleData }: { environments: Sb
     try {
       const response = await fetch("/api/remediation", { method: "POST", signal: controller.signal,
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${data.session.access_token}` },
-        body: JSON.stringify({ assets: prepareRemediationAssets(environments, includeNames), context }),
+        body: JSON.stringify({ assets: prepareRemediationAssets(environments, includeNames).map((asset, index) => {
+          const env = environments[index];
+          return { ...asset, migrationStatus: env ? actionStatus(env, actionRecords) : asset.migrationStatus };
+        }), context }),
       });
       if (!response.ok) { const body = await response.json(); if (response.status === 401) setNeedsSignIn(true); throw new Error(body.message || "Analysis is unavailable."); }
       if (!response.body) throw new Error("No analysis was returned.");
@@ -56,7 +60,8 @@ export function AiRemediation({ environments, isSampleData }: { environments: Sb
     } finally { setBusy(false); abort.current = null; }
   }
   function download() {
-    const blob = new Blob([`EOL remediation priorities\n${status}\n${isSampleData ? "Sample inventory" : "Uploaded inventory"}\n\n${result}\n\nAI-generated advisory. Validate support dates and upgrade targets before making changes.`], { type: "text/plain" });
+    const tracking = environments.map((env, index) => `${includeNames ? env.deployment_env : `Asset ${index + 1}`} (${env.platform} ${env.version}): ${actionStatus(env, actionRecords)}`).join("\n");
+    const blob = new Blob([`EOL remediation priorities\n${status}\n${isSampleData ? "Sample inventory" : "Uploaded inventory"}\n\n${result}\n\nCurrent action statuses\n${tracking}\n\nAI-generated advisory. Validate support dates and upgrade targets before making changes.`], { type: "text/plain" });
     const url = URL.createObjectURL(blob); const link = document.createElement("a"); link.href = url; link.download = "eol-remediation-plan.txt"; link.click(); URL.revokeObjectURL(url);
   }
   return <section className="mb-6 border-y border-border py-6" aria-labelledby="ai-remediation-title">
