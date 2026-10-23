@@ -21,7 +21,7 @@ import path from "node:path";
 const args = process.argv.slice(2);
 
 if (args.includes("--version") || args.includes("-v")) {
-  console.log("endoflife-check v1.2.0");
+  console.log("endoflife-check v1.3.0");
   process.exit(0);
 }
 
