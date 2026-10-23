@@ -9,6 +9,20 @@ export interface ReleaseNote {
 
 export const RELEASES: ReleaseNote[] = [
   {
+    version: "v1.3.0",
+    badge: "AI Remediation",
+    releaseDate: "October 23, 2026",
+    title: "AI Remediation Priorities & Asset Action Tracking",
+    tagline:
+      "Prioritize inventory remediation with Lovable AI and track planned, in-progress, and remediated actions alongside outstanding end-of-life risk.",
+    highlights: [
+      "AI Remediation Priorities: Generate advisory remediation plans from uploaded inventories and optional business context, with anonymized asset labels by default, explicit consent, streaming results, Stop, and downloadable plans.",
+      "Saved Asset Action Statuses: Mark assets as Planned, In progress, or Remediated. Account-saved statuses survive reimport of the same environment, product, and installed version; demo changes are not saved.",
+      "Outstanding EOL Action Monitoring: Track open EOL actions separately from still-reported EOL versions. Self-reported completion does not establish verified support or clear observed lifecycle risk.",
+      "Operational Follow-through: Filter inventories by action status, export statuses and update timestamps to CSV, and include current statuses in downloaded AI plans.",
+    ],
+  },
+  {
     version: "v1.2.0",
     badge: "Enterprise SecOps & Scale",
     releaseDate: "October 2026",

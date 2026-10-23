@@ -145,7 +145,7 @@ export function AppShell({ children }: { children: ReactNode }) {
                   title="View What's New & Release Notes"
                 >
                   <Sparkles className="size-3 text-primary" />
-                  <span>{RELEASES[0]?.version ?? "v1.2.0"}</span>
+                  <span>{RELEASES[0]?.version ?? "v1.3.0"}</span>
                   <span className="rounded bg-primary/15 px-1 py-0.2 text-[9px] font-bold uppercase tracking-wider text-primary">
                     {RELEASES[0]?.badge?.includes("SecOps")
                       ? "SecOps"

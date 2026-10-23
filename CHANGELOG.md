@@ -4,6 +4,17 @@ All notable changes to **[endoflife.tech](https://endoflife.tech)** are document
 
 ---
 
+## [v1.3.0]: October 23, 2026
+
+### AI Remediation Priorities & Asset Action Tracking
+- Generate advisory remediation priorities on the Risk inventory screen using Lovable AI, with optional business context, anonymized asset labels by default, explicit consent, streaming results, cancellation, and downloadable plans.
+- Save per-asset Planned, In progress, and Remediated statuses to the signed-in user's account. Statuses match the same environment, product, and installed version across reimports; demo changes remain unsaved.
+- Monitor outstanding EOL actions separately from still-reported EOL versions. Self-reported remediation does not verify support or erase observed lifecycle risk.
+- Filter inventories by action status, export statuses and update timestamps to CSV, and include current action statuses in downloaded remediation plans.
+- Inventory uploads remain session-only; raw uploads and AI recommendations are not persisted by action tracking.
+
+---
+
 ## [v1.2.0]: October 2026
 
 ### 🛡️ Enterprise SecOps, AppSec, GRC & Fleet Risk Engine
